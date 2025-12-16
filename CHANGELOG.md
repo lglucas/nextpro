@@ -5,6 +5,18 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-12-16
+### Changed
+- **Infra:** Migração do Supabase Local (Docker) para Supabase Cloud para reduzir complexidade e uso de disco.
+- **Config:** Removidos scripts e configurações locais do Docker (`supabase/` folder).
+- **Setup:** Atualizado fluxo de setup para usar `.env` com credenciais da nuvem.
+
+## [0.2.3] - 2025-12-16
+### Fixed
+- **Auth:** Corrigido bug de "Tela Branca" ao adicionar UI de Loading (`Spinner`) no `AuthContext`.
+- **Debug:** Adicionados logs no ciclo de vida de autenticação para facilitar diagnóstico.
+- **Config:** Criado arquivo `.env` padrão para evitar falhas de inicialização do Supabase Client.
+
 ## [0.2.2] - 2025-12-16
 ### Added
 - **Auth:** Implementado `AuthContext` para gerenciar estado de sessão global.
