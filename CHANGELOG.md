@@ -5,6 +5,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-12-16
+### Added
+- **Auth:** Implementada página de Cadastro (`Register.tsx`) funcional.
+- **Backend:** Criado script SQL (`migrations/init_auth_roles.sql`) para gerenciar Roles e Perfis.
+- **Context:** Atualizado `AuthContext` para suportar RBAC (Role-Based Access Control) via tabela `profiles`.
+
 ## [0.2.4] - 2025-12-16
 ### Changed
 - **Infra:** Migração do Supabase Local (Docker) para Supabase Cloud para reduzir complexidade e uso de disco.
