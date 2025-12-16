@@ -1,0 +1,25 @@
+{
+  "name": "superappfutebol",
+  "version": "1.0.0",
+  "description": "> \"O futuro do esporte começa na base.\"",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "npm run dev --prefix apps/web",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lglucas/nextpro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lglucas/nextpro/issues"
+  },
+  "homepage": "https://github.com/lglucas/nextpro#readme"
+}
