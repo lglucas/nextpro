@@ -24,80 +24,148 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Função auxiliar para buscar o perfil
-  const fetchProfile = async (userId: string) => {
+  // Função auxiliar para buscar o perfil com timeout e self-healing
+  const fetchProfile = async (userId: string, userEmail?: string) => {
     try {
-      const { data, error } = await supabase
+      console.log('AuthContext: Buscando perfil para', userId)
+      
+      // Promise race para timeout de 5 segundos
+      const fetchPromise = supabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single()
-      
+        
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout ao buscar perfil')), 5000)
+      )
+
+      const result: any = await Promise.race([fetchPromise, timeoutPromise])
+      const { data, error } = result
+
       if (error) {
-        console.warn('AuthContext: Perfil não encontrado ou erro:', error.message)
-        return null
+        // Se o erro for "Row not found" (PGRST116), tenta criar o perfil (Self-healing)
+        if (error.code === 'PGRST116') {
+          console.warn('AuthContext: Perfil não encontrado. Tentando criar perfil padrão...')
+          
+          const newProfile = {
+            id: userId,
+            email: userEmail,
+            role: 'user', // Default role
+            full_name: userEmail?.split('@')[0] || 'Usuário'
+          }
+
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert(newProfile)
+
+          if (insertError) {
+            console.error('AuthContext: Falha ao criar perfil automático:', insertError)
+            return 'user' // Fallback seguro
+          }
+
+          console.log('AuthContext: Perfil criado automaticamente!')
+          return 'user'
+        }
+        
+        console.warn('AuthContext: Erro genérico ao buscar perfil:', error.message)
+        return 'user' // Fallback para não travar
       }
+      
       return data?.role || 'user'
     } catch (err) {
-      console.error('AuthContext: Erro ao buscar perfil:', err)
-      return null
+      console.error('AuthContext: Erro crítico ao buscar perfil:', err)
+      return 'user' // Fallback seguro
     }
   }
 
   useEffect(() => {
+    let mounted = true
     console.log('AuthContext: Inicializando...')
     
-    // Busca sessão inicial
-    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-      if (error) {
-        console.error('AuthContext: Erro ao buscar sessão:', error)
-      } else {
-        console.log('AuthContext: Sessão encontrada:', session ? 'Sim' : 'Não')
+    // Função unificada de carga
+    const loadSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) throw error
+        
+        if (mounted) {
+          setSession(session)
+          setUser(session?.user ?? null)
+          
+          if (session?.user) {
+            const userRole = await fetchProfile(session.user.id, session.user.email)
+            if (mounted) setRole(userRole)
+          }
+        }
+      } catch (err) {
+        console.error('AuthContext: Erro ao carregar sessão:', err)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+
+    loadSession()
+
+    // Escuta mudanças de auth
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('AuthContext: Mudança de estado:', _event)
+      
+      if (mounted) {
         setSession(session)
         setUser(session?.user ?? null)
         
         if (session?.user) {
-          const userRole = await fetchProfile(session.user.id)
-          setRole(userRole)
+          // Só busca perfil se for login ou token refresh
+          if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED' || _event === 'INITIAL_SESSION') {
+             const userRole = await fetchProfile(session.user.id, session.user.email)
+             setRole(userRole)
+          }
+        } else if (_event === 'SIGNED_OUT') {
+          setRole(null)
         }
+        
+        setLoading(false)
       }
-      setLoading(false)
-    }).catch(err => {
-      console.error('AuthContext: Erro crítico:', err)
-      setLoading(false)
     })
 
-    // Escuta mudanças de auth (login, logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('AuthContext: Mudança de estado:', _event)
-      setSession(session)
-      setUser(session?.user ?? null)
-      
-      if (session?.user) {
-        // Se acabou de logar, busca a role
-        const userRole = await fetchProfile(session.user.id)
-        setRole(userRole)
-      } else {
-        setRole(null)
-      }
-      
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signOut = async () => {
+    setLoading(true)
     await supabase.auth.signOut()
     setRole(null)
+    setSession(null)
+    setUser(null)
+    setLoading(false)
   }
 
+  // Tela de Loading com Botão de Emergência
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-medium">Carregando NextPro...</p>
+        <div className="flex flex-col items-center gap-6 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          
+          <div className="text-center space-y-2">
+            <p className="text-slate-900 font-medium">Carregando NextPro...</p>
+            <p className="text-xs text-slate-400">Verificando credenciais e permissões</p>
+          </div>
+
+          <button 
+            onClick={() => {
+              supabase.auth.signOut()
+              window.location.reload()
+            }}
+            className="text-xs text-red-500 hover:text-red-700 underline mt-4"
+          >
+            Demorando muito? Sair e recarregar
+          </button>
         </div>
       </div>
     )

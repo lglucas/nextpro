@@ -5,6 +5,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-12-16
+### Added
+- **Layout:** Implementado `AppLayout` (Consumer) e `DashboardLayout` (Admin) com navegação distinta.
+- **Home:** Criada Landing Page (`HomePage`) para usuários logados.
+- **Nav:** Barra de navegação com link condicional para "Área Administrativa" (apenas SuperAdmin/Partner).
+- **Resilience:** Adicionado *Self-Healing* no `AuthContext` para criar perfis ausentes automaticamente.
+- **Logs:** Criada tabela `audit_logs` e widget de logs no Dashboard.
+
 ## [0.2.5] - 2025-12-16
 ### Added
 - **Auth:** Implementada página de Cadastro (`Register.tsx`) funcional.

@@ -34,8 +34,13 @@
 - **RBAC Foundation:** Implementada lógica de Roles (SuperAdmin vs User) e tabela `profiles` com triggers automáticos.
 - **Bug Fix:** Migração forçada de Docker para Supabase Cloud devido a instabilidades no ambiente Windows.
 
-### 🏗️ Sprint 2: Gestão de Entidades (22/12 - 28/12)
-**Objetivo:** O SuperAdmin consegue criar uma Escolinha e o Dono da Escolinha consegue entrar.
+### 🏗️ Sprint 2: Gestão de Entidades & Dashboard (22/12 - 28/12)
+**Status:** 🏃 Em Andamento
+**Objetivo:** O SuperAdmin consegue visualizar KPIs globais e gerenciar Escolinhas. Sócios têm visão de leitura.
+- [ ] **Dashboard Layout:** Sidebar responsiva, Header com perfil.
+- [ ] **BI & KPIs:** Cards de métricas (Alunos Totais, Receita, etc) e Widget de Logs.
+- [ ] **Role 'Partner':** Acesso read-only ao Dashboard para sócios.
+- [ ] **Cantinho do CTO:** Área restrita para SuperAdmin com configs avançadas e Logs de Auditoria.
 - [ ] **Painel SuperAdmin:** CRUD de `Organizations` e `Schools`.
 - [ ] **Painel SchoolAdmin:** Dashboard inicial (vazio) e CRUD de `Classes` (Turmas) e `Coaches` (Técnicos).
 - [ ] **Convite de Usuário:** Sistema de envio de e-mail para Técnico ativar a conta.
