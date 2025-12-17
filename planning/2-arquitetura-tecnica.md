@@ -19,8 +19,8 @@
 - **Roteamento:** React Router 6 (Data Router)
 
 ### Backend (Serverless)
-- **Plataforma:** Supabase (BaaS)
-- **Banco de Dados:** PostgreSQL 15+
+- **Plataforma:** Supabase Cloud (BaaS) - *Migrado de Docker Local (Ver ADR-001)*
+- **Banco de Dados:** PostgreSQL 15+ (Gerenciado)
 - **Auth:** Supabase Auth (JWT)
 - **API/Lógica:** Supabase Edge Functions (Deno/TypeScript)
 - **Storage:** Supabase Storage (Buckets privados com RLS)

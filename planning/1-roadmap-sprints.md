@@ -21,12 +21,18 @@
 ## 🛠️ Detalhamento por Sprint
 
 ### 🏁 Sprint 1: O "Hello World" Profissional (15/12 - 21/12)
+**Status:** ✅ Concluído (com adiantamentos)
 **Objetivo:** Ter o ambiente de desenvolvimento pronto, CI/CD configurado e Banco de Dados estruturado.
-- [ ] **Setup Monorepo:** Configurar Turborepo (Apps: Web, Admin; Packages: UI, Config).
-- [ ] **Setup Supabase:** Criar projeto, configurar Auth (Email/Senha + Google) e Storage.
-- [ ] **Database Schema V1:** Criar tabelas `organizations`, `schools`, `users`, `profiles`.
-- [ ] **Frontend Skeleton:** Instalar React, Tailwind, Framer Motion e configurar i18n (i18next).
-- [ ] **Deploy Inicial:** Configurar Pipeline de Deploy no cPanel (apenas "Hello World").
+- [x] **Setup Monorepo:** Configurar Turborepo (Apps: Web, Admin; Packages: UI, Config).
+- [x] **Setup Supabase:** Criar projeto, configurar Auth (Email/Senha + Google) e Storage.
+- [x] **Database Schema V1:** Criar tabelas `organizations`, `schools`, `users`, `profiles`.
+- [x] **Frontend Skeleton:** Instalar React, Tailwind, Framer Motion e configurar i18n (i18next).
+- [ ] **Deploy Inicial:** Configurar Pipeline de Deploy no cPanel (apenas "Hello World"). (Pendente: Aguardando credenciais)
+
+**🚀 Extras Realizados (Adiantamento de Sprints Futuras):**
+- **Auth Completo:** Implementadas telas de Login e Registro funcionais (adiantado da Sprint 2/3).
+- **RBAC Foundation:** Implementada lógica de Roles (SuperAdmin vs User) e tabela `profiles` com triggers automáticos.
+- **Bug Fix:** Migração forçada de Docker para Supabase Cloud devido a instabilidades no ambiente Windows.
 
 ### 🏗️ Sprint 2: Gestão de Entidades (22/12 - 28/12)
 **Objetivo:** O SuperAdmin consegue criar uma Escolinha e o Dono da Escolinha consegue entrar.
