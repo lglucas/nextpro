@@ -1,16 +1,44 @@
-import { BarChart3, TrendingUp, Users, Wallet } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Wallet, GraduationCap } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { generateDashboardReport } from '@/utils/pdf'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export function DashboardPage() {
   const { user, role } = useAuth()
+  const [realStats, setRealStats] = useState({
+    students: 0,
+    classes: 0
+  })
 
-  // Mock Data
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { count: studentsCount } = await supabase
+          .from('students')
+          .select('*', { count: 'exact', head: true })
+
+        const { count: classesCount } = await supabase
+          .from('classes')
+          .select('*', { count: 'exact', head: true })
+
+        setRealStats({
+          students: studentsCount || 0,
+          classes: classesCount || 0
+        })
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
+  // Mock Data (misturado com real)
   const kpiData = {
-    students: '1,234',
-    revenue: 'R$ 45.200',
-    attendance: '94.5%',
-    newEnrollments: '48'
+    students: realStats.students.toString(),
+    revenue: 'R$ 45.200', // Mock
+    attendance: '94.5%', // Mock
+    newEnrollments: '48' // Mock
   }
 
   const auditLogs = [
@@ -21,7 +49,7 @@ export function DashboardPage() {
 
   const stats = [
     { name: 'Total de Alunos', value: kpiData.students, change: '+12%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { name: 'Receita Mensal', value: kpiData.revenue, change: '+8.2%', icon: Wallet, color: 'text-green-600', bg: 'bg-green-100' },
+    { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '+2', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
     { name: 'Taxa de Presença', value: kpiData.attendance, change: '+2.1%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
     { name: 'Avaliações', value: '342', change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
   ]

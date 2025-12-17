@@ -48,10 +48,11 @@
 - [ ] **Convite de Usuário:** (Movido para Sprint 3).
 
 ### 🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
+**Status:** 🚧 Em Andamento
 **Objetivo:** Popular o banco de dados com dados reais e métricas.
-- [ ] **Conexão de KPIs:** Substituir dados mockados do Dashboard por Queries reais (`useDashboardMetrics`).
-- [ ] **Painel SchoolAdmin:** Dashboard inicial e gestão de turmas.
-- [ ] **Cadastro de Aluno:** Formulário completo (Dados Pessoais + Saúde + Responsáveis).
+- [x] **Conexão de KPIs:** Substituir dados mockados do Dashboard por Queries reais (`useDashboardMetrics`).
+- [x] **Painel SchoolAdmin:** Dashboard inicial e gestão de turmas (`ClassesPage`).
+- [x] **Cadastro de Aluno:** Formulário completo (Dados Pessoais + Saúde + Responsáveis).
 - [ ] **Importação em Massa (CSV):** Script/Tela para importar alunos da planilha legada.
 - [ ] **Vínculo Familiar:** Lógica para conectar `Guardian` ao `Athlete` e `Fan` ao `Athlete`.
 - [ ] **Termos de Uso (Legal):** Tela de aceite obrigatório com log de IP/Timestamp/Versão.

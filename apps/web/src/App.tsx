@@ -49,6 +49,8 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
+            <Route path="students" element={<StudentsPage />} />
+            <Route path="classes" element={<ClassesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

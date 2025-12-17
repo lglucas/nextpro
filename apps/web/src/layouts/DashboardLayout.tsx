@@ -26,6 +26,8 @@ export function DashboardLayout() {
   const navigation = [
     { name: 'Visão Geral', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Escolas', href: '/dashboard/schools', icon: Users, show: role === 'super_admin' },
+    { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' },
+    { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' },
     { name: 'Relatórios', href: '/dashboard/reports', icon: BarChart3 },
     // Cantinho do CTO
     { name: 'Cantinho do CTO', href: '/dashboard/settings', icon: ShieldAlert, show: role === 'super_admin', special: true },
