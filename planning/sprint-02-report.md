@@ -26,7 +26,8 @@
 - **Botão de Emergência:** Adicionada opção de "Sair e Recarregar" na tela de loading.
 
 ### 3. Backend & Banco de Dados
-- **Logs de Auditoria:** Tabela `audit_logs` criada com RLS.
+- **Logs de Auditoria:** Tabela `audit_logs` modelada e integrada.
+- **Configurações Globais:** Tabela `system_settings` criada para gestão de variáveis do sistema (XP, Regras de Negócio).
 - **Gestão de Escolas:** Criada tabela `schools` com RLS para SuperAdmin.
 
 ### 4. Funcionalidades (Features)
@@ -36,12 +37,17 @@
 - **Relatórios PDF:**
   - Implementado gerador de PDF (`jspdf`) para a lista de escolas.
   - Botão de exportação funcional na página de Escolas.
+- **Cantinho do CTO (Super Admin Tools):**
+  - Painel exclusivo para gestão de alto nível.
+  - Abas: Configurações Globais, Logs de Auditoria e Gestão de Usuários (Promover/Rebaixar roles).
+  - Integrado com `audit_logs` para rastreabilidade total.
 
 ## 🚧 Em Progresso / Próximos Passos
-- [ ] Conectar Dashboard mockado com dados reais do Supabase.
+- [ ] Conectar Dashboard mockado com dados reais do Supabase (KPIs).
 - [x] Implementar CRUD de Escolas.
 - [x] Implementar geração de relatórios PDF.
-- [ ] Finalizar "Cantinho do CTO" (Settings avançadas).
+- [x] Finalizar "Cantinho do CTO" (Settings avançadas).
+- [x] Persistência de Role (LocalStorage) para evitar flickers na navegação.
 
 ## 📝 Notas Técnicas
 - **Mudança de Roteamento:** A rota raiz `/` agora aponta para a `HomePage` (App Consumidor). O Dashboard fica isolado em `/dashboard`.
