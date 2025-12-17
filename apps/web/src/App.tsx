@@ -6,6 +6,8 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
+import { StudentsPage } from '@/features/school/pages/StudentsPage'
+import { ClassesPage } from '@/features/school/pages/ClassesPage'
 import './App.css'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
