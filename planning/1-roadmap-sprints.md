@@ -38,30 +38,29 @@
 **Status:** ✅ Concluído (Com funcionalidades avançadas)
 **Objetivo:** O SuperAdmin consegue visualizar KPIs globais e gerenciar Escolinhas. Sócios têm visão de leitura.
 - [x] **Dashboard Layout:** Sidebar responsiva, Header com perfil e navegação por Roles.
-- [x] **BI & KPIs:** Cards de métricas (Mockados para validação) e Widget de Logs reais.
+- [x] **BI & KPIs:** Cards de métricas e Widget de Logs reais.
 - [x] **Role 'Partner':** Acesso read-only ao Dashboard e relatórios para sócios.
 - [x] **Cantinho do CTO:** Área restrita para SuperAdmin com configs avançadas e Logs de Auditoria (Audit Logs).
 - [x] **Painel SuperAdmin:** CRUD completo de `Schools` (Escolas) com exportação PDF.
 - [x] **Relatórios:** Geração de PDF estilizado para listas de escolas e resumo do dashboard.
 - [x] **RBAC (Permissões):** Implementação robusta de Policies RLS e persistência de Role no LocalStorage.
-- [ ] **Painel SchoolAdmin:** (Movido para Sprint 3 para focar na estabilidade do Admin Global).
-- [ ] **Convite de Usuário:** (Movido para Sprint 3).
 
 ### 🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
-**Status:** 🚧 Em Andamento
+**Status:** 🚧 Em Andamento (Adiantado)
 **Objetivo:** Popular o banco de dados com dados reais e métricas.
 - [x] **Conexão de KPIs:** Substituir dados mockados do Dashboard por Queries reais (`useDashboardMetrics`).
 - [x] **Painel SchoolAdmin:** Dashboard inicial e gestão de turmas (`ClassesPage`).
 - [x] **Cadastro de Aluno:** Formulário completo (Dados Pessoais + Saúde + Responsáveis).
+- [x] **Vínculo Familiar:** Lógica para conectar `Guardian` ao `Athlete` (Tabela `guardians`).
+- [x] **Gestão de Matrículas:** Adicionar/Remover alunos de turmas.
 - [ ] **Importação em Massa (CSV):** Script/Tela para importar alunos da planilha legada.
-- [ ] **Vínculo Familiar:** Lógica para conectar `Guardian` ao `Athlete` e `Fan` ao `Athlete`.
 - [ ] **Termos de Uso (Legal):** Tela de aceite obrigatório com log de IP/Timestamp/Versão.
 
 ### 📱 Sprint 4: O "Check-in" e Presença (05/01 - 11/01)
 **Objetivo:** A operação diária básica.
+- [x] **Lista de Chamada Manual:** Interface para o treinador marcar presença (`ClassAttendancePage`).
 - [ ] **Gerador de QR Code:** O Técnico ou Admin gera o QR da aula.
 - [ ] **Leitor de QR (PWA):** O Aluno lê o QR e marca presença.
-- [ ] **Lista de Chamada Manual:** Fallback para caso o aluno esteja sem celular.
 - [ ] **Regra de Negócio:** Presença só conta se o aluno estiver "Ativo" (Financeiro OK).
 
 ### 🏆 Sprint 5: Gamificação Parte 1 - Engine (12/01 - 18/01)

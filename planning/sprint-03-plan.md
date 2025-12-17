@@ -33,6 +33,7 @@
 - [x] Formulário de cadastro (Nome, Categoria, Dias, Horários).
 - [ ] Edição e Exclusão.
 - [x] Vincular alunos a turmas (Relacionamento N:N ou 1:N).
+- [x] Interface de Chamada (`ClassAttendancePage`).
 
 ### 5. Importação e Exportação
 - [ ] Importação de alunos via CSV.
@@ -40,9 +41,11 @@
 
 ## Status Atual
 - Estrutura base implementada.
-- Tabelas criadas (`students`, `classes`, `guardians`, `class_students`).
+- Tabelas criadas (`students`, `classes`, `guardians`, `class_students`, `class_sessions`, `attendances`).
 - Formulários de criação funcionais com fluxo de dependência (Responsável -> Aluno).
+- Sistema de Chamada Manual funcional (v0.6.1).
 
 ## Lições Aprendidas
 - **Normalização de Dados:** Inicialmente tentamos colocar o nome do responsável como texto no aluno. Isso gerou duplicidade e falta de integridade. A solução foi criar a tabela `guardians`.
 - **Matrícula N:N:** Alunos podem fazer múltiplas modalidades. A tabela de junção `class_students` foi essencial.
+- **Resiliência de UI:** Importante tratar retornos nulos da API (como visto no bug da ClassesPage) para evitar que a tela fique branca.
