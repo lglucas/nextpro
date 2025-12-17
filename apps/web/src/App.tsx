@@ -53,6 +53,7 @@ function App() {
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
             <Route path="classes" element={<ClassesPage />} />
+            <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
           </Route>
         </Routes>
       </BrowserRouter>

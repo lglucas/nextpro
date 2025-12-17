@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-12-16
+### Added
+- **Attendance:** Banco de dados (tabelas `class_sessions`, `attendances`) e UI para Chamada.
+- **UI:** Página de Chamada (`ClassAttendancePage`) com criação de sessões e lista de presença.
+- **UX:** Botão "Chamada" na lista de Turmas para acesso rápido.
+- **Routing:** Rota `/classes/:id/attendance` configurada.
+
 ## [0.5.0] - 2025-12-16
 ### Added
 - **Database:** Novas tabelas `guardians` (Responsáveis) e `class_students` (Matrículas) com RLS.

@@ -31,6 +31,7 @@ const DAYS_OF_WEEK = [
 
 export function ClassesPage() {
   const { user, role } = useAuth()
+  const navigate = useNavigate()
   const [classes, setClasses] = useState<Class[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
