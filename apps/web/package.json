@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.88.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.23.26",
     "i18next": "^25.7.3",
     "jspdf": "^3.0.4",
