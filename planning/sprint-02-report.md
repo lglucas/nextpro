@@ -27,11 +27,20 @@
 
 ### 3. Backend & Banco de Dados
 - **Logs de Auditoria:** Tabela `audit_logs` criada com RLS.
+- **Gestão de Escolas:** Criada tabela `schools` com RLS para SuperAdmin.
+
+### 4. Funcionalidades (Features)
+- **Gestão de Escolas (CRUD):** 
+  - Interface completa para Listar, Adicionar, Editar e Remover escolas.
+  - Implementado com estado local (Mock) para validação rápida de UX.
+- **Relatórios PDF:**
+  - Implementado gerador de PDF (`jspdf`) para a lista de escolas.
+  - Botão de exportação funcional na página de Escolas.
 
 ## 🚧 Em Progresso / Próximos Passos
 - [ ] Conectar Dashboard mockado com dados reais do Supabase.
-- [ ] Implementar CRUD de Escolas.
-- [ ] Implementar geração de relatórios PDF.
+- [x] Implementar CRUD de Escolas.
+- [x] Implementar geração de relatórios PDF.
 - [ ] Finalizar "Cantinho do CTO" (Settings avançadas).
 
 ## 📝 Notas Técnicas

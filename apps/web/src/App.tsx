@@ -4,6 +4,7 @@ import { LoginPage } from '@/features/auth/pages/Login'
 import { RegisterPage } from '@/features/auth/pages/Register'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
+import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import './App.css'
 
@@ -46,6 +47,7 @@ function App() {
             </PrivateRoute>
           }>
             <Route index element={<DashboardPage />} />
+            <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
           </Route>
         </Routes>
