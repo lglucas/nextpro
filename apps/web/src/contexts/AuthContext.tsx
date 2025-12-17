@@ -21,8 +21,20 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
-  const [role, setRole] = useState<string | null>(null)
+  const [role, setRole] = useState<string | null>(() => {
+    // Tenta recuperar do localStorage na inicialização
+    return localStorage.getItem('@NextPro:role')
+  })
   const [loading, setLoading] = useState(true)
+
+  // Atualiza localStorage sempre que role mudar
+  useEffect(() => {
+    if (role) {
+      localStorage.setItem('@NextPro:role', role)
+    } else {
+      localStorage.removeItem('@NextPro:role')
+    }
+  }, [role])
 
   // Função auxiliar para buscar o perfil com timeout e self-healing
   const fetchProfile = async (userId: string, userEmail?: string) => {
@@ -69,13 +81,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         
         console.warn('AuthContext: Erro genérico ao buscar perfil:', error.message)
-        return 'user' // Fallback para não travar
+        // Se já temos um role em memória/storage, prefira manter ele em caso de erro temporário
+        const cachedRole = localStorage.getItem('@NextPro:role')
+        return cachedRole || 'user' 
       }
       
       return data?.role || 'user'
     } catch (err) {
       console.error('AuthContext: Erro crítico ao buscar perfil:', err)
-      return 'user' // Fallback seguro
+      const cachedRole = localStorage.getItem('@NextPro:role')
+      return cachedRole || 'user'
     }
   }
 
