@@ -10,7 +10,9 @@ import {
   X,
   Trophy,
   BarChart3,
-  ShieldAlert
+  ShieldAlert,
+  UserPlus,
+  GraduationCap
 } from 'lucide-react'
 
 export function DashboardLayout() {
