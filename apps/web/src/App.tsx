@@ -8,6 +8,7 @@ import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import { StudentsPage } from '@/features/school/pages/StudentsPage'
 import { ClassesPage } from '@/features/school/pages/ClassesPage'
+import { ClassAttendancePage } from '@/features/school/pages/ClassAttendancePage'
 import './App.css'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
