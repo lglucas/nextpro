@@ -95,4 +95,24 @@ Quando `status == blocked`:
     - [x] Autorizo a visibilidade de dados técnicos para Scouts parceiros (Opcional).
 
 ### 4.2 Direito ao Esquecimento
-- Se o pai solicitar exclusão, os dados pessoais são anonimizados (`Atleta #12345`), mas os dados estatísticos (gols, presença) são mantidos para não quebrar o histórico da turma.
+-98→- Se o pai solicitar exclusão, os dados pessoais são anonimizados (`Atleta #12345`), mas os dados estatísticos (gols, presença) são mantidos para não quebrar o histórico da turma.
+99→
+100→---
+101→
+102→## 5. Regras de Cadastro e Dependência
+103→
+104→### 5.1 Hierarquia Estrita de Cadastro
+105→Para garantir a integridade dos dados e a segurança jurídica (menores de idade), o sistema impõe a seguinte ordem:
+106→
+107→1.  **Escola:** A entidade raiz deve existir.
+108→2.  **Responsável (Guardian):** Deve ser cadastrado *antes* do aluno.
+109→    - Não é permitido digitar o nome do responsável em campo de texto livre no cadastro do aluno.
+110→    - O responsável deve ser uma entidade selecionável (busca por CPF/Nome).
+111→3.  **Aluno (Student):** Vinculado obrigatoriamente a um Responsável e a uma Escola.
+112→4.  **Turma (Class):** Criada independentemente, mas necessária para matrícula.
+113→5.  **Matrícula (Class Student):** Vínculo N:N entre Aluno e Turma.
+114→    - Um aluno pode estar em múltiplas turmas (ex: Futsal Sub-11 e Campo Sub-11).
+115→
+116→### 5.2 Unicidade
+117→- **CPF do Responsável:** Deve ser único por escola (ou global, dependendo da regra de negócio multi-tenancy).
+118→- **Aluno na Turma:** Um aluno não pode ser matriculado duas vezes na mesma turma.

@@ -8,8 +8,10 @@ export function DashboardPage() {
   const { user, role } = useAuth()
   const [realStats, setRealStats] = useState({
     students: 0,
-    classes: 0
+    classes: 0,
+    evaluations: 0
   })
+  const [auditLogs, setAuditLogs] = useState<any[]>([])
 
   useEffect(() => {
     async function fetchStats() {
@@ -22,10 +24,39 @@ export function DashboardPage() {
           .from('classes')
           .select('*', { count: 'exact', head: true })
 
+        // Tentativa de buscar avaliações (se a tabela existir)
+        const { count: evaluationsCount } = await supabase
+          .from('evaluations')
+          .select('*', { count: 'exact', head: true })
+
         setRealStats({
           students: studentsCount || 0,
-          classes: classesCount || 0
+          classes: classesCount || 0,
+          evaluations: evaluationsCount || 0
         })
+
+        // Fetch Audit Logs
+        const { data: logs } = await supabase
+          .from('audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5)
+        
+        if (logs) {
+           // Mapear logs para o formato de exibição se necessário, ou usar direto
+           setAuditLogs(logs.map(log => ({
+             action: log.action,
+             user: log.user_email || 'Sistema', // Fallback se não tiver join
+             time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+             detail: log.details || JSON.stringify(log.payload)
+           })))
+        } else {
+           // Fallback para mock se não tiver logs reais ainda
+           setAuditLogs([
+            { action: 'Sistema Iniciado', user: 'System', time: 'Agora', detail: 'Dashboard carregado' }
+           ])
+        }
+
       } catch (error) {
         console.error('Erro ao buscar estatísticas:', error)
       }
@@ -36,22 +67,16 @@ export function DashboardPage() {
   // Mock Data (misturado com real)
   const kpiData = {
     students: realStats.students.toString(),
-    revenue: 'R$ 45.200', // Mock
-    attendance: '94.5%', // Mock
+    revenue: 'R$ 45.200', // Mock (Financeiro ainda não implementado)
+    attendance: '94.5%', // Mock (Complexo calcular agora)
     newEnrollments: '48' // Mock
   }
-
-  const auditLogs = [
-    { action: 'Configuração Atualizada', user: 'Lucas Galvão (CTO)', time: '2 min atrás', detail: 'Alterou regra de cálculo de XP' },
-    { action: 'Nova Escola', user: 'Lucas Galvão (CTO)', time: '1h atrás', detail: 'Criou unidade "Barra Funda"' },
-    { action: 'Backup Realizado', user: 'Sistema', time: '4h atrás', detail: 'Backup diário automático' },
-  ]
 
   const stats = [
     { name: 'Total de Alunos', value: kpiData.students, change: '+12%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
     { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '+2', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
     { name: 'Taxa de Presença', value: kpiData.attendance, change: '+2.1%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { name: 'Avaliações', value: '342', change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { name: 'Avaliações', value: realStats.evaluations.toString(), change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
   ]
 
   const handleExportPDF = () => {

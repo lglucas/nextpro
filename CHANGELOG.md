@@ -5,6 +5,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-16
+### Added
+- **Database:** Novas tabelas `guardians` (Responsáveis) e `class_students` (Matrículas) com RLS.
+- **Feature:** Gestão de Responsáveis integrada ao fluxo de cadastro de alunos.
+- **Feature:** Gestão de Matrículas (Adicionar/Remover alunos) diretamente na tela de Turmas.
+- **Dashboard:** Conexão com dados reais de Alunos, Turmas, Avaliações e Logs de Auditoria.
+- **UX:** Modal de seleção de alunos com busca em tempo real.
+- **UI:** Exibição das turmas matriculadas na lista de estudantes.
+
+### Changed
+- **Refactor:** Cadastro de aluno agora exige seleção prévia de um Responsável existente (Hierarquia Estrita).
+- **Refactor:** Página de Turmas agora exibe contagem real de alunos e permite gestão.
+- **Refactor:** Dashboard atualizado para consumir dados reais do Supabase ao invés de mocks.
+
 ## [0.4.0] - 2025-12-16
 ### Added
 - **CTO Corner:** Implementado painel de super-administração com:

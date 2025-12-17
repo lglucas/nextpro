@@ -325,14 +325,22 @@ export function ClassesPage() {
                   <Clock className="w-4 h-4 text-slate-400" />
                   <span>{cls.start_time?.slice(0, 5)} - {cls.end_time?.slice(0, 5)}</span>
                 </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Users className="w-4 h-4 text-slate-400" />
+                  <span>{cls._count?.class_students || 0} alunos</span>
+                </div>
               </div>
 
               <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                <button
+                  onClick={() => handleOpenStudentManager(cls)}
+                  className="text-xs font-medium text-primary hover:text-primary-dark flex items-center gap-1"
+                >
+                  <Users className="w-3 h-3" />
+                  Gerenciar Alunos
+                </button>
                 <span className={`text-xs font-medium ${cls.active ? 'text-green-600' : 'text-red-600'}`}>
                   {cls.active ? 'Ativa' : 'Inativa'}
-                </span>
-                <span className="text-xs text-slate-400">
-                  ID: {cls.id.slice(0, 8)}
                 </span>
               </div>
             </div>

@@ -32,7 +32,7 @@
 - [x] Listagem de turmas.
 - [x] Formulário de cadastro (Nome, Categoria, Dias, Horários).
 - [ ] Edição e Exclusão.
-- [ ] Vincular alunos a turmas (Relacionamento N:N ou 1:N).
+- [x] Vincular alunos a turmas (Relacionamento N:N ou 1:N).
 
 ### 5. Importação e Exportação
 - [ ] Importação de alunos via CSV.
@@ -40,5 +40,9 @@
 
 ## Status Atual
 - Estrutura base implementada.
-- Tabelas criadas.
-- Formulários de criação funcionais.
+- Tabelas criadas (`students`, `classes`, `guardians`, `class_students`).
+- Formulários de criação funcionais com fluxo de dependência (Responsável -> Aluno).
+
+## Lições Aprendidas
+- **Normalização de Dados:** Inicialmente tentamos colocar o nome do responsável como texto no aluno. Isso gerou duplicidade e falta de integridade. A solução foi criar a tabela `guardians`.
+- **Matrícula N:N:** Alunos podem fazer múltiplas modalidades. A tabela de junção `class_students` foi essencial.
