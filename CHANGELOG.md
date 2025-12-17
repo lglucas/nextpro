@@ -5,6 +5,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-12-16
+### Added
+- **CTO Corner:** Implementado painel de super-administração com:
+  - **Configurações Globais:** Tabela `system_settings` para gestão dinâmica de variáveis.
+  - **Audit Logs:** Tabela `audit_logs` e visualização detalhada de ações críticas.
+  - **Gestão de Usuários:** Interface para promoção/rebaixamento de permissões (User/Partner/SuperAdmin).
+- **PDF Export:** Implementado gerador de relatórios PDF com cabeçalho, rodapé e logo estilizados (`utils/pdf.ts`).
+- **Dashboard:** Funcionalidade de exportação de relatório PDF integrada à tela de Escolas.
+
+### Changed
+- **UX/Nav:** Logo e nome "NextPro" agora linkam para a Home em todos os layouts.
+- **Performance:** Persistência de `role` no `localStorage` para evitar "flicker" de menu durante navegação.
+- **Dependencies:** Adicionada lib `date-fns` para formatação de datas.
+
 ## [0.3.0] - 2025-12-16
 ### Added
 - **Layout:** Implementado `AppLayout` (Consumer) e `DashboardLayout` (Admin) com navegação distinta.
