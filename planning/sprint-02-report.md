@@ -1,7 +1,7 @@
 # Relatório de Sprint 2: Gestão de Entidades & Dashboard
 
 **Período:** 22/12/2025 - 28/12/2025
-**Status:** 🏃 Em Andamento
+**Status:** ✅ Concluída
 
 ## 🎯 Objetivos Principais
 1. Implementar Dashboard Administrativo com KPIs e BI.
@@ -24,6 +24,7 @@
 - **Self-Healing de Perfil:** O sistema agora detecta se um usuário logado não tem perfil na tabela `profiles` e cria um automaticamente, evitando "tela branca da morte".
 - **Timeout de Segurança:** Adicionado timeout de 5s na busca de perfil para garantir que a UI sempre carregue, mesmo com lentidão no DB.
 - **Botão de Emergência:** Adicionada opção de "Sair e Recarregar" na tela de loading.
+- **Persistência de Role:** Uso de LocalStorage para evitar flickers na UI.
 
 ### 3. Backend & Banco de Dados
 - **Logs de Auditoria:** Tabela `audit_logs` modelada e integrada.
@@ -42,12 +43,14 @@
   - Abas: Configurações Globais, Logs de Auditoria e Gestão de Usuários (Promover/Rebaixar roles).
   - Integrado com `audit_logs` para rastreabilidade total.
 
-## 🚧 Em Progresso / Próximos Passos
+## 🚧 Em Progresso / Próximos Passos (Transição para Sprint 3)
 - [ ] Conectar Dashboard mockado com dados reais do Supabase (KPIs).
-- [x] Implementar CRUD de Escolas.
-- [x] Implementar geração de relatórios PDF.
-- [x] Finalizar "Cantinho do CTO" (Settings avançadas).
-- [x] Persistência de Role (LocalStorage) para evitar flickers na navegação.
+- [ ] Iniciar desenvolvimento do Painel SchoolAdmin.
 
 ## 📝 Notas Técnicas
 - **Mudança de Roteamento:** A rota raiz `/` agora aponta para a `HomePage` (App Consumidor). O Dashboard fica isolado em `/dashboard`.
+- **Bibliotecas Adicionadas:** `jspdf` (relatórios), `jspdf-autotable` (tabelas), `date-fns` (formatação datas).
+
+## ⚠️ Observações de Processo (Lições Aprendidas)
+- **Git Flow:** Durante esta sprint, todo o desenvolvimento foi realizado diretamente na branch `main`. 
+  - *Ação Corretiva:* Para a **Sprint 3**, voltaremos ao padrão de criar uma branch dedicada (`sprint-03-school-admin`) e realizar Pull Requests/Merges apenas ao finalizar os objetivos, garantindo maior estabilidade na `main`.
