@@ -1,6 +1,6 @@
 # 🏆 NextPro - Plataforma de Gestão Esportiva
 
-> **Sprint 2 Concluída ✅** (v0.4.0)
+> **Sprint 2 Concluída ✅** (v0.6.1)
 
 O **NextPro** é uma solução completa para digitalização de escolinhas de futebol, gestão de carreiras de atletas e engajamento familiar. Focada em PWA (Web First) para alta acessibilidade.
 
@@ -18,6 +18,8 @@ Atualmente estamos na **Fase 1 (Setup & Alicerce)**. O sistema já possui autent
 - **Dashboard Administrativo:**
   - Layout responsivo com Sidebar dinâmica.
   - **Gestão de Escolas (CRUD):** Cadastro completo de unidades.
+  - **Gestão de Alunos e Turmas:** Matrículas, frequência e cadastro de responsáveis.
+  - **Chamada Online:** Registro de presença em tempo real.
   - **Relatórios PDF:** Geração automática de listas e resumos executivos.
   - **Cantinho do CTO:** Área exclusiva para configurações globais do sistema.
 

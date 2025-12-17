@@ -5,6 +5,11 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2025-12-16
+### Fixed
+- **Bugfix:** Tratamento de erro na `ClassesPage` para evitar tela branca quando a API retorna erro ou nulo.
+- **Database:** Consolidação dos scripts SQL de migração para facilitar execução manual no Supabase Cloud.
+
 ## [0.6.0] - 2025-12-16
 ### Added
 - **Attendance:** Banco de dados (tabelas `class_sessions`, `attendances`) e UI para Chamada.
