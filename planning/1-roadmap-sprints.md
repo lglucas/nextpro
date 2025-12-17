@@ -45,7 +45,18 @@
 - [x] **Relatórios:** Geração de PDF estilizado para listas de escolas e resumo do dashboard.
 - [x] **RBAC (Permissões):** Implementação robusta de Policies RLS e persistência de Role no LocalStorage.
 
-### 🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
+### � Sprint 2.5: Site Público & Pré-Cadastro (Formulário Censo) (26/12 - 31/12)
+**Status:** 🟨 Planejado
+**Objetivo:** Capturar demanda e iniciar o funil de cadastro pelo site, com pré-cadastro de responsáveis/alunos e vínculo com escolinhas, preparando o fluxo de aprovação em camadas.
+- [ ] **Site Público (Marketing):** Landing com proposta, benefícios, diferenciais, FAQ e CTA de pré-cadastro.
+- [ ] **Captura de Leads:** Formulário simples (contato) e eventos para métricas (GA/Meta) conforme estratégia.
+- [ ] **Pré-Cadastro (Wizard):** Blocos Guardião/Dependentes/Vínculo, com persistência e retomada.
+- [ ] **Status de Onboarding:** `pendente_escola` → `aguardando_contrato` → `ativo` (documentado e preparado para integração).
+- [ ] **Confirmação da Escola:** Tela/lista para SchoolAdmin aceitar/rejeitar pré-cadastros.
+- [ ] **Assinatura Eletrônica (Forte):** Aceite com evidências (IP, timestamp, device fingerprint, hash de versão) via provedor (DocuSign/Clicksign) e trilha auditável.
+- [ ] **LGPD (Consentimentos):** Checkboxes granulares e opt-in de comunicação (WhatsApp/Email).
+
+### �🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
 **Status:** 🚧 Em Andamento (Adiantado)
 **Objetivo:** Popular o banco de dados com dados reais e métricas.
 - [x] **Conexão de KPIs:** Substituir dados mockados do Dashboard por Queries reais (`useDashboardMetrics`).
@@ -69,6 +80,12 @@
 - [ ] **Trigger de Pontos:** "Presença = +10XP".
 - [ ] **Level Up:** Lógica de subir de nível (Nível 1 -> Nível 2) com animação na tela.
 - [ ] **Perfil do Atleta (Card):** Visualização estilo "FUT Card" com foto e nível.
+  
+**Notas Estratégicas (Conversa de 17/12):**
+- **NextPro Academy (Carreira de Scouts):** Definir níveis (Iniciante, Analista, Elite) com pesos na avaliação (0.5x, 1.0x, 2.0x). Conteúdos/cursos ficam fora do MVP, mas a mecânica de níveis e pesos entra como base da Engine.
+- **Protocolo Pinóquio (Confiabilidade):** Projetar métricas internas visíveis ao staff: `mentiras_confirmadas`, `confiabilidade_avaliador` e **shadow ban silencioso** (peso → 0) para avaliadores recorrentes; sem aviso ao usuário final.
+- **Censo Socioeconômico (Wizard):** Estruturar blocos Guardião/Dependentes/Vínculo para futura coleta; perguntas direcionadas poderão ser ajustadas conforme parceiros (ex.: seguradoras).
+- **Aprovação em Camadas:** Documentar status do fluxo (Pendente Escola → Aguardando Contrato → Ativo) para integração com Termos/Assinatura em sprint de Legal.
 
 ### 🌟 Sprint 6: Avaliação Técnica Diária (19/01 - 25/01)
 **Objetivo:** O input do Treinador.

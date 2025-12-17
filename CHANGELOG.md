@@ -5,6 +5,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2025-12-17
+### Added
+- **Planning:** Criado `Sprint 2.5` (Site Público + Pré-Cadastro via formulário) e refinado `Sprint 5` com notas estratégicas de Gamificação, NextPro Academy (carreira de scouts), Protocolo Pinóquio e Censo (wizard).
+- **Business Rules:** Documentadas novas seções em `planning/3-regras-negocio-funcionais.md` cobrindo:
+  - Carreira de Scouts (níveis e pesos),
+  - Protocolo Pinóquio (métricas internas e shadow ban),
+  - Censo Familiar (blocos e privacidade),
+  - Aprovação em camadas (status e assinatura),
+  - Parceiros e perguntas direcionadas.
+
+### Changed
+- **Legal:** Reafirmada necessidade de assinatura eletrônica forte (IP, timestamp, device fingerprint, hash de versão) preferencialmente via provedor (DocuSign/Clicksign) com logs e webhooks.
+- **Monetização:** Registrado que múltiplos perfis terão fluxos pagos (pais, scouts, reps de clubes) incluindo marketplace e micro-serviços (fora do MVP imediato).
+
 ## [0.6.1] - 2025-12-16
 ### Fixed
 - **Bugfix:** Tratamento de erro na `ClassesPage` para evitar tela branca quando a API retorna erro ou nulo.
