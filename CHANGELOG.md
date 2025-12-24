@@ -5,6 +5,11 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.11] - 2025-12-24
+### Added
+- **Pré‑Cadastro:** Tabela `pre_registrations` e `school_suggestions` com RLS para censo por responsável.
+- **Pré‑Cadastro:** Wizard do censo em `/pre-cadastro` com etapas, validação e persistência (rascunho e envio).
+
 ## [0.6.10] - 2025-12-24
 ### Added
 - **Site Público:** Componentes de UI reutilizáveis (Hero/Section/Card/Callout) e seções da Home para padronização visual.

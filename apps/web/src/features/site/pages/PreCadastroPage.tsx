@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom'
 import { ShieldCheck, Sparkles } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 import { SiteContainer } from '@/features/site/components/SiteContainer'
 import { SiteSection } from '@/features/site/components/SiteSection'
 import { SiteHero } from '@/features/site/components/SiteHero'
 import { SiteCard } from '@/features/site/components/SiteCard'
+import { PreCadastroWizard } from '@/features/preCadastro/components/PreCadastroWizard'
 
 export function PreCadastroPage() {
+  const { user } = useAuth()
+
   return (
     <div>
       <SiteHero
@@ -13,24 +17,32 @@ export function PreCadastroPage() {
         title="Pré‑cadastro por convite"
         description="Se você recebeu este link da sua escolinha, é porque faz parte do processo de organização do projeto. O objetivo é coletar informações com responsabilidade e clareza."
       >
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            to="/login"
-            className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
-          >
-            Acessar
-          </Link>
-          <Link
-            to="/contato"
-            className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            Contato institucional
-          </Link>
-        </div>
+        {!user ? (
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+            >
+              Entrar
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
+            >
+              Criar acesso
+            </Link>
+          </div>
+        ) : null}
       </SiteHero>
 
       <SiteSection variant="muted">
         <SiteContainer>
+          {user ? (
+            <div className="mb-8">
+              <PreCadastroWizard />
+            </div>
+          ) : null}
+
           <div className="grid md:grid-cols-2 gap-4">
             <SiteCard
               icon={<Sparkles className="w-5 h-5 text-primary" />}
