@@ -319,50 +319,89 @@ Pré‑cadastro (BI):
 - Cadastros duplicados de escolinha (potenciais merges)
 - Taxa de validação pela escolinha (recebido → validado)
 
-## 12. Conceitos do produto para comunicar no site (sem micro-detalhes)
+## 10. Mensagens institucionais do produto (sem micro-detalhes)
 
-Objetivo: orientar a redação institucional do site com uma visão macro do projeto, sem entrar em detalhes técnicos.
+Objetivo: transformar os conceitos do produto em linguagem institucional pronta para o site, mantendo a visão macro do projeto e evitando explicações operacionais.
 
-### 12.1 Núcleos e fluxo de seleção
+### 10.1 Como diferenciar NextPro e Reglobo Soccer
 
-- A Reglobo Soccer opera com escolinhas e também com núcleos, que são agrupamentos operacionais que reúnem múltiplas escolinhas.
-- Em determinados ciclos, um grupo reduzido de atletas pode ser selecionado para avaliação presencial no núcleo pela equipe técnica NextPro.
-- A escolinha prepara o atleta; no núcleo, a avaliação é conduzida pela equipe NextPro e alimenta a evolução do atleta com maior confiabilidade.
+- **Reglobo Soccer**: o projeto e a operação (escolinhas, metodologia, histórico, núcleos, experiência de campo).
+- **NextPro**: a plataforma que digitaliza, organiza e padroniza essa operação, com dados estruturados para apoiar decisões com mais consistência.
 
-### 12.2 Avaliação multi-fonte e pesos por confiabilidade (conceito)
+Texto sugerido (curto, para `/projeto`):
+- “A Reglobo Soccer construiu uma história real no campo. O NextPro nasce para levar essa experiência para o digital — com organização, padronização e um histórico de evolução que acompanha o atleta ao longo do tempo.”
 
-Visão pública sugerida (para explicar de forma simples):
-- Diferentes fontes contribuem com sinais diferentes, com pesos diferentes.
-- Avaliações e dados operacionais do dia a dia ajudam a construir um histórico mais consistente.
-- Validações presenciais do núcleo servem como referência de alta confiabilidade e ajudam a calibrar o sistema ao longo do tempo.
+### 10.2 Núcleos (visão pública)
 
-### 12.3 Inputs das escolinhas (com orçamento diário e auditoria oculta)
+- Núcleos são agrupamentos operacionais que reúnem múltiplas escolinhas.
+- Em ciclos, alguns atletas podem ser avaliados presencialmente no núcleo pela equipe técnica NextPro, com critérios e metodologia próprios.
 
-- A cada treino, a escolinha terá um “orçamento” de destaques para registrar:
-  - 3 atletas em destaque (com inputs objetivos)
-  - 3 atletas com necessidade de atenção (com inputs objetivos)
-- Esses inputs são obrigatórios por treino, e complementados por um formulário mensal mais completo (20–40 perguntas) por turma.
-- O sistema reduz o peso de inputs inconsistentes ao longo do tempo e pode aplicar penalidades ocultas em caso de padrões de mentira/reincidência, sem expor o mecanismo.
+Texto sugerido (curto, para `/como-funciona`):
+- “Além do dia a dia nas escolinhas, o projeto conta com núcleos: momentos de avaliação e acompanhamento com a equipe técnica NextPro, reforçando consistência e seriedade no processo.”
 
-### 12.4 Autoavaliação diária do atleta (sinal de baixa/média confiança)
+### 10.3 Histórico robusto (multi-fonte) — explicação “market-friendly”
 
-- O atleta realiza autoavaliações diárias curtas para registrar contexto (ex.: posição treinada, foco, percepção do treino).
-- Esses sinais têm peso menor, mas contribuem para a consistência e visão longitudinal do histórico.
+Posicionamento a ser usado no site:
+- “O NextPro combina diferentes sinais do dia a dia para construir um histórico mais consistente do atleta.”
+- “Quando há avaliações presenciais do núcleo e avaliações de profissionais credenciados, elas ajudam a qualificar ainda mais o histórico.”
 
-### 12.5 Scouts e representantes de clubes (credenciamento + evidência mínima)
+Frases curtas para usar em cards/benefícios (pais e escolinhas):
+- “Evolução registrada ao longo do tempo, não por um único dia.”
+- “Mais consistência, mais transparência e mais seriedade.”
 
-- Scouts terão progressão por credenciamento e cursos dentro da plataforma; conforme evoluem, sua confiabilidade/peso pode aumentar.
-- Representantes de clubes podem ter níveis de acesso/serviços que influenciam o peso e a profundidade de uso.
-- Evidência mínima para avaliação externa: check-in por GPS/horário, com o sistema sugerindo automaticamente escolinha/turma e exibindo apenas atletas com presença registrada no treino daquele momento.
+### 10.4 Participação da escolinha (linguagem institucional)
 
+O que dizer (sem entrar em mecanismo):
+- “As escolinhas registram destaques e pontos de atenção do treino, de forma objetiva, criando uma rotina de acompanhamento.”
+- “Há também ciclos de avaliação mais completos por turma, para consolidar a visão do mês.”
+- “A plataforma prioriza consistência e qualidade de dados, para que o histórico seja confiável ao longo do tempo.”
 
-## 10. Conteúdo e fontes internas (para reescrita institucional)
+Texto sugerido para `/escolinhas`:
+- “Uma rotina simples de registro torna o acompanhamento mais claro para a equipe e para as famílias — e ajuda a padronizar a evolução em todas as escolinhas do projeto.”
+
+### 10.5 Autoavaliação diária do atleta (sem promessas)
+
+Como comunicar:
+- “O atleta participa registrando o contexto do treino e sua percepção diária.”
+- “Ao longo do tempo, isso ajuda a construir disciplina, rotina e um histórico mais completo.”
+
+Texto sugerido para `/atletas`:
+- “Sua evolução não é um palpite. É um histórico — treino após treino.”
+
+### 10.6 Scouts e representantes de clubes (sem explicar regras internas)
+
+Como comunicar:
+- “A plataforma também organiza o fluxo de avaliação com profissionais credenciados, criando mais visibilidade e estrutura para conversas futuras.”
+- “Avaliações externas são feitas com contexto do treino e presença confirmada, reforçando integridade do processo.”
+
+Texto sugerido para `/como-funciona`:
+- “Com uma base organizada, o diálogo com scouts e representantes de clubes acontece com mais contexto, clareza e seriedade.”
+
+### 10.7 Rascunhos prontos para usar no site (copy base)
+
+**Home (hero)**
+- Título: “O futuro do esporte começa na base.”
+- Subtítulo: “NextPro é a plataforma que digitaliza a operação da Reglobo Soccer — para dar mais organização, consistência e transparência ao dia a dia.”
+
+**Projeto / Sobre**
+- “Uma operação real no campo. Uma plataforma para organizar e evoluir no digital.”
+
+**Para Pais**
+- “Você acompanha a jornada com mais clareza: organização, rotina e um histórico construído no dia a dia.”
+
+**Para Escolinhas**
+- “Gestão padronizada, comunicação mais clara e dados consistentes — sem perder o que importa: o treino e a evolução do atleta.”
+
+**Como Funciona**
+- “Escolinhas + Núcleos + Plataforma: um ecossistema conectado, com histórico e consistência ao longo do tempo.”
+
+## 11. Conteúdo e fontes internas (para reescrita institucional)
 
 Base interna a ser usada para redigir o conteúdo do site:
 - `project/documento-1-business-plan-estrategico (1).md`
 - `project/doc-3-anexos-tecnicos-juridicos-REVISADO (1).md`
 
-## 11. Checklist de entrega do site (quando formos codar)
+## 12. Checklist de entrega do site (quando formos codar)
 
 - Rotas públicas separadas da plataforma
 - Menu multi‑páginas + footer com termos/privacidade

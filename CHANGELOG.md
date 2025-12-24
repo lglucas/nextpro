@@ -5,6 +5,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.6] - 2025-12-24
+### Changed
+- **Planning:** Reescrita da seção de conceitos para linguagem institucional (copy base) e renumeração das seções do documento do Sprint 2.5.
+
 ## [0.6.5] - 2025-12-24
 ### Changed
 - **Planning:** Refinado o documento do Sprint 2.5 com conceitos de núcleos, avaliação multi‑fonte (pesos e reputação), inputs diários/mensais das escolinhas e melhorias no wizard (filhos e perguntas socioeconômicas).
