@@ -401,7 +401,218 @@ Base interna a ser usada para redigir o conteúdo do site:
 - `project/documento-1-business-plan-estrategico (1).md`
 - `project/doc-3-anexos-tecnicos-juridicos-REVISADO (1).md`
 
-## 12. Checklist de entrega do site (quando formos codar)
+## 12. Wireframe textual (por página, antes de codar)
+
+Objetivo: descrever cada página com estrutura de seções, títulos e CTAs, para orientar design e implementação sem decidir ainda UI final.
+
+### 12.0 Layout global (todas as páginas do site)
+
+**Header (fixo)**
+- Logo NextPro (link para `/`)
+- Menu: Projeto, Pais, Atletas, Escolinhas, Como Funciona, FAQ, Contato
+- CTA primário: Entrar (vai para login da plataforma)
+
+**Footer**
+- Links: Termos (`/termos`), Privacidade (`/privacidade`), Blog (`/blog`), Parceiros (`/parceiros`)
+- Texto institucional curto + direitos
+
+**Padrões de conteúdo**
+- Cada página deve ter: H1 + subtítulo curto + 1 CTA (quando fizer sentido)
+- Tom: institucional, claro para pais, sem promessa exagerada e sem “venda de SaaS”
+- Sem página de preços/planos
+
+### 12.1 Home (`/`)
+
+**Objetivo:** apresentar o NextPro como plataforma do projeto Reglobo Soccer e direcionar para páginas por persona.
+
+**Seções**
+- Hero
+  - H1: “O futuro do esporte começa na base.”
+  - Sub: “NextPro é a plataforma que digitaliza a operação da Reglobo Soccer — para dar mais organização, consistência e transparência ao dia a dia.”
+  - CTA: “Entrar”
+  - CTA secundário: “Entender o projeto” → `/projeto`
+- O que é NextPro (institucional)
+  - Título: “Uma plataforma para organizar e evoluir no digital”
+  - 2–3 parágrafos (sem detalhe técnico)
+- O que é a Reglobo Soccer
+  - Título: “Uma operação real no campo”
+  - 2 parágrafos com contexto + ligação com NextPro
+- Números de impacto
+  - Blocos estáticos iniciais (13 anos, 12 estados, 38.114 atletas, 10–12 escolinhas)
+  - Nota pequena: “No futuro, números poderão ser atualizados em tempo real pela plataforma.”
+- Para quem é
+  - Cards: Pais, Atletas, Escolinhas, Scouts/Clubes (discreto)
+  - CTA nos cards → páginas correspondentes
+- Como funciona (resumo)
+  - 4 passos resumidos
+  - Link: “Ver como funciona” → `/como-funciona`
+- FAQ curto
+  - 5 perguntas com link para `/faq`
+- Contato
+  - CTA: “Falar com a equipe” → `/contato`
+
+### 12.2 Projeto / Sobre (`/projeto`)
+
+**Objetivo:** história, missão, visão; diferenciar Reglobo Soccer e NextPro; mostrar credibilidade sem “vender”.
+
+**Seções**
+- Hero institucional
+  - H1: “Uma operação real no campo. Uma plataforma para organizar e evoluir no digital.”
+  - Sub: texto curto sobre digitalização da operação
+  - CTA: “Como funciona” → `/como-funciona`
+- História
+  - Linha do tempo curta (13 anos → digitalização)
+- Missão, visão e princípios
+  - 3 cards: Missão, Visão, Compromissos (seriedade, transparência, proteção de dados)
+- O que muda a partir daqui (benefícios)
+  - Título: “Histórico construído no dia a dia”
+  - Texto: consistência, evolução longitudinal, mais clareza para famílias e operação
+- Núcleos (visão pública)
+  - Texto curto sobre núcleos como etapa de acompanhamento/avaliação com equipe NextPro
+- Credibilidade
+  - Parcerias e marcas: “Em breve” (placeholder)
+  - CTA: “Contato institucional” → `/contato`
+
+### 12.3 Para Pais (`/pais`)
+
+**Objetivo:** falar com famílias; explicar clareza/rotina/histórico; reforçar privacidade; sem promessas.
+
+**Seções**
+- Hero
+  - H1: “Acompanhe a jornada com mais clareza.”
+  - Sub: “Organização, rotina e um histórico construído no dia a dia.”
+  - CTA: “Entrar”
+- O que você vai encontrar
+  - 4 bullets (ex.: rotina, presença, comunicados, evolução ao longo do tempo)
+- Transparência e seriedade
+  - Texto curto (sem algoritmo)
+- Privacidade e segurança
+  - Link: “Política de Privacidade” → `/privacidade`
+- FAQ para pais (atalho)
+  - Link: “Ver dúvidas de pais” → `/faq`
+
+### 12.4 Para Atletas (`/atletas`)
+
+**Objetivo:** motivar sem exagero; reforçar rotina e histórico; participação do atleta.
+
+**Seções**
+- Hero
+  - H1: “Sua evolução não é um palpite. É um histórico — treino após treino.”
+  - CTA: “Entrar”
+- Rotina e disciplina
+  - Texto curto sobre consistência
+- Participação do atleta
+  - Texto curto sobre registrar contexto do treino diariamente (sem detalhes)
+- O caminho dentro do projeto
+  - Texto curto: escolinha → histórico → núcleos (quando aplicável)
+
+### 12.5 Para Escolinhas (`/escolinhas`)
+
+**Objetivo:** mostrar valor operacional e padronização; convidar pais; reforçar seriedade dos dados.
+
+**Seções**
+- Hero
+  - H1: “Gestão padronizada, comunicação mais clara e dados consistentes.”
+  - Sub: “Sem perder o que importa: o treino e a evolução do atleta.”
+  - CTA: “Entrar”
+- O que é digitalizado
+  - Lista: turmas, alunos, presença, comunicados, organização
+- Padronização entre escolinhas
+  - Texto curto sobre padrão único entre unidades e núcleos
+- Convite aos pais (pré‑cadastro)
+  - Texto curto: “A escolinha compartilha o link de pré‑cadastro com as famílias.”
+  - Nota: “Página não aparece no menu público.”
+- FAQ para escolinhas (atalho)
+  - Link: “Ver dúvidas de escolinhas” → `/faq`
+
+### 12.6 Como Funciona (`/como-funciona`)
+
+**Objetivo:** visão global do ecossistema; sem micro-passos.
+
+**Seções**
+- Hero
+  - H1: “Escolinhas + Núcleos + Plataforma: um ecossistema conectado.”
+  - CTA: “Entrar”
+- Fluxo em macroetapas
+  - 1) Dia a dia na escolinha (rotina e histórico)
+  - 2) Núcleos (quando aplicável)
+  - 3) Profissionais credenciados (scouts) e diálogo com clubes (mais contexto e seriedade)
+- Integridade e contexto
+  - Texto curto: presença confirmada e contexto do treino como base
+- Para quem é (atalhos)
+  - Links: `/pais`, `/atletas`, `/escolinhas`
+
+### 12.7 FAQ (`/faq`)
+
+**Objetivo:** central de dúvidas por categoria, com volume suficiente.
+
+**Estrutura**
+- Tabs ou âncoras:
+  - Pais (10–20)
+  - Atletas (10–20)
+  - Escolinhas (10–20)
+  - Privacidade e Segurança (10–20)
+- Bloco final
+  - “Ainda com dúvidas?” → `/contato`
+
+### 12.8 Contato (`/contato`)
+
+**Objetivo:** canal institucional.
+
+**Seções**
+- Hero
+  - H1: “Contato”
+  - Sub: “Fale com a equipe NextPro.”
+- Formulário
+  - Nome, email, assunto, mensagem
+  - CTA: “Enviar”
+- Alternativas
+  - Email e WhatsApp (se aplicável)
+
+### 12.9 Termos (`/termos`)
+
+**Estrutura**
+- H1: “Termos de Uso”
+- Blocos curtos (placeholder inicial)
+- Link para privacidade
+
+### 12.10 Privacidade (`/privacidade`)
+
+**Estrutura**
+- H1: “Política de Privacidade”
+- Blocos curtos (placeholder inicial)
+- Seções: dados coletados, finalidade, retenção, direitos do titular, contato
+
+### 12.11 Blog (`/blog`) — em breve
+
+**Estrutura**
+- H1: “Blog e Notícias”
+- Estado: “Em breve”
+
+### 12.12 Parceiros (`/parceiros`) — em breve
+
+**Estrutura**
+- H1: “Parceiros”
+- Estado: “Em breve”
+
+### 12.13 Pré‑cadastro (rota escondida) (`/pre-cadastro`)
+
+**Objetivo:** receber pré‑cadastro/censo por convite da escolinha; exigir conta e confirmação de email; sem link no menu.
+
+**Estrutura**
+- Gate (se não logado)
+  - Tela “Criar acesso” (nome, email, WhatsApp)
+  - Mensagem: “Você receberá um email para confirmar seu acesso.”
+- Wizard (se logado e confirmado)
+  - Barra de progresso
+  - Etapas: Responsável → Escolinha → Filhos → Socioeconômico → Consentimento
+  - CTA por etapa: “Continuar” / “Voltar”
+  - Persistência de rascunho
+- Confirmação final
+  - Mensagem calorosa de agradecimento
+  - Próximos passos (macro): “A escolinha fará a validação e você receberá um email.”
+
+## 13. Checklist de entrega do site (quando formos codar)
 
 - Rotas públicas separadas da plataforma
 - Menu multi‑páginas + footer com termos/privacidade
