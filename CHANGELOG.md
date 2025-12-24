@@ -5,6 +5,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] - 2025-12-24
+### Added
+- **Planning:** Documento detalhado do Site Público (institucional, multi‑páginas) e do Pré‑Cadastro (censo familiar) com fluxo de validação por escolinha.
+
 ## [0.6.3] - 2025-12-24
 ### Fixed
 - **Dev Environment:** Corrigido erro do Vite/React-Babel de módulo ausente (`@babel/helper-validator-identifier`) com reinstalação confiável via lockfile.
