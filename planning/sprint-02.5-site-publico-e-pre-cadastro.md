@@ -64,7 +64,7 @@ Seções:
 - Hero: mensagem principal + “Entrar” + “Saiba mais”
 - O que é o NextPro (2–3 parágrafos institucionais)
 - O que é o projeto Reglobo Soccer (contexto resumido)
-- Números de impacto (contadores): 13 anos, 12 estados, 38.114 atletas avaliados, 10–12 escolinhas prontas para digitalização
+- Números de impacto (contadores): 13 anos, 12 estados, 38.114 atletas avaliados, 10–12 escolinhas prontas para digitalização (inicialmente estático; no futuro conectado à plataforma com dados reais)
 - Para quem é (cards): Pais, Atletas, Escolinhas, Scouts/Clubes (mais discreto)
 - Como funciona (resumo em 4 passos com link para `/como-funciona`)
 - FAQ curto (3–5 perguntas) com link para `/faq`
@@ -75,9 +75,9 @@ Seções:
 Objetivo: explicar a história, missão, visão e o porquê do projeto existir.
 
 Seções:
-- História e contexto (13 anos de operação + digitalização)
+- História e contexto (Reglobo Soccer: 13 anos de operação; NextPro: camada de digitalização e padronização)
 - Missão e visão (baseado nos documentos)
-- Problema que resolve (base analógica, falta de dados, fragmentação)
+- Benefícios a partir daqui (dados e evolução diária no dia a dia do atleta, gamificação e visibilidade com mais seriedade para conversas futuras com scouts e clubes)
 - Impacto social (esporte e escolarização; abordar com cuidado e respeito)
 - Credibilidade e parcerias (sem “vender”; apenas institucional; pode ter “Em breve” para logos)
 
@@ -103,7 +103,7 @@ Seções:
 
 ### 5.5 Para Escolinhas (`/escolinhas`)
 
-Objetivo: reduzir atrito com gestores (“pedra no sapato”), deixando claro o que muda no dia a dia e como funciona o onboarding.
+Objetivo: apresentar uma gestão eficiente e padronizada entre escolinhas, melhorando a organização, a comunicação e a qualidade do fluxo de dados do dia a dia.
 
 Seções:
 - O que é digitalizado (cadastros, turmas, presença, comunicados)
@@ -121,7 +121,7 @@ Seções:
 - Convites e acesso
 - Pré‑cadastro (explicar que ocorre por convite)
 - Validação pela escolinha (aprovação/confirmação)
-- Próximas fases (contratos/consentimentos completos no futuro)
+- Visão global do ecossistema dentro da plataforma (escolinhas, equipe técnica NextPro, scouts e representantes de clubes)
 
 ### 5.7 FAQ (`/faq`)
 
@@ -129,6 +129,7 @@ Objetivo: reduzir suporte e dúvidas.
 
 Estrutura:
 - Perguntas por categoria: Pais, Atletas, Escolinhas, Privacidade/Segurança
+- Meta de conteúdo: 10–20 perguntas por categoria
 - “Não encontrou?” → Contato
 
 ### 5.8 Contato (`/contato`)
@@ -169,6 +170,7 @@ Planejamento sugerido (a ser validado na implementação):
   - `account_stage = 'pre_cadastro' | 'ativo'`
   - `account_source = 'pre_cadastro' | 'gestor' | 'admin' | ...`
 - O dashboard/admin deve listar e gerenciar esse grupo separadamente.
+- O pré‑cadastro deve gravar dados em tabelas dedicadas (não misturar com tabelas operacionais da plataforma).
 
 ### 6.3 Fluxo de entrada (proposto)
 
@@ -225,7 +227,7 @@ Etapas sugeridas:
   - Para cada filho: nome, data de nascimento, gênero, posição
   - Série escolar e escola onde estuda
 - Bloco “Outros filhos (não treinam na escolinha)”
-  - Quantidade e faixas etárias (mais simples, opcional)
+  - Cadastro individual por filho (opcional), também com limite total de 8 filhos
 
 **Etapa 4 — Pesquisa socioeconômica**
 - Renda familiar (faixas)
@@ -239,6 +241,12 @@ Etapas sugeridas:
   - Quantas pessoas contribuem com renda
   - Situação de moradia (própria/alugada/cedida)
   - Principal desafio para manter a criança no esporte (opcional)
+  - Plano de saúde (faixas: não / sim — básico / sim — completo)
+  - Poupança e investimentos (faixas: não / sim — pouco / sim — moderado / sim — alto)
+  - Bens e eletrodomésticos (faixas por item: 0 / 1 / 2+)
+  - Acesso a atividades extracurriculares (faixas: não / às vezes / regularmente)
+  - Objetivo principal da família com o esporte (opcional, múltipla escolha)
+  - Tempo disponível para acompanhar a rotina do atleta (faixas)
 
 **Etapa 5 — Consentimento e envio**
 - Checkbox de aceite (LGPD + finalidade do uso)
@@ -274,15 +282,13 @@ Termo sugerido no email (em vez de “reconhecidos”):
 Objetivo: permitir um fluxo simples e seguro para pessoas com baixa familiaridade digital.
 
 Sugestão:
-- O pai é o “ponto de verdade” (guardian).
-- A escolinha valida e libera o cadastro do atleta.
-- Quando for hora do cadastro do atleta na plataforma:
-  - o gestor cria o atleta (ou aprova o atleta) e o sistema envia um link de vinculação ao email/whatsapp do responsável
-  - o pai confirma e define um código/consentimento
-  - o atleta cria sua conta e escolhe “Sou atleta” e seleciona o responsável por link (token de convite)
-
-Alternativa (mais simples):
-- Um único cadastro “família”, e o atleta entra apenas com um “código da escolinha + data de nascimento”, e o responsável confirma depois.
+- O responsável é o “ponto de verdade” (guardian).
+- A validação da família acontece pela escolinha, com email de confirmação ao responsável.
+- Quando for hora de cadastrar atletas (fase futura):
+  - o responsável recebe um aviso grande dentro da plataforma e um email com botão “Cadastrar seus filhos”
+  - nessa tela, o responsável gera um link e um código temporário (expira em 7 dias) para compartilhar com o atleta via WhatsApp
+  - o atleta se cadastra via link ou informando o código
+  - fallback: caso o atleta tente se cadastrar sem link/código, o sistema tenta vincular se houver cruzamento simultâneo (nome do atleta e nome do responsável já cadastrados no pré‑cadastro)
 
 ## 9. Métricas e indicadores (para o site e para BI)
 
@@ -290,13 +296,65 @@ Site (institucional):
 - Visitas por página (pais/atletas/escolinhas)
 - Cliques em “Entrar”
 - Conversão em pré‑cadastro (quando link for usado)
+- Cliques por persona (Pais/Atletas/Escolinhas)
+- Taxa de rejeição por página e tempo médio
+- Conversão “Contato” (envios do formulário)
+- Origem do tráfego (UTM por escolinha/cidade)
 
 Pré‑cadastro (BI):
 - Cadastros por escolinha/cidade/UF
+- Cadastros por núcleo (agrupamento operacional)
 - Perfil demográfico (idade, série escolar, gênero)
+- Distribuição por posição (auto‑relato)
+- Distribuição por escola (onde estuda) e série
 - Renda por região (faixas)
 - Transporte e acesso à internet
+- Benefícios sociais (faixas)
+- Plano de saúde (faixas)
+- Investimentos/poupança (faixas)
+- Situação de moradia (faixas)
 - Percentual de preenchimento completo vs parcial
+- Tempo médio de preenchimento do wizard por etapa
+- Taxa de abandono por etapa
+- Cadastros duplicados de escolinha (potenciais merges)
+- Taxa de validação pela escolinha (recebido → validado)
+
+## 12. Conceitos do produto para comunicar no site (sem micro-detalhes)
+
+Objetivo: orientar a redação institucional do site com uma visão macro do projeto, sem entrar em detalhes técnicos.
+
+### 12.1 Núcleos e fluxo de seleção
+
+- A Reglobo Soccer opera com escolinhas e também com núcleos, que são agrupamentos operacionais que reúnem múltiplas escolinhas.
+- Em determinados ciclos, um grupo reduzido de atletas pode ser selecionado para avaliação presencial no núcleo pela equipe técnica NextPro.
+- A escolinha prepara o atleta; no núcleo, a avaliação é conduzida pela equipe NextPro e alimenta a evolução do atleta com maior confiabilidade.
+
+### 12.2 Avaliação multi-fonte e pesos por confiabilidade (conceito)
+
+Visão pública sugerida (para explicar de forma simples):
+- Diferentes fontes contribuem com sinais diferentes, com pesos diferentes.
+- Avaliações e dados operacionais do dia a dia ajudam a construir um histórico mais consistente.
+- Validações presenciais do núcleo servem como referência de alta confiabilidade e ajudam a calibrar o sistema ao longo do tempo.
+
+### 12.3 Inputs das escolinhas (com orçamento diário e auditoria oculta)
+
+- A cada treino, a escolinha terá um “orçamento” de destaques para registrar:
+  - 3 atletas em destaque (com inputs objetivos)
+  - 3 atletas com necessidade de atenção (com inputs objetivos)
+- Esses inputs são obrigatórios por treino, e complementados por um formulário mensal mais completo (20–40 perguntas) por turma.
+- O sistema reduz o peso de inputs inconsistentes ao longo do tempo e pode aplicar penalidades ocultas em caso de padrões de mentira/reincidência, sem expor o mecanismo.
+
+### 12.4 Autoavaliação diária do atleta (sinal de baixa/média confiança)
+
+- O atleta realiza autoavaliações diárias curtas para registrar contexto (ex.: posição treinada, foco, percepção do treino).
+- Esses sinais têm peso menor, mas contribuem para a consistência e visão longitudinal do histórico.
+
+### 12.5 Scouts e representantes de clubes (credenciamento + evidência mínima)
+
+- Scouts terão progressão por credenciamento e cursos dentro da plataforma; conforme evoluem, sua confiabilidade/peso pode aumentar.
+- Representantes de clubes podem ter níveis de acesso/serviços que influenciam o peso e a profundidade de uso.
+- Evidência mínima para avaliação externa: check-in por GPS/horário, com o sistema sugerindo automaticamente escolinha/turma e exibindo apenas atletas com presença registrada no treino daquele momento.
+
 
 ## 10. Conteúdo e fontes internas (para reescrita institucional)
 
@@ -314,4 +372,3 @@ Base interna a ser usada para redigir o conteúdo do site:
 - Persistência de rascunho do wizard (não perde progresso)
 - Salvamento no Supabase em tabelas dedicadas
 - Email para pai e para equipe
-
