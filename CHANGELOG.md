@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.8] - 2025-12-24
+### Added
+- **Site Público:** Estrutura inicial do site institucional multi‑páginas (layout público, navegação, footer e páginas base).
+### Changed
+- **Routing:** Site público passa a viver em `/` e a plataforma do usuário em `/app` (dashboard permanece em `/dashboard`).
+- **Auth:** Login e cadastro redirecionam para `/app` após autenticação.
+
 ## [0.6.7] - 2025-12-24
 ### Added
 - **Planning:** Wireframe textual por página do site público (inclui rota escondida `/pre-cadastro`) para guiar a implementação.

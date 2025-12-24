@@ -22,7 +22,7 @@ export function LoginPage() {
 
       if (error) throw error
 
-      navigate('/dashboard') // Redireciona após sucesso
+      navigate('/app') // Redireciona após sucesso
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao fazer login'
       setError(message)

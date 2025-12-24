@@ -21,7 +21,7 @@ export function AppLayout() {
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
             <div className="flex items-center">
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/app" className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                   <Trophy className="w-5 h-5 text-primary" />
                 </div>

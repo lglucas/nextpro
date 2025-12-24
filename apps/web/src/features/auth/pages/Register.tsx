@@ -51,7 +51,7 @@ export function RegisterPage() {
       if (data.user) {
         // Se o email confirmation estiver desligado, já loga direto
         if (data.session) {
-          navigate('/dashboard')
+          navigate('/app')
         } else {
           // Se precisar confirmar email
           setError('Cadastro realizado! Verifique seu email para confirmar a conta.')

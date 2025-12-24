@@ -51,7 +51,7 @@ export function DashboardLayout() {
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="h-16 flex items-center px-6 border-b border-slate-100">
-            <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <Link to="/app" className="flex items-center hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                 <Trophy className="w-5 h-5 text-primary" />
               </div>
@@ -120,7 +120,7 @@ export function DashboardLayout() {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <Link to="/" className="font-bold text-lg text-secondary hover:opacity-80 transition-opacity">
+          <Link to="/app" className="font-bold text-lg text-secondary hover:opacity-80 transition-opacity">
             NextPro
           </Link>
           <div className="w-10" /> {/* Spacer for centering */}

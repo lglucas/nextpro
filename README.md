@@ -97,7 +97,10 @@ Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte
     ```bash
     npm run dev
     ```
-    Acesse: `http://localhost:5173`
+    Acesse:
+    - Site público: `http://localhost:5173/`
+    - App (área logada): `http://localhost:5173/app`
+    - Dashboard admin: `http://localhost:5173/dashboard`
 
 ## 📄 Licença
 
