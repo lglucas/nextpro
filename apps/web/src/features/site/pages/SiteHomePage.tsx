@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { SiteHero } from '@/features/site/components/SiteHero'
+import { SiteAuthCtaButton } from '@/features/site/components/SiteAuthCtaButton'
 import { HomeImpactSection } from '@/features/site/sections/home/HomeImpactSection'
 import { HomePathsSection } from '@/features/site/sections/home/HomePathsSection'
 import { HomeHowItWorksSection } from '@/features/site/sections/home/HomeHowItWorksSection'
@@ -16,12 +17,7 @@ export function SiteHomePage() {
         description="NextPro é a plataforma que digitaliza a operação da Reglobo Soccer — para dar mais organização, consistência e transparência ao dia a dia."
       >
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            to="/login"
-            className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
-          >
-            Entrar
-          </Link>
+          <SiteAuthCtaButton className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors" />
           <Link
             to="/como-funciona"
             className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"

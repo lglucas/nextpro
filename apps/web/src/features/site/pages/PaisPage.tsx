@@ -5,6 +5,7 @@ import { SiteSection } from '@/features/site/components/SiteSection'
 import { SiteHero } from '@/features/site/components/SiteHero'
 import { SiteCard } from '@/features/site/components/SiteCard'
 import { SiteCallout } from '@/features/site/components/SiteCallout'
+import { SiteAuthCtaButton } from '@/features/site/components/SiteAuthCtaButton'
 
 export function PaisPage() {
   return (
@@ -100,12 +101,10 @@ export function PaisPage() {
                 >
                   Contato
                 </Link>
-                <Link
-                  to="/login"
+                <SiteAuthCtaButton
                   className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors"
-                >
-                  Entrar
-                </Link>
+                  loggedInLabel="Ir para o app"
+                />
               </>
             }
           />

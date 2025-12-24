@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { ShieldAlert, Database, Save, Activity, Users, Search } from 'lucide-react'
+import { ShieldAlert, Database, Save, Activity, Users, Search, ClipboardList } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { PreCadastrosAdminPanel } from '@/features/admin/components/PreCadastrosAdminPanel'
 
 interface AuditLog {
   id: string
@@ -34,7 +35,7 @@ type SystemSettings = { xp_base: number; financial_block_days: number } & Record
 
 export function CTOCornerPage() {
   const { role, user: currentUser } = useAuth()
-  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users'>('settings')
+  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users' | 'pre_cadastros'>('settings')
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loadingLogs, setLoadingLogs] = useState(false)
   const [users, setUsers] = useState<UserRow[]>([])
@@ -248,6 +249,21 @@ export function CTOCornerPage() {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
             )}
           </button>
+
+          <button
+            onClick={() => setActiveTab('pre_cadastros')}
+            className={`pb-4 px-2 text-sm font-medium transition-colors relative ${
+              activeTab === 'pre_cadastros' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" />
+              Pré‑Cadastros
+            </div>
+            {activeTab === 'pre_cadastros' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -439,6 +455,9 @@ export function CTOCornerPage() {
             </div>
           </div>
         )}
+
+        {/* PRE-CADASTROS TAB */}
+        {activeTab === 'pre_cadastros' && <PreCadastrosAdminPanel />}
 
       </div>
     </div>

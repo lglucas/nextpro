@@ -5,6 +5,15 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.12] - 2025-12-24
+### Added
+- **CTO:** Nova aba para listar pré‑cadastros do censo no painel administrativo.
+- **Auth UI:** Menu de usuário no site público (Meu Perfil + Sair) e página placeholder de perfil.
+### Changed
+- **Auth Flow:** Login/cadastro respeitam `returnTo` e retornam para `/pre-cadastro` quando aplicável.
+### Fixed
+- **RLS:** Super Admin passa a ter acesso de leitura/gestão em `pre_registrations` e leitura em `school_suggestions`.
+
 ## [0.6.11] - 2025-12-24
 ### Added
 - **Pré‑Cadastro:** Tabela `pre_registrations` e `school_suggestions` com RLS para censo por responsável.

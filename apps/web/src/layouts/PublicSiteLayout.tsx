@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
-import { Menu, X, Trophy } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { LogOut, Menu, User, X, Trophy } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const NAV_ITEMS = [
   { label: 'Como Funciona', to: '/como-funciona' },
@@ -14,6 +15,25 @@ const NAV_ITEMS = [
 
 export function PublicSiteLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const { user, signOut } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const returnTo = useMemo(() => encodeURIComponent(location.pathname + location.search), [location.pathname, location.search])
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsMobileMenuOpen(false)
+      setIsUserMenuOpen(false)
+    }, 0)
+    return () => clearTimeout(timeoutId)
+  }, [location.pathname])
+
+  const userLabel = useMemo(() => {
+    if (!user) return ''
+    return user.email || user.id
+  }, [user])
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -44,12 +64,51 @@ export function PublicSiteLayout() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
-            >
-              Entrar
-            </Link>
+            {user ? (
+              <div className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setIsUserMenuOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                  aria-label="Menu do usuário"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-800 max-w-[220px] truncate">{userLabel}</span>
+                </button>
+
+                {isUserMenuOpen ? (
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+                    <Link
+                      to="/app/meu-perfil"
+                      className="flex items-center gap-2 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <User className="w-4 h-4 text-slate-500" />
+                      Meu perfil
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await signOut()
+                        navigate('/', { replace: true })
+                      }}
+                      className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sair
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <Link
+                to={`/login?returnTo=${returnTo}`}
+                className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+              >
+                Entrar
+              </Link>
+            )}
 
             <button
               type="button"
@@ -82,13 +141,41 @@ export function PublicSiteLayout() {
               ))}
 
               <div className="pt-2">
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
-                >
-                  Entrar
-                </Link>
+                {user ? (
+                  <div className="space-y-2">
+                    <Link
+                      to="/app/meu-perfil"
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                    >
+                      Meu perfil
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await signOut()
+                        navigate('/', { replace: true })
+                      }}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                    >
+                      Sair
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link
+                      to={`/login?returnTo=${returnTo}`}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                    >
+                      Entrar
+                    </Link>
+                    <Link
+                      to={`/register?returnTo=${returnTo}`}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                    >
+                      Criar acesso
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -40,6 +40,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 import { AppLayout } from '@/layouts/AppLayout'
 import { HomePage } from '@/features/home/pages/Home'
+import { MeuPerfilPage } from '@/features/profile/pages/MeuPerfilPage'
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
             </PrivateRoute>
           }>
             <Route index element={<HomePage />} />
+            <Route path="meu-perfil" element={<MeuPerfilPage />} />
           </Route>
 
           {/* Rotas do Dashboard Administrativo */}

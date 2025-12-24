@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { SiteCallout } from '@/features/site/components/SiteCallout'
 import { SiteContainer } from '@/features/site/components/SiteContainer'
 import { SiteSection } from '@/features/site/components/SiteSection'
+import { SiteAuthCtaButton } from '@/features/site/components/SiteAuthCtaButton'
 
 export function HomeContactSection() {
   return (
@@ -18,12 +19,10 @@ export function HomeContactSection() {
               >
                 Falar com a equipe
               </Link>
-              <Link
-                to="/login"
+              <SiteAuthCtaButton
                 className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors"
-              >
-                Entrar
-              </Link>
+                loggedInLabel="Ir para o app"
+              />
             </>
           }
         />
@@ -31,4 +30,3 @@ export function HomeContactSection() {
     </SiteSection>
   )
 }
-

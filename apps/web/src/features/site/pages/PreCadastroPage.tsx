@@ -20,13 +20,13 @@ export function PreCadastroPage() {
         {!user ? (
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
-              to="/login"
+              to="/login?returnTo=%2Fpre-cadastro"
               className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
             >
               Entrar
             </Link>
             <Link
-              to="/register"
+              to="/register?returnTo=%2Fpre-cadastro"
               className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
             >
               Criar acesso

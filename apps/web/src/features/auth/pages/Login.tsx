@@ -1,9 +1,22 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+
+function getSafeReturnTo(value: string | null) {
+  if (!value) return '/app'
+  try {
+    const decoded = decodeURIComponent(value)
+    if (decoded.startsWith('/')) return decoded
+    return '/app'
+  } catch {
+    return '/app'
+  }
+}
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const returnTo = getSafeReturnTo(searchParams.get('returnTo'))
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('') // Adicionado estado de senha
@@ -22,7 +35,7 @@ export function LoginPage() {
 
       if (error) throw error
 
-      navigate('/app') // Redireciona após sucesso
+      navigate(returnTo, { replace: true }) // Redireciona após sucesso
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao fazer login'
       setError(message)
@@ -83,7 +96,7 @@ export function LoginPage() {
 
         <div className="mt-6 text-center text-sm text-slate-500">
           Ainda não tem conta?{' '}
-          <Link to="/register" className="text-primary font-semibold hover:underline">
+          <Link to={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="text-primary font-semibold hover:underline">
             Criar conta
           </Link>
         </div>
