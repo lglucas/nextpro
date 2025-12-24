@@ -5,9 +5,9 @@ import { Menu, X, Trophy } from 'lucide-react'
 const NAV_ITEMS = [
   { label: 'Como Funciona', to: '/como-funciona' },
   { label: 'Projeto', to: '/projeto' },
-  { label: 'Pais', to: '/pais' },
-  { label: 'Atletas', to: '/atletas' },
-  { label: 'Escolinhas', to: '/escolinhas' },
+  { label: 'Para Pais', to: '/pais' },
+  { label: 'Para Atletas', to: '/atletas' },
+  { label: 'Para Escolinhas', to: '/escolinhas' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Contato', to: '/contato' },
 ]

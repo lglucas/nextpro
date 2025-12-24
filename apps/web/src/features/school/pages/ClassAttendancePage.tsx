@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { 
@@ -60,20 +60,12 @@ export function ClassAttendancePage() {
   const [attendanceData, setAttendanceData] = useState<Record<string, Attendance>>({})
   const [isSaving, setIsSaving] = useState(false)
 
-  useEffect(() => {
-    if (classId) {
-      fetchClassDetails()
-      fetchSessions()
-      fetchStudents()
-    }
-  }, [classId])
-
-  const fetchClassDetails = async () => {
+  const fetchClassDetails = useCallback(async () => {
     const { data } = await supabase.from('classes').select('name').eq('id', classId).single()
     if (data) setClassName(data.name)
-  }
+  }, [classId])
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     const { data, error } = await supabase
       .from('class_sessions')
       .select('*, attendances(count)')
@@ -88,9 +80,9 @@ export function ClassAttendancePage() {
       })))
     }
     setLoading(false)
-  }
+  }, [classId])
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     const { data } = await supabase
       .from('class_students')
       .select('student:students(id, full_name, photo_url)')
@@ -103,7 +95,15 @@ export function ClassAttendancePage() {
         .filter((s): s is Student => Boolean(s))
       setStudents(studentsList)
     }
-  }
+  }, [classId])
+
+  useEffect(() => {
+    if (classId) {
+      fetchClassDetails()
+      fetchSessions()
+      fetchStudents()
+    }
+  }, [classId, fetchClassDetails, fetchSessions, fetchStudents])
 
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault()

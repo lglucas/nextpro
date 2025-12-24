@@ -5,6 +5,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.10] - 2025-12-24
+### Added
+- **Site Público:** Componentes de UI reutilizáveis (Hero/Section/Card/Callout) e seções da Home para padronização visual.
+### Changed
+- **Site Público:** Revisão e expansão de textos em todas as páginas e melhoria do layout para um tom mais premium.
+### Fixed
+- **Lint/Build:** Corrigidos warnings do `react-hooks/exhaustive-deps` nas páginas escolares e ajustado import de ícone inválido no site.
+
 ## [0.6.9] - 2025-12-24
 ### Changed
 - **Site Público:** Refinados textos e navegação do site institucional (Home e Como Funciona) e ajustado visual para um tom mais premium.

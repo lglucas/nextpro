@@ -1,97 +1,133 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Flag, Layers3, Target } from 'lucide-react'
+import { SiteContainer } from '@/features/site/components/SiteContainer'
+import { SiteSection } from '@/features/site/components/SiteSection'
+import { SiteHero } from '@/features/site/components/SiteHero'
+import { SiteCard } from '@/features/site/components/SiteCard'
+import { SiteCallout } from '@/features/site/components/SiteCallout'
 
 export function ProjetoPage() {
   return (
-    <div className="bg-white">
-      <section className="bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-              Uma operação real no campo. Uma plataforma para organizar e evoluir no digital.
-            </h1>
-            <p className="mt-4 text-slate-600">
-              A Reglobo Soccer construiu uma história real na base. O NextPro nasce para levar essa experiência para o digital
-              — com organização, padronização e um histórico de evolução que acompanha o atleta ao longo do tempo.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/como-funciona"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
-              >
-                Como funciona <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-              <Link
-                to="/contato"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
-              >
-                Contato institucional
-              </Link>
+    <div>
+      <SiteHero
+        eyebrow="Projeto"
+        title="Uma operação real no campo. Uma plataforma para organizar e evoluir no digital."
+        description="A Reglobo Soccer construiu uma história na base. O NextPro nasce para digitalizar essa operação com padrão, linguagem clara e um histórico de evolução que acompanha o atleta ao longo do tempo."
+      />
+
+      <SiteSection>
+        <SiteContainer>
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <p className="text-sm font-semibold text-primary">Reglobo Soccer</p>
+              <h2 className="mt-2 text-xl font-bold text-slate-900">A operação e a experiência de campo</h2>
+              <p className="mt-3 text-slate-600">
+                A história do projeto foi construída no dia a dia: treino, rotina, relacionamento com famílias e formação.
+                Esse lastro é o que dá verdade ao que fazemos.
+              </p>
+              <p className="mt-3 text-slate-600">
+                Núcleos e avaliações qualificadas fazem parte do caminho, reforçando seriedade quando é hora de observar,
+                comparar e acompanhar com mais profundidade.
+              </p>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <p className="text-sm font-semibold text-primary">NextPro</p>
+              <h2 className="mt-2 text-xl font-bold text-slate-900">A camada de digitalização e padronização</h2>
+              <p className="mt-3 text-slate-600">
+                O NextPro organiza o que acontece na base com consistência: comunicação, rotina e histórico ao longo do tempo.
+                Isso reduz ruído e cria contexto para todos os envolvidos.
+              </p>
+              <p className="mt-3 text-slate-600">
+                A plataforma conecta escolinhas, núcleos, comunidade, scouts e clubes — sem perder o foco no que importa: o
+                treino e a evolução do atleta.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </SiteContainer>
+      </SiteSection>
 
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">História</h2>
-            <p className="mt-3 text-slate-600">
-              O projeto nasce da experiência prática e contínua na base. O objetivo do NextPro é transformar o dia a dia em
-              um histórico mais consistente, com linguagem acessível para famílias e um padrão operacional para as escolinhas.
-            </p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Missão</h2>
-            <p className="mt-3 text-slate-600">
-              Digitalizar e padronizar a rotina do esporte de base para criar mais organização, consistência e transparência.
-            </p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Visão</h2>
-            <p className="mt-3 text-slate-600">
-              Construir um ecossistema conectado — escolinhas, núcleos e profissionais — com histórico ao longo do tempo.
-            </p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Compromissos</h2>
-            <p className="mt-3 text-slate-600">
-              Seriedade, clareza no acompanhamento e proteção de dados como base de confiança para famílias e escolinhas.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-14 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">O que muda a partir daqui</h2>
-          <p className="mt-3 text-slate-600 max-w-3xl">
-            A proposta é simples: transformar o dia a dia em um histórico mais consistente, com acompanhamento ao longo do
-            tempo. Quando há momentos de avaliação no núcleo e avaliações de profissionais credenciados, isso ajuda a
-            qualificar ainda mais o contexto.
+      <SiteSection variant="muted">
+        <SiteContainer>
+          <h2 className="text-2xl font-bold text-slate-900">Missão, visão e compromissos</h2>
+          <p className="mt-2 text-slate-600 max-w-3xl">
+            Um projeto sério precisa de padrão, clareza e responsabilidade. Nossa ambição é organizar a base e construir um
+            histórico que faça sentido ao longo do tempo.
           </p>
-          <div className="mt-8 grid md:grid-cols-2 gap-4">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6">
-              <p className="font-semibold text-slate-900">Consistência</p>
-              <p className="mt-2 text-sm text-slate-600">Evolução registrada ao longo do tempo, não por um único dia.</p>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-2xl p-6">
-              <p className="font-semibold text-slate-900">Transparência</p>
-              <p className="mt-2 text-sm text-slate-600">Mais clareza para famílias e mais padrão para escolinhas.</p>
-            </div>
+          <div className="mt-8 grid md:grid-cols-3 gap-4">
+            <SiteCard
+              icon={<Target className="w-5 h-5 text-primary" />}
+              title="Missão"
+              description="Digitalizar e padronizar a rotina do esporte de base para criar organização, consistência e transparência."
+            />
+            <SiteCard
+              icon={<Flag className="w-5 h-5 text-primary" />}
+              title="Visão"
+              description="Construir um ecossistema conectado com histórico ao longo do tempo, do treino às avaliações qualificadas."
+            />
+            <SiteCard
+              icon={<Layers3 className="w-5 h-5 text-primary" />}
+              title="Compromissos"
+              description="Seriedade no acompanhamento e proteção de dados como base de confiança para famílias e escolinhas."
+            />
           </div>
-        </div>
-      </section>
+        </SiteContainer>
+      </SiteSection>
 
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-slate-900">Credibilidade e parceiros</h2>
-            <p className="mt-3 text-slate-600">Seção institucional. Lista completa e logos: em breve.</p>
+      <SiteSection>
+        <SiteContainer>
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">O que muda a partir daqui</h2>
+              <p className="mt-3 text-slate-600">
+                Em vez de depender de um único momento, o acompanhamento passa a ser construído no dia a dia — com mais
+                consistência, mais contexto e uma base organizada para conversas futuras com scouts e clubes.
+              </p>
+              <p className="mt-3 text-slate-600">
+                Quando existem avaliações qualificadas, elas reforçam o histórico e ajudam o ecossistema a enxergar melhor a
+                evolução do atleta.
+              </p>
+              <div className="mt-6">
+                <Link to="/como-funciona" className="inline-flex items-center text-primary font-semibold hover:underline">
+                  Ver como funciona <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <SiteCard title="Consistência" description="Evolução registrada ao longo do tempo, não por um único dia." />
+              <SiteCard title="Transparência" description="Mais clareza para famílias e mais padrão para escolinhas." />
+              <SiteCard title="Contexto" description="Rotina, presença e acompanhamento conectados em uma visão única." />
+              <SiteCard title="Seriedade" description="Um caminho mais estruturado para avaliações e conversas futuras." />
+            </div>
           </div>
-        </div>
-      </section>
+        </SiteContainer>
+      </SiteSection>
+
+      <SiteSection variant="muted">
+        <SiteContainer>
+          <SiteCallout
+            title="Contato institucional"
+            description="Quer falar com a equipe NextPro sobre o projeto, implantação e operação? Use o canal institucional."
+            actions={
+              <>
+                <Link
+                  to="/contato"
+                  className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-colors"
+                >
+                  Contato
+                </Link>
+                <Link
+                  to="/como-funciona"
+                  className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors"
+                >
+                  Como funciona
+                </Link>
+              </>
+            }
+          />
+        </SiteContainer>
+      </SiteSection>
     </div>
   )
 }
-

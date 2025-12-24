@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -52,11 +52,32 @@ export function ClassesPage() {
     school_id: ''
   })
 
-  useEffect(() => {
-    fetchProfileAndData()
-  }, [user])
+  const fetchClasses = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('classes')
+        .select('*, _count:class_students(count)')
+        .order('created_at', { ascending: false })
 
-  const fetchProfileAndData = async () => {
+      if (error) {
+        console.error('Erro ao buscar turmas:', error)
+        setClasses([])
+        return
+      }
+
+      const formattedData = (data || []).map(d => ({
+        ...d,
+        _count: { class_students: d._count?.[0]?.count || 0 } 
+      }))
+      
+      setClasses(formattedData)
+    } catch (err) {
+      console.error('Erro ao processar turmas:', err)
+      setClasses([])
+    }
+  }, [])
+
+  const fetchProfileAndData = useCallback(async () => {
     try {
       setLoading(true)
       
@@ -78,40 +99,18 @@ export function ClassesPage() {
         if (schoolsData) setSchools(schoolsData)
       }
 
-      fetchClasses()
+      await fetchClasses()
 
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [fetchClasses, role, user])
 
-  const fetchClasses = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('classes')
-        .select('*, _count:class_students(count)')
-        .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('Erro ao buscar turmas:', error)
-        setClasses([])
-        return
-      }
-
-      // Transform _count to number
-      const formattedData = (data || []).map(d => ({
-        ...d,
-        _count: { class_students: d._count?.[0]?.count || 0 } 
-      }))
-      
-      setClasses(formattedData)
-    } catch (err) {
-      console.error('Erro ao processar turmas:', err)
-      setClasses([])
-    }
-  }
+  useEffect(() => {
+    fetchProfileAndData()
+  }, [fetchProfileAndData])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

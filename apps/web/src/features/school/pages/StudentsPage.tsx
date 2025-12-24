@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield } from 'lucide-react'
@@ -62,11 +62,34 @@ export function StudentsPage() {
     email: ''
   })
 
-  useEffect(() => {
-    fetchProfileAndData()
-  }, [user])
+  const fetchStudents = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('students')
+      .select(`
+        *,
+        guardian:guardians (
+          id,
+          full_name,
+          phone,
+          email
+        )
+      `)
+      .order('created_at', { ascending: false })
+    
+    if (error) console.error('Erro ao buscar alunos:', error)
+    else setStudents(data || [])
+  }, [])
 
-  const fetchProfileAndData = async () => {
+  const fetchGuardians = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('guardians')
+      .select('*')
+      .order('full_name', { ascending: true })
+      
+    if (!error && data) setGuardians(data)
+  }, [])
+
+  const fetchProfileAndData = useCallback(async () => {
     try {
       setLoading(true)
       
@@ -88,42 +111,19 @@ export function StudentsPage() {
         if (schoolsData) setSchools(schoolsData)
       }
 
-      fetchStudents()
-      fetchGuardians()
+      await fetchStudents()
+      await fetchGuardians()
 
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [fetchGuardians, fetchStudents, role, user])
 
-  const fetchStudents = async () => {
-    const { data, error } = await supabase
-      .from('students')
-      .select(`
-        *,
-        guardian:guardians (
-          id,
-          full_name,
-          phone,
-          email
-        )
-      `)
-      .order('created_at', { ascending: false })
-    
-    if (error) console.error('Erro ao buscar alunos:', error)
-    else setStudents(data || [])
-  }
-
-  const fetchGuardians = async () => {
-    const { data, error } = await supabase
-      .from('guardians')
-      .select('*')
-      .order('full_name', { ascending: true })
-      
-    if (!error && data) setGuardians(data)
-  }
+  useEffect(() => {
+    fetchProfileAndData()
+  }, [fetchProfileAndData])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

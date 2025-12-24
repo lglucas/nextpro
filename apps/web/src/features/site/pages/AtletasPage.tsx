@@ -1,56 +1,90 @@
 import { Link } from 'react-router-dom'
+import { ClipboardCheck, Compass, Trophy, Zap } from 'lucide-react'
+import { SiteContainer } from '@/features/site/components/SiteContainer'
+import { SiteSection } from '@/features/site/components/SiteSection'
+import { SiteHero } from '@/features/site/components/SiteHero'
+import { SiteCard } from '@/features/site/components/SiteCard'
+import { SiteCallout } from '@/features/site/components/SiteCallout'
 
 export function AtletasPage() {
   return (
-    <div className="bg-white">
-      <section className="bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-              Sua evolução não é um palpite. É um histórico — treino após treino.
-            </h1>
-            <p className="mt-4 text-slate-600">
-              Rotina, disciplina e participação no dia a dia ajudam a construir uma visão mais completa ao longo do tempo.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
-              >
-                Entrar
-              </Link>
-              <Link
-                to="/como-funciona"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
-              >
-                Como funciona
-              </Link>
+    <div>
+      <SiteHero
+        eyebrow="Para Atletas"
+        title="Sua evolução não é um palpite. É um histórico — treino após treino."
+        description="Rotina, disciplina e participação no dia a dia ajudam a construir um caminho mais consistente, com mais contexto ao longo do tempo."
+      />
+
+      <SiteSection>
+        <SiteContainer>
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">O que importa de verdade</h2>
+              <p className="mt-3 text-slate-600">
+                A base é feita de repetição, consistência e rotina. O NextPro não é sobre “um dia bom” — é sobre construir
+                histórico, entender evolução e dar clareza para quem acompanha sua jornada.
+              </p>
+              <p className="mt-3 text-slate-600">
+                A plataforma organiza o dia a dia com responsabilidade e linguagem simples, sem promessas exageradas. O foco
+                é disciplina, presença, participação e contexto.
+              </p>
+              <div className="mt-6">
+                <Link to="/como-funciona" className="inline-flex items-center text-primary font-semibold hover:underline">
+                  Entender o ecossistema
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <SiteCard
+                icon={<Trophy className="w-5 h-5 text-primary" />}
+                title="Rotina"
+                description="Treino após treino, com consistência e foco no que importa."
+              />
+              <SiteCard
+                icon={<ClipboardCheck className="w-5 h-5 text-primary" />}
+                title="Participação"
+                description="O atleta registra contexto e percepção diária do treino, construindo disciplina."
+              />
+              <SiteCard
+                icon={<Compass className="w-5 h-5 text-primary" />}
+                title="Caminho"
+                description="Escolinhas, núcleos, comunidade, scouts e clubes conectados ao longo do tempo."
+              />
+              <SiteCard
+                icon={<Zap className="w-5 h-5 text-primary" />}
+                title="Evolução"
+                description="Uma visão mais completa, baseada em consistência e histórico."
+              />
             </div>
           </div>
-        </div>
-      </section>
+        </SiteContainer>
+      </SiteSection>
 
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Rotina</h2>
-            <p className="mt-3 text-slate-600">Treino após treino, com consistência e foco no que importa.</p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Participação</h2>
-            <p className="mt-3 text-slate-600">
-              O atleta participa registrando contexto e percepção diária do treino, ajudando a construir disciplina.
-            </p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900">Caminho</h2>
-            <p className="mt-3 text-slate-600">
-              Escolinhas + histórico + núcleos (quando aplicável): um ecossistema conectado ao longo do tempo.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SiteSection variant="muted">
+        <SiteContainer>
+          <SiteCallout
+            title="Acesso orientado pela escolinha"
+            description="O acesso é feito por comunicação e convites do projeto e das escolinhas participantes."
+            actions={
+              <>
+                <Link
+                  to="/faq"
+                  className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-colors"
+                >
+                  Ver FAQ
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors"
+                >
+                  Entrar
+                </Link>
+              </>
+            }
+          />
+        </SiteContainer>
+      </SiteSection>
     </div>
   )
 }
-
