@@ -4,9 +4,12 @@ import { ArrowRight, BarChart3, GraduationCap, ShieldCheck, Trophy, Users } from
 export function SiteHomePage() {
   return (
     <div>
-      <section className="bg-gradient-to-b from-slate-50 to-white">
+      <section className="bg-[radial-gradient(900px_circle_at_0%_0%,rgba(59,130,246,0.18),transparent_55%),radial-gradient(900px_circle_at_100%_20%,rgba(15,23,42,0.10),transparent_55%)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-slate-200 text-xs font-semibold text-slate-700">
+              NextPro · Reglobo Soccer
+            </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">O futuro do esporte começa na base.</h1>
             <p className="mt-5 text-base sm:text-lg text-slate-600">
               NextPro é a plataforma que digitaliza a operação da Reglobo Soccer — para dar mais organização, consistência e
@@ -57,40 +60,45 @@ export function SiteHomePage() {
                 <p className="text-sm text-slate-600">escolinhas prontas</p>
               </div>
             </div>
-            <p className="mt-4 text-xs text-slate-500">
-              No futuro, estes números poderão ser atualizados em tempo real pela plataforma.
-            </p>
           </div>
         </div>
       </section>
       <section className="py-14 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">Para quem é</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Para quem o NextPro foi criado</h2>
           <p className="mt-2 text-slate-600 max-w-2xl">Conteúdo por perfil, com linguagem institucional e foco no dia a dia da base.</p>
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link to="/pais" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-shadow">
-              <Users className="w-6 h-6 text-primary" />
+            <Link to="/pais" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
               <p className="mt-3 font-semibold text-slate-900">Pais</p>
               <p className="mt-1 text-sm text-slate-600">Organização, rotina e histórico com mais clareza.</p>
               <p className="mt-3 text-sm text-primary group-hover:underline">Ver mais</p>
             </Link>
 
-            <Link to="/atletas" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-shadow">
-              <Trophy className="w-6 h-6 text-primary" />
+            <Link to="/atletas" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-primary" />
+              </div>
               <p className="mt-3 font-semibold text-slate-900">Atletas</p>
               <p className="mt-1 text-sm text-slate-600">Evolução treino após treino, sem promessas exageradas.</p>
               <p className="mt-3 text-sm text-primary group-hover:underline">Ver mais</p>
             </Link>
 
-            <Link to="/escolinhas" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-shadow">
-              <GraduationCap className="w-6 h-6 text-primary" />
+            <Link to="/escolinhas" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-primary" />
+              </div>
               <p className="mt-3 font-semibold text-slate-900">Escolinhas</p>
               <p className="mt-1 text-sm text-slate-600">Gestão padronizada, comunicação e dados consistentes.</p>
               <p className="mt-3 text-sm text-primary group-hover:underline">Ver mais</p>
             </Link>
 
-            <Link to="/como-funciona" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-shadow">
-              <BarChart3 className="w-6 h-6 text-primary" />
+            <Link to="/como-funciona" className="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-primary" />
+              </div>
               <p className="mt-3 font-semibold text-slate-900">Ecossistema</p>
               <p className="mt-1 text-sm text-slate-600">Escolinhas, núcleos, scouts e clubes com mais contexto.</p>
               <p className="mt-3 text-sm text-primary group-hover:underline">Ver mais</p>
@@ -102,10 +110,9 @@ export function SiteHomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">Como funciona (visão geral)</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Como funciona</h2>
               <p className="mt-2 text-slate-600">
-                Um ecossistema conectado: rotina nas escolinhas, momentos de acompanhamento no núcleo (quando aplicável) e
-                histórico consistente ao longo do tempo.
+                Um ecossistema conectado: escolinhas, núcleos, comunidade, scouts e clubes — com histórico consistente ao longo do tempo.
               </p>
               <Link to="/como-funciona" className="mt-6 inline-flex items-center text-primary font-semibold hover:underline">
                 Ver como funciona <ArrowRight className="w-4 h-4 ml-2" />
@@ -139,14 +146,10 @@ export function SiteHomePage() {
       </section>
       <section className="py-14 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">Perguntas frequentes</h2>
-          <p className="mt-2 text-slate-600 max-w-2xl">Respostas por categoria para pais, atletas, escolinhas e privacidade.</p>
+          <h2 className="text-2xl font-bold text-slate-900">Dúvidas comuns</h2>
+          <p className="mt-2 text-slate-600 max-w-2xl">Respostas rápidas e acesso ao FAQ completo por categoria.</p>
           <div className="mt-6 bg-white border border-slate-200 rounded-2xl p-6">
             <div className="space-y-4">
-              <div>
-                <p className="font-semibold text-slate-900">O NextPro é um aplicativo à venda?</p>
-                <p className="mt-1 text-sm text-slate-600">Não. O NextPro é a plataforma que organiza e digitaliza a operação das escolinhas do projeto.</p>
-              </div>
               <div>
                 <p className="font-semibold text-slate-900">Como as famílias acessam?</p>
                 <p className="mt-1 text-sm text-slate-600">O acesso é orientado pelas escolinhas participantes e pelo projeto, com comunicação e convites adequados.</p>
@@ -154,6 +157,10 @@ export function SiteHomePage() {
               <div>
                 <p className="font-semibold text-slate-900">Onde encontro informações por perfil?</p>
                 <p className="mt-1 text-sm text-slate-600">Veja as páginas “Pais”, “Atletas” e “Escolinhas” para uma visão direta.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900">Como falo com a equipe?</p>
+                <p className="mt-1 text-sm text-slate-600">Use o contato institucional para dúvidas e alinhamentos.</p>
               </div>
             </div>
             <div className="mt-6">

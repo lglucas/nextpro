@@ -3,11 +3,11 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { Menu, X, Trophy } from 'lucide-react'
 
 const NAV_ITEMS = [
+  { label: 'Como Funciona', to: '/como-funciona' },
   { label: 'Projeto', to: '/projeto' },
   { label: 'Pais', to: '/pais' },
   { label: 'Atletas', to: '/atletas' },
   { label: 'Escolinhas', to: '/escolinhas' },
-  { label: 'Como Funciona', to: '/como-funciona' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Contato', to: '/contato' },
 ]
@@ -17,7 +17,7 @@ export function PublicSiteLayout() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-100">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -141,4 +141,3 @@ export function PublicSiteLayout() {
     </div>
   )
 }
-

@@ -7,11 +7,10 @@ export function ComoFuncionaPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-3xl">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-              Escolinhas + Núcleos + Plataforma: um ecossistema conectado.
+              Escolinhas + Núcleos + Comunidade + Scouts + Clubes + Plataforma: um ecossistema conectado.
             </h1>
             <p className="mt-4 text-slate-600">
-              A base é construída no dia a dia. O NextPro organiza esse caminho com histórico, consistência e contexto para o
-              projeto.
+              A base é construída no dia a dia. O NextPro organiza esse caminho com histórico, consistência e contexto para o projeto.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
@@ -33,8 +32,8 @@ export function ComoFuncionaPage() {
 
       <section className="py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">Fluxo em macroetapas</h2>
-          <div className="mt-8 grid md:grid-cols-3 gap-4">
+          <h2 className="text-2xl font-bold text-slate-900">Fluxo</h2>
+          <div className="mt-8 grid md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
               <p className="text-sm font-semibold text-primary">1</p>
               <p className="mt-2 font-semibold text-slate-900">Dia a dia na escolinha</p>
@@ -42,13 +41,23 @@ export function ComoFuncionaPage() {
             </div>
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
               <p className="text-sm font-semibold text-primary">2</p>
-              <p className="mt-2 font-semibold text-slate-900">Núcleos (quando aplicável)</p>
-              <p className="mt-2 text-sm text-slate-600">Momentos de acompanhamento e avaliação com equipe técnica NextPro.</p>
+              <p className="mt-2 font-semibold text-slate-900">Núcleos</p>
+              <p className="mt-2 text-sm text-slate-600">Momentos de acompanhamento e avaliação com a equipe técnica NextPro.</p>
             </div>
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
               <p className="text-sm font-semibold text-primary">3</p>
-              <p className="mt-2 font-semibold text-slate-900">Profissionais e clubes</p>
-              <p className="mt-2 text-sm text-slate-600">Mais contexto e seriedade para avaliações e conversas futuras.</p>
+              <p className="mt-2 font-semibold text-slate-900">Comunidade</p>
+              <p className="mt-2 text-sm text-slate-600">Engajamento e interação com mais contexto e organização no dia a dia.</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <p className="text-sm font-semibold text-primary">4</p>
+              <p className="mt-2 font-semibold text-slate-900">Scouts</p>
+              <p className="mt-2 text-sm text-slate-600">Avaliações e observações com mais clareza de contexto.</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <p className="text-sm font-semibold text-primary">5</p>
+              <p className="mt-2 font-semibold text-slate-900">Clubes</p>
+              <p className="mt-2 text-sm text-slate-600">Conversas futuras com mais seriedade, com histórico ao longo do tempo.</p>
             </div>
           </div>
         </div>
@@ -73,4 +82,3 @@ export function ComoFuncionaPage() {
     </div>
   )
 }
-

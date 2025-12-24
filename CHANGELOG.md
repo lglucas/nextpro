@@ -5,6 +5,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.9] - 2025-12-24
+### Changed
+- **Site Público:** Refinados textos e navegação do site institucional (Home e Como Funciona) e ajustado visual para um tom mais premium.
+
 ## [0.6.8] - 2025-12-24
 ### Added
 - **Site Público:** Estrutura inicial do site institucional multi‑páginas (layout público, navegação, footer e páginas base).
