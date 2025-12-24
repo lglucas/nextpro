@@ -58,9 +58,10 @@ export function RegisterPage() {
           // Opcional: Redirecionar para uma página de "Check your email"
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro no cadastro:', err)
-      setError(err.message || 'Erro ao criar conta. Tente novamente.')
+      const message = err instanceof Error ? err.message : 'Erro ao criar conta. Tente novamente.'
+      setError(message)
     } finally {
       setLoading(false)
     }

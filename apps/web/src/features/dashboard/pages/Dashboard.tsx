@@ -1,17 +1,32 @@
-import { BarChart3, TrendingUp, Users, Wallet, GraduationCap } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, GraduationCap } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { generateDashboardReport } from '@/utils/pdf'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
+interface AuditLogEntry {
+  action: string
+  user: string
+  time: string
+  detail: string
+}
+
+interface RawAuditLog {
+  action: string
+  user_email?: string | null
+  created_at: string
+  details?: string | null
+  payload?: unknown
+}
+
 export function DashboardPage() {
-  const { user, role } = useAuth()
+  const { user } = useAuth()
   const [realStats, setRealStats] = useState({
     students: 0,
     classes: 0,
     evaluations: 0
   })
-  const [auditLogs, setAuditLogs] = useState<any[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
 
   useEffect(() => {
     async function fetchStats() {
@@ -43,18 +58,17 @@ export function DashboardPage() {
           .limit(5)
         
         if (logs) {
-           // Mapear logs para o formato de exibição se necessário, ou usar direto
-           setAuditLogs(logs.map(log => ({
-             action: log.action,
-             user: log.user_email || 'Sistema', // Fallback se não tiver join
-             time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-             detail: log.details || JSON.stringify(log.payload)
-           })))
+          const typedLogs = logs as unknown as RawAuditLog[]
+          setAuditLogs(
+            typedLogs.map((log) => ({
+              action: log.action,
+              user: log.user_email || 'Sistema',
+              time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+              detail: log.details || JSON.stringify(log.payload),
+            }))
+          )
         } else {
-           // Fallback para mock se não tiver logs reais ainda
-           setAuditLogs([
-            { action: 'Sistema Iniciado', user: 'System', time: 'Agora', detail: 'Dashboard carregado' }
-           ])
+          setAuditLogs([{ action: 'Sistema Iniciado', user: 'System', time: 'Agora', detail: 'Dashboard carregado' }])
         }
 
       } catch (error) {

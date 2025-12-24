@@ -4,10 +4,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { 
   LayoutDashboard, 
   Users, 
-  Settings, 
   LogOut, 
   Menu, 
-  X,
   Trophy,
   BarChart3,
   ShieldAlert,

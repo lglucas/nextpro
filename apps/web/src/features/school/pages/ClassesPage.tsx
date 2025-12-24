@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { GraduationCap, Plus, Search, Edit, Trash, Save, X, Clock, Calendar, Users, ClipboardList } from 'lucide-react'
+import { GraduationCap, Plus, Edit, Save, X, Clock, Calendar, Users, ClipboardList } from 'lucide-react'
 
 interface Class {
   id: string
@@ -41,8 +41,6 @@ export function ClassesPage() {
   const [isCreating, setIsCreating] = useState(false)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([])
-  const [isStudentManagerOpen, setIsStudentManagerOpen] = useState(false)
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null)
 
   // Form Data
   const [formData, setFormData] = useState({

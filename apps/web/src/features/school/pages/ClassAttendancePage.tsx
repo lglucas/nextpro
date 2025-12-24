@@ -9,7 +9,6 @@ import {
   AlertCircle, 
   Plus, 
   ArrowLeft,
-  MoreVertical,
   Save,
   Trash
 } from 'lucide-react'
@@ -99,7 +98,9 @@ export function ClassAttendancePage() {
       .order('student(full_name)')
     
     if (data) {
-      const studentsList = data.map((d: any) => d.student).filter(Boolean)
+      const studentsList = (data as unknown as Array<{ student: Student | null }>)
+        .map((d) => d.student)
+        .filter((s): s is Student => Boolean(s))
       setStudents(studentsList)
     }
   }

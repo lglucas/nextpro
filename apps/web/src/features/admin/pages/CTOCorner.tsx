@@ -1,30 +1,58 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { ShieldAlert, Database, Save, Activity, Users, Search, AlertTriangle, GraduationCap } from 'lucide-react'
+import { ShieldAlert, Database, Save, Activity, Users, Search } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+
+interface AuditLog {
+  id: string
+  created_at: string
+  action: string
+  target: string
+  details: unknown
+  profiles?: {
+    full_name?: string | null
+    email?: string | null
+  } | null
+}
+
+interface UserRow {
+  id: string
+  full_name: string
+  email: string
+  role: string
+  school_id?: string | null
+}
+
+interface SchoolRow {
+  id: string
+  name: string
+}
+
+type SystemSettings = { xp_base: number; financial_block_days: number } & Record<string, unknown>
 
 export function CTOCornerPage() {
   const { role, user: currentUser } = useAuth()
   const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users'>('settings')
-  const [logs, setLogs] = useState<any[]>([])
+  const [logs, setLogs] = useState<AuditLog[]>([])
   const [loadingLogs, setLoadingLogs] = useState(false)
-  const [users, setUsers] = useState<any[]>([])
-  const [schools, setSchools] = useState<any[]>([])
+  const [users, setUsers] = useState<UserRow[]>([])
+  const [schools, setSchools] = useState<SchoolRow[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
-  const [settings, setSettings] = useState<any>({ xp_base: 10, financial_block_days: 5 })
+  const [settings, setSettings] = useState<SystemSettings>({ xp_base: 10, financial_block_days: 5 })
 
   // Carregar Configurações
   useEffect(() => {
     const loadSettings = async () => {
       const { data } = await supabase.from('system_settings').select('*')
       if (data) {
-        const newSettings = data.reduce((acc: any, curr: any) => ({
-          ...acc,
-          [curr.key]: curr.value
-        }), {})
-        setSettings((prev: any) => ({ ...prev, ...newSettings }))
+        const rows = data as unknown as Array<{ key: string; value: unknown }>
+        const newSettings = rows.reduce<Record<string, unknown>>((acc, curr) => {
+          acc[curr.key] = curr.value
+          return acc
+        }, {})
+        setSettings((prev) => ({ ...prev, ...newSettings } as SystemSettings))
       }
     }
     loadSettings()
@@ -53,13 +81,13 @@ export function CTOCornerPage() {
       .order('created_at', { ascending: false })
       .limit(50)
     
-    if (data) setLogs(data)
+    if (data) setLogs(data as unknown as AuditLog[])
     setLoadingLogs(false)
   }
 
   const fetchSchools = async () => {
     const { data } = await supabase.from('schools').select('id, name')
-    if (data) setSchools(data)
+    if (data) setSchools(data as unknown as SchoolRow[])
   }
 
   const fetchUsers = async () => {
@@ -71,7 +99,7 @@ export function CTOCornerPage() {
       .select('*')
       .order('created_at', { ascending: false })
     
-    if (data) setUsers(data)
+    if (data) setUsers(data as unknown as UserRow[])
     setLoadingUsers(false)
   }
 

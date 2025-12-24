@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { UserPlus, Search, Edit, Trash, Save, X, Phone, Calendar, Heart, UserCheck, Shield } from 'lucide-react'
+import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield } from 'lucide-react'
 
 interface Guardian {
   id: string
@@ -19,6 +19,11 @@ interface Student {
   guardian?: Guardian // Join
   category: string
   active: boolean
+  class_students?: Array<{
+    class?: {
+      name: string
+    } | null
+  }>
 }
 
 interface School {
