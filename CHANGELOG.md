@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2025-12-24
+### Fixed
+- **Dev Environment:** Corrigido erro do Vite/React-Babel de módulo ausente (`@babel/helper-validator-identifier`) com reinstalação confiável via lockfile.
+- **Auth:** Separado `AuthProvider` do `AuthContext` para estabilizar Fast Refresh e reduzir falsos positivos do lint.
+- **TypeScript/Lint:** Removidos `any` e imports não usados em páginas de Auth, Dashboard, CTO Corner e área escolar.
+- **PDF:** Ajustada tipagem de cores e removido `@ts-ignore` para destravar build.
+
 ## [0.6.2] - 2025-12-17
 ### Added
 - **Planning:** Criado `Sprint 2.5` (Site Público + Pré-Cadastro via formulário) e refinado `Sprint 5` com notas estratégicas de Gamificação, NextPro Academy (carreira de scouts), Protocolo Pinóquio e Censo (wizard).

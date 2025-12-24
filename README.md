@@ -77,6 +77,11 @@ Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte
     ```bash
     npm install
     ```
+    Se você tiver erro no Vite/Babel (ex: módulo `@babel/*` ausente), prefira instalar pelo lockfile do app web:
+    ```bash
+    cd apps/web
+    npm ci
+    ```
 
 3.  **Configure o Ambiente**
     Crie um arquivo `apps/web/.env` baseado no exemplo:
