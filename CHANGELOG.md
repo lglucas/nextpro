@@ -11,6 +11,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Auth:** Separado `AuthProvider` do `AuthContext` para estabilizar Fast Refresh e reduzir falsos positivos do lint.
 - **TypeScript/Lint:** Removidos `any` e imports não usados em páginas de Auth, Dashboard, CTO Corner e área escolar.
 - **PDF:** Ajustada tipagem de cores e removido `@ts-ignore` para destravar build.
+### Changed
+- **Rollback:** Revertido o repositório para o commit `16c6b2c539ba6b6d94f742e19de9d8e07978216` para remover o site institucional/formulário fora do padrão esperado (reset hard + force push), e então estabilizado o build/lint após o rollback.
 
 ## [0.6.2] - 2025-12-17
 ### Added
