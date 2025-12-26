@@ -1,6 +1,7 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 function base64UrlDecode(input: string) {
@@ -73,11 +74,6 @@ Deno.serve(async (req) => {
       null
     const userAgent = req.headers.get('user-agent')
 
-    const { createClient } = await import('npm:@supabase/supabase-js@2.88.0')
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${jwt}` } },
-    })
-
     const payload = {
       user_id: userId,
       terms_version: termsVersion,
@@ -88,9 +84,21 @@ Deno.serve(async (req) => {
       meta: body?.meta || {},
     }
 
-    const { error } = await supabase.from('terms_acceptances').upsert(payload, { onConflict: 'user_id,terms_version' })
-    if (error) {
-      return new Response(JSON.stringify({ success: false, error: error.message }), {
+    const restUrl = `${supabaseUrl}/rest/v1/terms_acceptances?on_conflict=user_id,terms_version`
+    const insertRes = await fetch(restUrl, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${jwt}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify([payload]),
+    })
+
+    if (!insertRes.ok) {
+      const message = await insertRes.text().catch(() => 'Falha ao registrar aceite')
+      return new Response(JSON.stringify({ success: false, error: message }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -108,4 +116,3 @@ Deno.serve(async (req) => {
     })
   }
 })
-
