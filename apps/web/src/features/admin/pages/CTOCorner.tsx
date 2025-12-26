@@ -1,29 +1,59 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { ShieldAlert, Database, Save, Activity, Users, Search, AlertTriangle } from 'lucide-react'
+import { ShieldAlert, Database, Save, Activity, Users, Search, ClipboardList } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { PreCadastrosAdminPanel } from '@/features/admin/components/PreCadastrosAdminPanel'
+
+interface AuditLog {
+  id: string
+  created_at: string
+  action: string
+  target: string
+  details: unknown
+  profiles?: {
+    full_name?: string | null
+    email?: string | null
+  } | null
+}
+
+interface UserRow {
+  id: string
+  full_name: string
+  email: string
+  role: string
+  school_id?: string | null
+}
+
+interface SchoolRow {
+  id: string
+  name: string
+}
+
+type SystemSettings = { xp_base: number; financial_block_days: number } & Record<string, unknown>
 
 export function CTOCornerPage() {
   const { role, user: currentUser } = useAuth()
-  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users'>('settings')
-  const [logs, setLogs] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users' | 'pre_cadastros'>('settings')
+  const [logs, setLogs] = useState<AuditLog[]>([])
   const [loadingLogs, setLoadingLogs] = useState(false)
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<UserRow[]>([])
+  const [schools, setSchools] = useState<SchoolRow[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
-  const [settings, setSettings] = useState<any>({ xp_base: 10, financial_block_days: 5 })
+  const [settings, setSettings] = useState<SystemSettings>({ xp_base: 10, financial_block_days: 5 })
 
   // Carregar Configurações
   useEffect(() => {
     const loadSettings = async () => {
       const { data } = await supabase.from('system_settings').select('*')
       if (data) {
-        const newSettings = data.reduce((acc: any, curr: any) => ({
-          ...acc,
-          [curr.key]: curr.value
-        }), {})
-        setSettings((prev: any) => ({ ...prev, ...newSettings }))
+        const rows = data as unknown as Array<{ key: string; value: unknown }>
+        const newSettings = rows.reduce<Record<string, unknown>>((acc, curr) => {
+          acc[curr.key] = curr.value
+          return acc
+        }, {})
+        setSettings((prev) => ({ ...prev, ...newSettings } as SystemSettings))
       }
     }
     loadSettings()
@@ -36,10 +66,11 @@ export function CTOCornerPage() {
     }
   }, [activeTab])
 
-  // Carregar Usuários
+  // Carregar Usuários e Escolas
   useEffect(() => {
     if (activeTab === 'users') {
       fetchUsers()
+      fetchSchools()
     }
   }, [activeTab])
 
@@ -51,8 +82,13 @@ export function CTOCornerPage() {
       .order('created_at', { ascending: false })
       .limit(50)
     
-    if (data) setLogs(data)
+    if (data) setLogs(data as unknown as AuditLog[])
     setLoadingLogs(false)
+  }
+
+  const fetchSchools = async () => {
+    const { data } = await supabase.from('schools').select('id, name')
+    if (data) setSchools(data as unknown as SchoolRow[])
   }
 
   const fetchUsers = async () => {
@@ -64,7 +100,7 @@ export function CTOCornerPage() {
       .select('*')
       .order('created_at', { ascending: false })
     
-    if (data) setUsers(data)
+    if (data) setUsers(data as unknown as UserRow[])
     setLoadingUsers(false)
   }
 
@@ -120,6 +156,23 @@ export function CTOCornerPage() {
     } catch (error) {
       console.error('Erro ao atualizar role:', error)
       alert('Erro ao atualizar permissão')
+    }
+  }
+
+  const handleUpdateSchool = async (userId: string, schoolId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ school_id: schoolId || null })
+        .eq('id', userId)
+
+      if (error) throw error
+
+      alert('Escola vinculada com sucesso')
+      fetchUsers()
+    } catch (error) {
+      console.error('Erro ao vincular escola:', error)
+      alert('Erro ao vincular escola')
     }
   }
 
@@ -193,6 +246,21 @@ export function CTOCornerPage() {
               Gestão de Usuários
             </div>
             {activeTab === 'users' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('pre_cadastros')}
+            className={`pb-4 px-2 text-sm font-medium transition-colors relative ${
+              activeTab === 'pre_cadastros' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" />
+              Pré‑Cadastros
+            </div>
+            {activeTab === 'pre_cadastros' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
             )}
           </button>
@@ -318,12 +386,13 @@ export function CTOCornerPage() {
                     <th className="px-6 py-3">Nome</th>
                     <th className="px-6 py-3">Email</th>
                     <th className="px-6 py-3">Role Atual</th>
+                    <th className="px-6 py-3">Escola Vinculada</th>
                     <th className="px-6 py-3 text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {loadingUsers ? (
-                    <tr><td colSpan={4} className="p-8 text-center text-slate-500">Carregando usuários...</td></tr>
+                    <tr><td colSpan={5} className="p-8 text-center text-slate-500">Carregando usuários...</td></tr>
                   ) : (
                     users.map((u) => (
                       <tr key={u.id} className="hover:bg-slate-50 transition-colors">
@@ -333,28 +402,39 @@ export function CTOCornerPage() {
                           <span className={`
                             inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                             ${u.role === 'super_admin' ? 'bg-purple-100 text-purple-700' : 
+                              u.role === 'school_admin' ? 'bg-amber-100 text-amber-700' :
                               u.role === 'partner' ? 'bg-blue-100 text-blue-700' : 
                               'bg-slate-100 text-slate-700'}
                           `}>
-                            {u.role === 'super_admin' ? 'Super Admin' : u.role === 'partner' ? 'Sócio' : 'Atleta'}
+                            {u.role === 'super_admin' ? 'Super Admin' : 
+                             u.role === 'school_admin' ? 'Gestor de Escola' :
+                             u.role === 'partner' ? 'Sócio' : 'Atleta'}
                           </span>
+                        </td>
+                        <td className="px-6 py-3">
+                          {u.role === 'super_admin' ? (
+                            <span className="text-xs text-slate-400">Acesso Global</span>
+                          ) : (
+                            <select
+                              value={u.school_id || ''}
+                              onChange={(e) => handleUpdateSchool(u.id, e.target.value)}
+                              className="text-xs border border-slate-200 rounded px-2 py-1 max-w-[150px]"
+                            >
+                              <option value="">Sem vínculo</option>
+                              {schools.map(s => (
+                                <option key={s.id} value={s.id}>{s.name}</option>
+                              ))}
+                            </select>
+                          )}
                         </td>
                         <td className="px-6 py-3 text-right">
                           <div className="flex justify-end gap-2">
-                            {u.role !== 'super_admin' && (
+                            {u.role !== 'school_admin' && (
                               <button 
-                                onClick={() => handleUpdateRole(u.id, 'super_admin')}
-                                className="text-xs text-purple-600 hover:bg-purple-50 px-2 py-1 rounded"
+                                onClick={() => handleUpdateRole(u.id, 'school_admin')}
+                                className="text-xs text-amber-600 hover:bg-amber-50 px-2 py-1 rounded"
                               >
-                                Promover CTO
-                              </button>
-                            )}
-                            {u.role !== 'partner' && (
-                              <button 
-                                onClick={() => handleUpdateRole(u.id, 'partner')}
-                                className="text-xs text-blue-600 hover:bg-blue-50 px-2 py-1 rounded"
-                              >
-                                Promover Sócio
+                                Virar Gestor
                               </button>
                             )}
                             {u.role !== 'user' && (
@@ -362,7 +442,7 @@ export function CTOCornerPage() {
                                 onClick={() => handleUpdateRole(u.id, 'user')}
                                 className="text-xs text-slate-600 hover:bg-slate-50 px-2 py-1 rounded"
                               >
-                                Rebaixar Atleta
+                                Rebaixar
                               </button>
                             )}
                           </div>
@@ -375,6 +455,9 @@ export function CTOCornerPage() {
             </div>
           </div>
         )}
+
+        {/* PRE-CADASTROS TAB */}
+        {activeTab === 'pre_cadastros' && <PreCadastrosAdminPanel />}
 
       </div>
     </div>

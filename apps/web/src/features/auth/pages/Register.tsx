@@ -1,10 +1,23 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Trophy } from 'lucide-react'
 
+function getSafeReturnTo(value: string | null) {
+  if (!value) return '/app'
+  try {
+    const decoded = decodeURIComponent(value)
+    if (decoded.startsWith('/')) return decoded
+    return '/app'
+  } catch {
+    return '/app'
+  }
+}
+
 export function RegisterPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const returnTo = getSafeReturnTo(searchParams.get('returnTo'))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -51,16 +64,17 @@ export function RegisterPage() {
       if (data.user) {
         // Se o email confirmation estiver desligado, já loga direto
         if (data.session) {
-          navigate('/dashboard')
+          navigate(returnTo, { replace: true })
         } else {
           // Se precisar confirmar email
           setError('Cadastro realizado! Verifique seu email para confirmar a conta.')
           // Opcional: Redirecionar para uma página de "Check your email"
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro no cadastro:', err)
-      setError(err.message || 'Erro ao criar conta. Tente novamente.')
+      const message = err instanceof Error ? err.message : 'Erro ao criar conta. Tente novamente.'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -147,7 +161,7 @@ export function RegisterPage() {
 
         <div className="mt-6 text-center text-sm text-slate-500">
           Já tem uma conta?{' '}
-          <Link to="/login" className="text-primary font-semibold hover:underline">
+          <Link to={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="text-primary font-semibold hover:underline">
             Entrar
           </Link>
         </div>

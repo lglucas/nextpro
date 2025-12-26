@@ -5,6 +5,112 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.13] - 2025-12-26
+### Added
+- **Pré‑Cadastro:** `onboarding_status` no Supabase (pendente_escola → aguardando_contrato → ativo).
+- **Pré‑Cadastro:** Evidências mínimas de consentimento (`consented_at`, `consent_version`, `submitted_meta`).
+- **CTO:** Edição do status de onboarding diretamente na lista de pré‑cadastros.
+### Fixed
+- **Anti‑Spam:** Honeypot no envio do pré‑cadastro para reduzir automações básicas.
+
+## [0.6.12] - 2025-12-24
+### Added
+- **CTO:** Nova aba para listar pré‑cadastros do censo no painel administrativo.
+- **Auth UI:** Menu de usuário no site público (Meu Perfil + Sair) e página placeholder de perfil.
+### Changed
+- **Auth Flow:** Login/cadastro respeitam `returnTo` e retornam para `/pre-cadastro` quando aplicável.
+### Fixed
+- **RLS:** Super Admin passa a ter acesso de leitura/gestão em `pre_registrations` e leitura em `school_suggestions`.
+
+## [0.6.11] - 2025-12-24
+### Added
+- **Pré‑Cadastro:** Tabela `pre_registrations` e `school_suggestions` com RLS para censo por responsável.
+- **Pré‑Cadastro:** Wizard do censo em `/pre-cadastro` com etapas, validação e persistência (rascunho e envio).
+
+## [0.6.10] - 2025-12-24
+### Added
+- **Site Público:** Componentes de UI reutilizáveis (Hero/Section/Card/Callout) e seções da Home para padronização visual.
+### Changed
+- **Site Público:** Revisão e expansão de textos em todas as páginas e melhoria do layout para um tom mais premium.
+### Fixed
+- **Lint/Build:** Corrigidos warnings do `react-hooks/exhaustive-deps` nas páginas escolares e ajustado import de ícone inválido no site.
+
+## [0.6.9] - 2025-12-24
+### Changed
+- **Site Público:** Refinados textos e navegação do site institucional (Home e Como Funciona) e ajustado visual para um tom mais premium.
+
+## [0.6.8] - 2025-12-24
+### Added
+- **Site Público:** Estrutura inicial do site institucional multi‑páginas (layout público, navegação, footer e páginas base).
+### Changed
+- **Routing:** Site público passa a viver em `/` e a plataforma do usuário em `/app` (dashboard permanece em `/dashboard`).
+- **Auth:** Login e cadastro redirecionam para `/app` após autenticação.
+
+## [0.6.7] - 2025-12-24
+### Added
+- **Planning:** Wireframe textual por página do site público (inclui rota escondida `/pre-cadastro`) para guiar a implementação.
+
+## [0.6.6] - 2025-12-24
+### Changed
+- **Planning:** Reescrita da seção de conceitos para linguagem institucional (copy base) e renumeração das seções do documento do Sprint 2.5.
+
+## [0.6.5] - 2025-12-24
+### Changed
+- **Planning:** Refinado o documento do Sprint 2.5 com conceitos de núcleos, avaliação multi‑fonte (pesos e reputação), inputs diários/mensais das escolinhas e melhorias no wizard (filhos e perguntas socioeconômicas).
+
+## [0.6.4] - 2025-12-24
+### Added
+- **Planning:** Documento detalhado do Site Público (institucional, multi‑páginas) e do Pré‑Cadastro (censo familiar) com fluxo de validação por escolinha.
+
+## [0.6.3] - 2025-12-24
+### Fixed
+- **Dev Environment:** Corrigido erro do Vite/React-Babel de módulo ausente (`@babel/helper-validator-identifier`) com reinstalação confiável via lockfile.
+- **Auth:** Separado `AuthProvider` do `AuthContext` para estabilizar Fast Refresh e reduzir falsos positivos do lint.
+- **TypeScript/Lint:** Removidos `any` e imports não usados em páginas de Auth, Dashboard, CTO Corner e área escolar.
+- **PDF:** Ajustada tipagem de cores e removido `@ts-ignore` para destravar build.
+### Changed
+- **Rollback:** Revertido o repositório para o commit `16c6b2c539ba6b6d94f742e19de9d8e07978216` para remover o site institucional/formulário fora do padrão esperado (reset hard + force push), e então estabilizado o build/lint após o rollback.
+
+## [0.6.2] - 2025-12-17
+### Added
+- **Planning:** Criado `Sprint 2.5` (Site Público + Pré-Cadastro via formulário) e refinado `Sprint 5` com notas estratégicas de Gamificação, NextPro Academy (carreira de scouts), Protocolo Pinóquio e Censo (wizard).
+- **Business Rules:** Documentadas novas seções em `planning/3-regras-negocio-funcionais.md` cobrindo:
+  - Carreira de Scouts (níveis e pesos),
+  - Protocolo Pinóquio (métricas internas e shadow ban),
+  - Censo Familiar (blocos e privacidade),
+  - Aprovação em camadas (status e assinatura),
+  - Parceiros e perguntas direcionadas.
+
+### Changed
+- **Legal:** Reafirmada necessidade de assinatura eletrônica forte (IP, timestamp, device fingerprint, hash de versão) preferencialmente via provedor (DocuSign/Clicksign) com logs e webhooks.
+- **Monetização:** Registrado que múltiplos perfis terão fluxos pagos (pais, scouts, reps de clubes) incluindo marketplace e micro-serviços (fora do MVP imediato).
+
+## [0.6.1] - 2025-12-16
+### Fixed
+- **Bugfix:** Tratamento de erro na `ClassesPage` para evitar tela branca quando a API retorna erro ou nulo.
+- **Database:** Consolidação dos scripts SQL de migração para facilitar execução manual no Supabase Cloud.
+
+## [0.6.0] - 2025-12-16
+### Added
+- **Attendance:** Banco de dados (tabelas `class_sessions`, `attendances`) e UI para Chamada.
+- **UI:** Página de Chamada (`ClassAttendancePage`) com criação de sessões e lista de presença.
+- **UX:** Botão "Chamada" na lista de Turmas para acesso rápido.
+- **Routing:** Rota `/classes/:id/attendance` configurada.
+
+## [0.5.0] - 2025-12-16
+### Added
+- **Database:** Novas tabelas `guardians` (Responsáveis) e `class_students` (Matrículas) com RLS.
+- **Feature:** Gestão de Responsáveis integrada ao fluxo de cadastro de alunos.
+- **Feature:** Gestão de Matrículas (Adicionar/Remover alunos) diretamente na tela de Turmas.
+- **Dashboard:** Conexão com dados reais de Alunos, Turmas, Avaliações e Logs de Auditoria.
+- **UX:** Modal de seleção de alunos com busca em tempo real.
+- **UI:** Exibição das turmas matriculadas na lista de estudantes.
+
+### Changed
+- **Refactor:** Cadastro de aluno agora exige seleção prévia de um Responsável existente (Hierarquia Estrita).
+- **Refactor:** Página de Turmas agora exibe contagem real de alunos e permite gestão.
+- **Refactor:** Dashboard atualizado para consumir dados reais do Supabase ao invés de mocks.
+
 ## [0.4.0] - 2025-12-16
 ### Added
 - **CTO Corner:** Implementado painel de super-administração com:

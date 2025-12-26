@@ -95,4 +95,90 @@ Quando `status == blocked`:
     - [x] Autorizo a visibilidade de dados técnicos para Scouts parceiros (Opcional).
 
 ### 4.2 Direito ao Esquecimento
-- Se o pai solicitar exclusão, os dados pessoais são anonimizados (`Atleta #12345`), mas os dados estatísticos (gols, presença) são mantidos para não quebrar o histórico da turma.
+-98→- Se o pai solicitar exclusão, os dados pessoais são anonimizados (`Atleta #12345`), mas os dados estatísticos (gols, presença) são mantidos para não quebrar o histórico da turma.
+99→
+100→---
+101→
+102→## 5. Regras de Cadastro e Dependência
+103→
+104→### 5.1 Hierarquia Estrita de Cadastro
+105→Para garantir a integridade dos dados e a segurança jurídica (menores de idade), o sistema impõe a seguinte ordem:
+106→
+107→1.  **Escola:** A entidade raiz deve existir.
+108→2.  **Responsável (Guardian):** Deve ser cadastrado *antes* do aluno.
+109→    - Não é permitido digitar o nome do responsável em campo de texto livre no cadastro do aluno.
+110→    - O responsável deve ser uma entidade selecionável (busca por CPF/Nome).
+111→3.  **Aluno (Student):** Vinculado obrigatoriamente a um Responsável e a uma Escola.
+112→4.  **Turma (Class):** Criada independentemente, mas necessária para matrícula.
+113→5.  **Matrícula (Class Student):** Vínculo N:N entre Aluno e Turma.
+114→    - Um aluno pode estar em múltiplas turmas (ex: Futsal Sub-11 e Campo Sub-11).
+115→
+116→### 5.2 Unicidade
+117→117→- **CPF do Responsável:** Deve ser único por escola (ou global, dependendo da regra de negócio multi-tenancy).
+118→118→- **Aluno na Turma:** Um aluno não pode ser matriculado duas vezes na mesma turma.
+
+---
+
+## 6. Carreira de Scouts (NextPro Academy)
+
+### 6.1 Níveis e Pesos
+- **Olheiro Iniciante (Nível 1):** Peso 0.5x nas avaliações.
+- **Analista Tático (Nível 2):** Peso 1.0x nas avaliações.
+- **Scout Elite/Master (Nível 3):** Peso 2.0x nas avaliações (após certificações e histórico validado).
+- Cursos e conteúdos ficam fora do MVP; a mecânica de níveis/pesos integra a Engine de Gamificação.
+
+### 6.2 Progressão
+- Missões e avaliações assertivas aumentam confiabilidade e desbloqueiam níveis.
+- Recompensas: acesso a relatórios avançados, convites, benefícios em parceiros.
+
+---
+
+## 7. Protocolo Pinóquio (Detecção de Mentiras)
+
+### 7.1 Métricas Internas (visíveis ao staff)
+- `mentiras_confirmadas`: contagem de validações desmentidas por equipe/algoritmo.
+- `confiabilidade_avaliador`: índice composto (peso dinâmico) por acerto histórico.
+- `shadow_ban`: redução silenciosa de peso (→ 0) para avaliadores recorrentes.
+
+### 7.2 Comportamento do Sistema
+- Sem aviso ao usuário final ao reduzir peso; feedback permanece “Sucesso” para evitar fraude e evasão.
+- Logs e dashboards internos exibem estatísticas de confiabilidade por avaliador/escola.
+
+---
+
+## 8. Censo Familiar e Socioeconômico (Wizard)
+
+### 8.1 Estrutura de Blocos
+- **Guardião:** Identificação, escolaridade, profissão, faixa de renda, composição familiar.
+- **Dependentes:** Escola, turno, série, saúde (alergias, medicamentos, tipo sanguíneo), esporte (posição, pé dominante).
+- **Vínculo:** Seleção de escolinha existente ou criação assistida.
+
+### 8.2 Privacidade
+- Coletas sensíveis com consentimentos granulares; uso exclusivo para fins esportivos e operacionais.
+
+---
+
+## 9. Aprovação em Camadas (Onboarding)
+
+### 9.1 Status do Fluxo
+- `pendente_escola` → `aguardando_contrato` → `ativo`.
+- Disparo automático ao responsável para assinatura dos termos quando escola confirmar pré-cadastro.
+
+### 9.2 Assinatura Legal
+- Preferência por assinatura eletrônica **forte** com evidências (IP, timestamp, device fingerprint, hash de versão) e provedor externo (DocuSign/Clicksign) com logs/webhooks.
+
+---
+
+## 10. Parceiros e Perguntas Direcionadas (Base)
+
+### 10.1 Exemplos de Verticais
+- **Seguradoras:** cobertura em treinos/jogos/testes; perguntas sobre deslocamento, histórico médico básico.
+- **Saúde/Clínicas:** triagens, fisioterapia, exames; consentimento para contato e ofertas.
+- **Educação:** bolsas, reforço escolar; turno e desempenho.
+- **Transporte:** rotas até o núcleo; horários, distância, preferência.
+
+### 10.2 Perguntas Base (ajustáveis por parceiro)
+- Tem seguro ativo vinculado ao aluno? Qual cobertura?
+- Há plano de saúde? Qual operadora?
+- Necessita transporte para treinos/testes? Frequência e origem.
+- Autorizo contato por WhatsApp para ofertas vinculadas ao projeto? (Opt-in)

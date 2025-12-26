@@ -71,7 +71,10 @@ Seguindo a regra de **Vertical Slices** (Features), não organizamos por "tipo d
 - `schools`: Unidades físicas (Filiais).
 - `users`: Tabela `auth.users` estendida.
 - `profiles`: Dados públicos/privados do usuário (nome, foto, role).
+- `guardians`: Responsáveis legais (Pais/Mães) - *Adicionado v0.5.0*.
+- `students`: Alunos/Atletas (Vinculados a Guardians).
 - `classes`: Turmas (Sub-11 Manhã).
+- `class_students`: Tabela de junção (N:N) para matrículas - *Adicionado v0.5.0*.
 - `class_sessions`: Sessões de treino (Dia 15/12, 09:00).
 - `attendances`: Presença (Link user_id + session_id).
 - `badges`: Definição das medalhas.

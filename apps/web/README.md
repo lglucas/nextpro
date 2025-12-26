@@ -71,3 +71,21 @@ export default defineConfig([
   },
 ])
 ```
+
+## NextPro (apps/web)
+
+### Rodar localmente
+
+```bash
+npm ci
+npm run dev
+```
+
+Se o Vite acusar módulo do Babel ausente (ex: `@babel/helper-validator-identifier`), rode `npm ci` novamente para reconstruir o `node_modules` a partir do `package-lock.json`.
+
+### Qualidade e build
+
+```bash
+npm run lint
+npm run build
+```

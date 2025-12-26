@@ -2,7 +2,14 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
 // Definição de Cores do Tema (Tailwind colors aproximadas)
-const COLORS = {
+type ColorTuple = [number, number, number]
+
+const COLORS: {
+  primary: ColorTuple
+  secondary: ColorTuple
+  slate100: ColorTuple
+  slate500: ColorTuple
+} = {
   primary: [59, 130, 246], // blue-500
   secondary: [15, 23, 42], // slate-900
   slate100: [241, 245, 249],
@@ -69,7 +76,15 @@ const drawFooter = (doc: jsPDF) => {
 // ----------------------------------------------------------------------
 // Relatório de Escolas
 // ----------------------------------------------------------------------
-export const generateSchoolsReport = (schools: any[]) => {
+export const generateSchoolsReport = (
+  schools: Array<{
+    name: string
+    document?: string | null
+    address?: string | null
+    active: boolean
+    studentsCount?: number | null
+  }>
+) => {
   const doc = new jsPDF()
 
   // Header Personalizado
@@ -114,7 +129,20 @@ export const generateSchoolsReport = (schools: any[]) => {
 // ----------------------------------------------------------------------
 // Relatório do Dashboard (Visão Geral)
 // ----------------------------------------------------------------------
-export const generateDashboardReport = (kpiData: any, auditLogs: any[]) => {
+export const generateDashboardReport = (
+  kpiData: {
+    students: string
+    revenue: string
+    attendance: string
+    newEnrollments: string
+  },
+  auditLogs: Array<{
+    time: string
+    action: string
+    user: string
+    detail: string
+  }>
+) => {
   const doc = new jsPDF()
   
   drawHeader(doc, 'Resumo Executivo do Dashboard')
@@ -146,8 +174,8 @@ export const generateDashboardReport = (kpiData: any, auditLogs: any[]) => {
     styles: { fontSize: 11, cellPadding: 5 }
   })
 
-  // @ts-ignore
-  currentY = doc.lastAutoTable.finalY + 20
+  const lastAutoTable = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable
+  currentY = (lastAutoTable?.finalY ?? currentY) + 20
 
   // Seção de Auditoria Recente
   doc.setFontSize(14)

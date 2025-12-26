@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, FileDown, MoreVertical, MapPin, Building2, Pencil, Trash2, X } from 'lucide-react'
+import { Plus, Search, FileDown, MapPin, Building2, Pencil, Trash2, X } from 'lucide-react'
 import { generateSchoolsReport } from '@/utils/pdf'
 
 // Mock Data Type

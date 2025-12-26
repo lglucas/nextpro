@@ -1,29 +1,96 @@
-import { BarChart3, TrendingUp, Users, Wallet } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, GraduationCap } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { generateDashboardReport } from '@/utils/pdf'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+
+interface AuditLogEntry {
+  action: string
+  user: string
+  time: string
+  detail: string
+}
+
+interface RawAuditLog {
+  action: string
+  user_email?: string | null
+  created_at: string
+  details?: string | null
+  payload?: unknown
+}
 
 export function DashboardPage() {
-  const { user, role } = useAuth()
+  const { user } = useAuth()
+  const [realStats, setRealStats] = useState({
+    students: 0,
+    classes: 0,
+    evaluations: 0
+  })
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
 
-  // Mock Data
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { count: studentsCount } = await supabase
+          .from('students')
+          .select('*', { count: 'exact', head: true })
+
+        const { count: classesCount } = await supabase
+          .from('classes')
+          .select('*', { count: 'exact', head: true })
+
+        // Tentativa de buscar avaliações (se a tabela existir)
+        const { count: evaluationsCount } = await supabase
+          .from('evaluations')
+          .select('*', { count: 'exact', head: true })
+
+        setRealStats({
+          students: studentsCount || 0,
+          classes: classesCount || 0,
+          evaluations: evaluationsCount || 0
+        })
+
+        // Fetch Audit Logs
+        const { data: logs } = await supabase
+          .from('audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5)
+        
+        if (logs) {
+          const typedLogs = logs as unknown as RawAuditLog[]
+          setAuditLogs(
+            typedLogs.map((log) => ({
+              action: log.action,
+              user: log.user_email || 'Sistema',
+              time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+              detail: log.details || JSON.stringify(log.payload),
+            }))
+          )
+        } else {
+          setAuditLogs([{ action: 'Sistema Iniciado', user: 'System', time: 'Agora', detail: 'Dashboard carregado' }])
+        }
+
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
+  // Mock Data (misturado com real)
   const kpiData = {
-    students: '1,234',
-    revenue: 'R$ 45.200',
-    attendance: '94.5%',
-    newEnrollments: '48'
+    students: realStats.students.toString(),
+    revenue: 'R$ 45.200', // Mock (Financeiro ainda não implementado)
+    attendance: '94.5%', // Mock (Complexo calcular agora)
+    newEnrollments: '48' // Mock
   }
-
-  const auditLogs = [
-    { action: 'Configuração Atualizada', user: 'Lucas Galvão (CTO)', time: '2 min atrás', detail: 'Alterou regra de cálculo de XP' },
-    { action: 'Nova Escola', user: 'Lucas Galvão (CTO)', time: '1h atrás', detail: 'Criou unidade "Barra Funda"' },
-    { action: 'Backup Realizado', user: 'Sistema', time: '4h atrás', detail: 'Backup diário automático' },
-  ]
 
   const stats = [
     { name: 'Total de Alunos', value: kpiData.students, change: '+12%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { name: 'Receita Mensal', value: kpiData.revenue, change: '+8.2%', icon: Wallet, color: 'text-green-600', bg: 'bg-green-100' },
+    { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '+2', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
     { name: 'Taxa de Presença', value: kpiData.attendance, change: '+2.1%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { name: 'Avaliações', value: '342', change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { name: 'Avaliações', value: realStats.evaluations.toString(), change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
   ]
 
   const handleExportPDF = () => {
