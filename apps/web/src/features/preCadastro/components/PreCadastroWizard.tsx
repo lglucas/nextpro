@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabase'
 import { createEmptyPreCadastroDraft } from '@/features/preCadastro/defaults'
 import { getMyPreCadastroDraft, insertSchoolSuggestion, upsertMyPreCadastroDraft } from '@/features/preCadastro/api'
 import type { PreCadastroDraftData, PreCadastroStatus } from '@/features/preCadastro/types'
@@ -24,7 +25,9 @@ export function PreCadastroWizard() {
   const [error, setError] = useState<string | null>(null)
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [botTrap, setBotTrap] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const startedAtRef = useRef<number>(Date.now())
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
   const canGoBack = step > 0 && status !== 'submitted'
   const canGoNext = step < STEPS.length - 1 && status !== 'submitted'
@@ -51,11 +54,24 @@ export function PreCadastroWizard() {
         setError('Não foi possível enviar. Tente novamente.')
         return
       }
+      if (nextStatus === 'submitted' && turnstileSiteKey && !turnstileToken) {
+        setError('Conclua a verificação antes de enviar.')
+        return
+      }
       setSaving(true)
       setError(null)
       savePreCadastroToLocalStorage(user.id, draft)
 
       try {
+        if (nextStatus === 'submitted' && turnstileSiteKey && turnstileToken) {
+          const { data, error: captchaError } = await supabase.functions.invoke('turnstile-verify', {
+            body: { token: turnstileToken },
+          })
+          if (captchaError || !data?.success) {
+            throw new Error('Falha na verificação. Tente novamente.')
+          }
+        }
+
         const nowIso = new Date().toISOString()
         const row = await upsertMyPreCadastroDraft(user.id, nextStatus, draft, {
           onboardingStatus: nextStatus === 'submitted' ? 'pendente_escola' : 'draft',
@@ -86,7 +102,7 @@ export function PreCadastroWizard() {
         setSaving(false)
       }
     },
-    [botTrap, draft, user],
+    [botTrap, draft, turnstileSiteKey, turnstileToken, user],
   )
 
   useEffect(() => {
@@ -162,6 +178,8 @@ export function PreCadastroWizard() {
             onChange={(accepted) => setDraft((d) => ({ ...d, consent: { accepted } }))}
             botTrap={botTrap}
             onBotTrapChange={setBotTrap}
+            turnstileToken={turnstileToken}
+            onTurnstileTokenChange={setTurnstileToken}
           />
         ) : null}
       </div>

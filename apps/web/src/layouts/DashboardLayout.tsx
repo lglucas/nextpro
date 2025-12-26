@@ -14,13 +14,30 @@ import {
 } from 'lucide-react'
 
 export function DashboardLayout() {
-  const { signOut, user, role } = useAuth()
+  const { signOut, user, role, actualRole, roleOverride, setRoleOverride } = useAuth()
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
     navigate('/login')
+  }
+
+  const canImpersonate = actualRole === 'super_admin'
+
+  const handlePersonaChange = (nextRole: string) => {
+    if (!canImpersonate) return
+    if (nextRole === actualRole || nextRole === 'super_admin') {
+      setRoleOverride(null)
+    } else {
+      setRoleOverride(nextRole)
+    }
+
+    if (nextRole === 'user') {
+      navigate('/app', { replace: true })
+      return
+    }
+    navigate('/dashboard', { replace: true })
   }
 
   const navigation = [
@@ -99,6 +116,30 @@ export function DashboardLayout() {
                 </p>
               </div>
             </div>
+            {canImpersonate ? (
+              <div className="mb-3 px-2">
+                <p className="text-xs font-semibold text-slate-500">Modo de visualização</p>
+                <select
+                  value={role || 'user'}
+                  onChange={(e) => handlePersonaChange(e.target.value)}
+                  className="mt-2 w-full text-sm px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700"
+                >
+                  <option value="super_admin">CTO (Super Admin)</option>
+                  <option value="partner">Sócio (Partner)</option>
+                  <option value="school_admin">Gestor de Escolinha</option>
+                  <option value="user">Usuário</option>
+                </select>
+                {roleOverride ? (
+                  <button
+                    type="button"
+                    onClick={() => handlePersonaChange(actualRole || 'super_admin')}
+                    className="mt-2 w-full text-xs text-slate-500 hover:text-slate-700 underline"
+                  >
+                    Voltar para o meu perfil real
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
             <button
               onClick={handleSignOut}
               className="w-full flex items-center justify-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"

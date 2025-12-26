@@ -16,11 +16,32 @@ const NAV_ITEMS = [
 export function PublicSiteLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const { user, signOut } = useAuth()
+  const { user, signOut, actualRole, role, roleOverride, setRoleOverride } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
   const returnTo = useMemo(() => encodeURIComponent(location.pathname + location.search), [location.pathname, location.search])
+  const canImpersonate = actualRole === 'super_admin'
+
+  const handlePersonaChange = (nextRole: string) => {
+    if (!canImpersonate) return
+
+    if (nextRole === actualRole || nextRole === 'super_admin') {
+      setRoleOverride(null)
+    } else {
+      setRoleOverride(nextRole)
+    }
+
+    setIsUserMenuOpen(false)
+    setIsMobileMenuOpen(false)
+
+    if (nextRole === 'user') {
+      navigate('/app', { replace: true })
+      return
+    }
+
+    navigate('/dashboard', { replace: true })
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -87,6 +108,30 @@ export function PublicSiteLayout() {
                       <User className="w-4 h-4 text-slate-500" />
                       Meu perfil
                     </Link>
+                    {canImpersonate ? (
+                      <div className="px-4 py-3 border-t border-slate-100">
+                        <p className="text-xs font-semibold text-slate-500">Modo de visualização</p>
+                        <select
+                          value={role || 'user'}
+                          onChange={(e) => handlePersonaChange(e.target.value)}
+                          className="mt-2 w-full text-sm px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700"
+                        >
+                          <option value="super_admin">CTO (Super Admin)</option>
+                          <option value="partner">Sócio (Partner)</option>
+                          <option value="school_admin">Gestor de Escolinha</option>
+                          <option value="user">Usuário</option>
+                        </select>
+                        {roleOverride ? (
+                          <button
+                            type="button"
+                            onClick={() => handlePersonaChange(actualRole || 'super_admin')}
+                            className="mt-2 w-full text-xs text-slate-500 hover:text-slate-700 underline"
+                          >
+                            Voltar para o meu perfil real
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       onClick={async () => {
@@ -149,6 +194,30 @@ export function PublicSiteLayout() {
                     >
                       Meu perfil
                     </Link>
+                    {canImpersonate ? (
+                      <div className="bg-white border border-slate-200 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-slate-500">Modo de visualização</p>
+                        <select
+                          value={role || 'user'}
+                          onChange={(e) => handlePersonaChange(e.target.value)}
+                          className="mt-2 w-full text-sm px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700"
+                        >
+                          <option value="super_admin">CTO (Super Admin)</option>
+                          <option value="partner">Sócio (Partner)</option>
+                          <option value="school_admin">Gestor de Escolinha</option>
+                          <option value="user">Usuário</option>
+                        </select>
+                        {roleOverride ? (
+                          <button
+                            type="button"
+                            onClick={() => handlePersonaChange(actualRole || 'super_admin')}
+                            className="mt-2 w-full text-xs text-slate-500 hover:text-slate-700 underline"
+                          >
+                            Voltar para o meu perfil real
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       onClick={async () => {

@@ -5,6 +5,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- **CTO:** Modo de visualização (trocar persona) disponível apenas para Super Admin.
+- **Site:** Contato grava mensagens no Supabase (`contact_messages`).
+- **Segurança:** Turnstile opcional no Contato e no envio do Pré‑Cadastro.
+
 ## [0.6.13] - 2025-12-26
 ### Added
 - **Pré‑Cadastro:** `onboarding_status` no Supabase (pendente_escola → aguardando_contrato → ativo).
