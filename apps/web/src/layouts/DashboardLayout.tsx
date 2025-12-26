@@ -112,7 +112,13 @@ export function DashboardLayout() {
                   {user?.user_metadata?.full_name || 'Usuário'}
                 </p>
                 <p className="text-xs text-slate-500 truncate">
-                  {role === 'super_admin' ? 'Super Admin' : role === 'partner' ? 'Sócio' : 'Usuário'}
+                  {role === 'super_admin'
+                    ? 'Super Admin'
+                    : role === 'partner'
+                      ? 'Sócio'
+                      : role === 'school_admin'
+                        ? 'Gestor'
+                        : 'Usuário'}
                 </p>
               </div>
             </div>

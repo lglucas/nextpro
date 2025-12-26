@@ -11,7 +11,7 @@ export function AppLayout() {
     navigate('/login')
   }
 
-  const canAccessDashboard = role === 'super_admin' || role === 'partner'
+  const canAccessDashboard = role === 'super_admin' || role === 'partner' || role === 'school_admin'
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -49,7 +49,13 @@ export function AppLayout() {
                     {user?.user_metadata?.full_name?.split(' ')[0]}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {role === 'user' ? 'Atleta' : role === 'super_admin' ? 'Super Admin' : 'Sócio'}
+                    {role === 'user'
+                      ? 'Atleta'
+                      : role === 'super_admin'
+                        ? 'Super Admin'
+                        : role === 'partner'
+                          ? 'Sócio'
+                          : 'Gestor'}
                   </p>
                 </div>
                 
