@@ -5,6 +5,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.13] - 2025-12-26
+### Added
+- **Pré‑Cadastro:** `onboarding_status` no Supabase (pendente_escola → aguardando_contrato → ativo).
+- **Pré‑Cadastro:** Evidências mínimas de consentimento (`consented_at`, `consent_version`, `submitted_meta`).
+- **CTO:** Edição do status de onboarding diretamente na lista de pré‑cadastros.
+### Fixed
+- **Anti‑Spam:** Honeypot no envio do pré‑cadastro para reduzir automações básicas.
+
 ## [0.6.12] - 2025-12-24
 ### Added
 - **CTO:** Nova aba para listar pré‑cadastros do censo no painel administrativo.

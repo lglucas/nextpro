@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { createEmptyPreCadastroDraft } from '@/features/preCadastro/defaults'
 import { getMyPreCadastroDraft, insertSchoolSuggestion, upsertMyPreCadastroDraft } from '@/features/preCadastro/api'
@@ -12,6 +12,7 @@ import { SocioEconomicStep } from '@/features/preCadastro/components/steps/Socio
 import { ConsentStep } from '@/features/preCadastro/components/steps/ConsentStep'
 
 const STEPS = ['Responsável', 'Escolinha', 'Filhos', 'Censo', 'Confirmação']
+const CONSENT_VERSION = '2025-12-26-v1'
 
 export function PreCadastroWizard() {
   const { user } = useAuth()
@@ -22,6 +23,8 @@ export function PreCadastroWizard() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedAt, setSavedAt] = useState<string | null>(null)
+  const [botTrap, setBotTrap] = useState('')
+  const startedAtRef = useRef<number>(Date.now())
 
   const canGoBack = step > 0 && status !== 'submitted'
   const canGoNext = step < STEPS.length - 1 && status !== 'submitted'
@@ -44,12 +47,32 @@ export function PreCadastroWizard() {
   const saveDraft = useCallback(
     async (nextStatus: PreCadastroStatus) => {
       if (!user) return
+      if (nextStatus === 'submitted' && botTrap.trim() !== '') {
+        setError('Não foi possível enviar. Tente novamente.')
+        return
+      }
       setSaving(true)
       setError(null)
       savePreCadastroToLocalStorage(user.id, draft)
 
       try {
-        const row = await upsertMyPreCadastroDraft(user.id, nextStatus, draft)
+        const nowIso = new Date().toISOString()
+        const row = await upsertMyPreCadastroDraft(user.id, nextStatus, draft, {
+          onboardingStatus: nextStatus === 'submitted' ? 'pendente_escola' : 'draft',
+          consentedAt: nextStatus === 'submitted' ? nowIso : null,
+          consentVersion: nextStatus === 'submitted' ? CONSENT_VERSION : null,
+          submittedMeta:
+            nextStatus === 'submitted'
+              ? {
+                  userAgent: typeof navigator === 'undefined' ? null : navigator.userAgent,
+                  language: typeof navigator === 'undefined' ? null : navigator.language,
+                  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+                  submittedAtClient: nowIso,
+                  startedAtClient: new Date(startedAtRef.current).toISOString(),
+                  durationMs: Date.now() - startedAtRef.current,
+                }
+              : {},
+        })
         setStatus(row.status)
         setSavedAt(new Date().toLocaleString())
         if (nextStatus === 'submitted') {
@@ -63,7 +86,7 @@ export function PreCadastroWizard() {
         setSaving(false)
       }
     },
-    [draft, user],
+    [botTrap, draft, user],
   )
 
   useEffect(() => {
@@ -133,7 +156,14 @@ export function PreCadastroWizard() {
         {step === 1 ? <SchoolStep value={draft.school} onChange={(school) => setDraft((d) => ({ ...d, school }))} /> : null}
         {step === 2 ? <ChildrenStep value={draft.children} onChange={(children) => setDraft((d) => ({ ...d, children }))} /> : null}
         {step === 3 ? <SocioEconomicStep value={draft.socio} onChange={(socio) => setDraft((d) => ({ ...d, socio }))} /> : null}
-        {step === 4 ? <ConsentStep accepted={draft.consent.accepted} onChange={(accepted) => setDraft((d) => ({ ...d, consent: { accepted } }))} /> : null}
+        {step === 4 ? (
+          <ConsentStep
+            accepted={draft.consent.accepted}
+            onChange={(accepted) => setDraft((d) => ({ ...d, consent: { accepted } }))}
+            botTrap={botTrap}
+            onBotTrapChange={setBotTrap}
+          />
+        ) : null}
       </div>
 
       <div className="mt-10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -183,4 +213,3 @@ export function PreCadastroWizard() {
     </div>
   )
 }
-

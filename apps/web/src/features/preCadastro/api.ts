@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { PreCadastroDraftData, PreCadastroStatus, PreRegistrationRow } from '@/features/preCadastro/types'
+import type { PreCadastroDraftData, PreCadastroOnboardingStatus, PreCadastroStatus, PreRegistrationRow } from '@/features/preCadastro/types'
 
 export async function getMyPreCadastroDraft(userId: string) {
   const { data, error } = await supabase
@@ -16,12 +16,39 @@ export async function getMyPreCadastroDraft(userId: string) {
   return data as unknown as PreRegistrationRow
 }
 
-export async function upsertMyPreCadastroDraft(userId: string, status: PreCadastroStatus, draft: PreCadastroDraftData) {
+export async function upsertMyPreCadastroDraft(
+  userId: string,
+  status: PreCadastroStatus,
+  draft: PreCadastroDraftData,
+  options?: {
+    onboardingStatus?: PreCadastroOnboardingStatus
+    consentedAt?: string | null
+    consentVersion?: string | null
+    submittedMeta?: Record<string, unknown>
+  },
+) {
+  const onboardingStatus: PreCadastroOnboardingStatus = options?.onboardingStatus ?? (status === 'submitted' ? 'pendente_escola' : 'draft')
+  const consentedAt = options?.consentedAt ?? (status === 'submitted' ? new Date().toISOString() : null)
+  const consentVersion = options?.consentVersion ?? (status === 'submitted' ? '2025-12-26-v1' : null)
+  const submittedMeta =
+    options?.submittedMeta ??
+    (status === 'submitted'
+      ? {
+          userAgent: typeof navigator === 'undefined' ? null : navigator.userAgent,
+          language: typeof navigator === 'undefined' ? null : navigator.language,
+          timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+          submittedAtClient: new Date().toISOString(),
+        }
+      : {})
   const payload = {
     user_id: userId,
     status,
+    onboarding_status: onboardingStatus,
     data: draft as unknown,
     submitted_at: status === 'submitted' ? new Date().toISOString() : null,
+    consented_at: consentedAt,
+    consent_version: consentVersion,
+    submitted_meta: submittedMeta as unknown,
   }
 
   const { data, error } = await supabase
@@ -48,4 +75,3 @@ export async function insertSchoolSuggestion(userId: string, school: { uf: strin
 export function isSubmittedStatus(status: string | null | undefined): status is PreCadastroStatus {
   return status === 'submitted' || status === 'draft'
 }
-

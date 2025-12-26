@@ -31,6 +31,7 @@ export function preCadastroMatchesQuery(row: PreRegistrationRow, query: string) 
   const haystack = [
     row.user_id,
     row.status,
+    row.onboarding_status || '',
     s.guardianName,
     s.guardianEmail,
     s.uf,
@@ -41,4 +42,3 @@ export function preCadastroMatchesQuery(row: PreRegistrationRow, query: string) 
     .toLowerCase()
   return haystack.includes(q)
 }
-

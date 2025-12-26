@@ -1,5 +1,7 @@
 export type PreCadastroStatus = 'draft' | 'submitted'
 
+export type PreCadastroOnboardingStatus = 'draft' | 'pendente_escola' | 'aguardando_contrato' | 'ativo' | 'rejeitado'
+
 export interface PreCadastroSchoolInfo {
   uf: string
   city: string
@@ -52,9 +54,12 @@ export interface PreRegistrationRow {
   id: string
   user_id: string
   status: PreCadastroStatus
+  onboarding_status?: PreCadastroOnboardingStatus
   data: unknown
   submitted_at: string | null
+  consented_at?: string | null
+  consent_version?: string | null
+  submitted_meta?: unknown
   created_at: string
   updated_at: string
 }
-

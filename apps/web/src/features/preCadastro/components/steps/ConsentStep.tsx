@@ -1,9 +1,13 @@
 export function ConsentStep({
   accepted,
   onChange,
+  botTrap,
+  onBotTrapChange,
 }: {
   accepted: boolean
   onChange: (next: boolean) => void
+  botTrap: string
+  onBotTrapChange: (next: string) => void
 }) {
   return (
     <div className="space-y-4">
@@ -27,7 +31,11 @@ export function ConsentStep({
           Li e concordo com o envio do pré‑cadastro.
         </label>
       </div>
+
+      <div className="sr-only">
+        <label htmlFor="company">Empresa</label>
+        <input id="company" value={botTrap} onChange={(e) => onBotTrapChange(e.target.value)} />
+      </div>
     </div>
   )
 }
-

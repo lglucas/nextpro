@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { PreRegistrationRow } from '@/features/admin/components/preCadastros/types'
+import type { PreCadastroOnboardingStatus, PreRegistrationRow } from '@/features/admin/components/preCadastros/types'
 import { preCadastroMatchesQuery } from '@/features/admin/components/preCadastros/utils'
 import { PreCadastrosTable } from '@/features/admin/components/preCadastros/PreCadastrosTable'
 
 export function PreCadastrosAdminPanel() {
   const [rows, setRows] = useState<PreRegistrationRow[]>([])
   const [loading, setLoading] = useState(false)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [showSubmittedOnly, setShowSubmittedOnly] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -28,6 +29,16 @@ export function PreCadastrosAdminPanel() {
 
     setRows((data || []) as unknown as PreRegistrationRow[])
     setLoading(false)
+  }
+
+  const updateOnboardingStatus = async (id: string, onboardingStatus: PreCadastroOnboardingStatus) => {
+    setUpdatingId(id)
+    const { error } = await supabase.from('pre_registrations').update({ onboarding_status: onboardingStatus }).eq('id', id)
+    if (error) {
+      console.error('Erro ao atualizar status:', error)
+    }
+    await fetchRows()
+    setUpdatingId(null)
   }
 
   useEffect(() => {
@@ -79,8 +90,10 @@ export function PreCadastrosAdminPanel() {
       <PreCadastrosTable
         rows={filteredRows}
         loading={loading}
+        updatingId={updatingId}
         expandedId={expandedId}
         onToggleExpanded={(id) => setExpandedId((curr) => (curr === id ? null : id))}
+        onUpdateOnboardingStatus={updateOnboardingStatus}
       />
     </div>
   )
