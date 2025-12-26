@@ -16,16 +16,25 @@ function promiseWithTimeout<T>(promise: PromiseLike<T>, ms: number, message: str
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
-  const [role, setRole] = useState<string | null>(() => localStorage.getItem('@NextPro:role'))
+  const [actualRole, setActualRole] = useState<string | null>(() => localStorage.getItem('@NextPro:role'))
+  const [roleOverride, setRoleOverrideState] = useState<string | null>(() => localStorage.getItem('@NextPro:roleOverride'))
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (role) {
-      localStorage.setItem('@NextPro:role', role)
+    if (actualRole) {
+      localStorage.setItem('@NextPro:role', actualRole)
     } else {
       localStorage.removeItem('@NextPro:role')
     }
-  }, [role])
+  }, [actualRole])
+
+  useEffect(() => {
+    if (roleOverride) {
+      localStorage.setItem('@NextPro:roleOverride', roleOverride)
+    } else {
+      localStorage.removeItem('@NextPro:roleOverride')
+    }
+  }, [roleOverride])
 
   const fetchProfile = async (userId: string, userEmail?: string) => {
     try {
@@ -81,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (data.session?.user) {
           const userRole = await fetchProfile(data.session.user.id, data.session.user.email)
-          if (mounted) setRole(userRole)
+          if (mounted) setActualRole(userRole)
         }
       } catch (err: unknown) {
         console.error('AuthProvider: erro ao carregar sessão:', err)
@@ -103,10 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (nextSession?.user) {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
           const userRole = await fetchProfile(nextSession.user.id, nextSession.user.email)
-          if (mounted) setRole(userRole)
+          if (mounted) setActualRole(userRole)
         }
       } else if (event === 'SIGNED_OUT') {
-        setRole(null)
+        setActualRole(null)
+        setRoleOverrideState(null)
       }
 
       setLoading(false)
@@ -121,10 +131,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     setLoading(true)
     await supabase.auth.signOut()
-    setRole(null)
+    setActualRole(null)
+    setRoleOverrideState(null)
     setSession(null)
     setUser(null)
     setLoading(false)
+  }
+
+  const setRoleOverride = (next: string | null) => {
+    if (actualRole !== 'super_admin') return
+    setRoleOverrideState(next)
   }
 
   if (loading) {
@@ -152,7 +168,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  const value = { session, user, role, loading, signOut }
+  const role = actualRole === 'super_admin' && roleOverride ? roleOverride : actualRole
+  const value = { session, user, role, actualRole, roleOverride, loading, signOut, setRoleOverride }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

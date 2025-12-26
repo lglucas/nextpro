@@ -46,15 +46,15 @@
 - [x] **RBAC (Permissões):** Implementação robusta de Policies RLS e persistência de Role no LocalStorage.
 
 ### � Sprint 2.5: Site Público & Pré-Cadastro (Formulário Censo) (26/12 - 31/12)
-**Status:** 🟨 Planejado
+**Status:** ✅ Concluído (MVP v0.6.13)
 **Objetivo:** Capturar demanda e iniciar o funil de cadastro pelo site, com pré-cadastro de responsáveis/alunos e vínculo com escolinhas, preparando o fluxo de aprovação em camadas.
-- [ ] **Site Público (Marketing):** Landing com proposta, benefícios, diferenciais, FAQ e CTA de pré-cadastro.
+- [x] **Site Público (Marketing):** Site institucional multi‑páginas com CTA e navegação.
 - [ ] **Captura de Leads:** Formulário simples (contato) e eventos para métricas (GA/Meta) conforme estratégia.
-- [ ] **Pré-Cadastro (Wizard):** Blocos Guardião/Dependentes/Vínculo, com persistência e retomada.
-- [ ] **Status de Onboarding:** `pendente_escola` → `aguardando_contrato` → `ativo` (documentado e preparado para integração).
+- [x] **Pré-Cadastro (Wizard):** Blocos Guardião/Dependentes/Vínculo, com persistência e retomada.
+- [x] **Status de Onboarding:** `pendente_escola` → `aguardando_contrato` → `ativo` (com gestão no CTO).
 - [ ] **Confirmação da Escola:** Tela/lista para SchoolAdmin aceitar/rejeitar pré-cadastros.
 - [ ] **Assinatura Eletrônica (Forte):** Aceite com evidências (IP, timestamp, device fingerprint, hash de versão) via provedor (DocuSign/Clicksign) e trilha auditável.
-- [ ] **LGPD (Consentimentos):** Checkboxes granulares e opt-in de comunicação (WhatsApp/Email).
+- [x] **LGPD (Consentimentos):** Consentimento no envio com evidências mínimas (data/hora, versão e meta básica).
 
 ### �🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
 **Status:** 🚧 Em Andamento (Adiantado)

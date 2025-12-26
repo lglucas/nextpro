@@ -1,6 +1,6 @@
 # 🏆 NextPro - Plataforma de Gestão Esportiva
 
-> **Sprint 2 Concluída ✅** (v0.6.1)
+> **Sprint 2.5 Concluída ✅** (v0.6.13)
 
 O **NextPro** é uma solução completa para digitalização de escolinhas de futebol, gestão de carreiras de atletas e engajamento familiar. Focada em PWA (Web First) para alta acessibilidade.
 
@@ -23,6 +23,11 @@ Atualmente estamos na **Fase 1 (Setup & Alicerce)**. O sistema já possui autent
   - **Relatórios PDF:** Geração automática de listas e resumos executivos.
   - **Cantinho do CTO:** Área exclusiva para configurações globais do sistema.
 
+- **Site Público + Pré‑Cadastro:**
+  - Site institucional multi‑páginas (rota `/`).
+  - Wizard do censo em `/pre-cadastro` com persistência e envio.
+  - CTO: listagem de pré‑cadastros + status de onboarding.
+
 - **App do Usuário (Atleta):**
   - Landing Page personalizada.
   - Visualização de perfil básico.
@@ -31,7 +36,7 @@ Atualmente estamos na **Fase 1 (Setup & Alicerce)**. O sistema já possui autent
 
 | Camada | Tecnologia |
 |--------|------------|
-| **Frontend** | React 18, TypeScript, Vite |
+| **Frontend** | React 19, TypeScript, Vite |
 | **Estilização** | Tailwind CSS v3, Lucide Icons |
 | **Backend (BaaS)** | Supabase (PostgreSQL, Auth, Edge Functions) |
 | **Relatórios** | jsPDF, AutoTable |
@@ -45,7 +50,8 @@ nextpro/
 │   └── web/            # Aplicação Principal (PWA)
 ├── planning/           # Documentação de Produto & Roadmap
 │   ├── 1-roadmap-sprints.md
-│   └── sprint-02-report.md
+│   ├── sprint-02-report.md
+│   └── sprint-02.5-report.md
 ├── supabase/           # Migrations e Configs de Banco
 └── packages/           # Libs compartilhadas (UI Kit - WIP)
 ```
@@ -58,6 +64,7 @@ Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte
 - [🏗️ Arquitetura Técnica](./planning/2-arquitetura-tecnica.md) - Decisões de stack e infra.
 - [📝 Relatório Sprint 1](./planning/sprint-01-report.md) - Setup inicial.
 - [📝 Relatório Sprint 2](./planning/sprint-02-report.md) - Dashboard & Entidades.
+- [📝 Relatório Sprint 2.5](./planning/sprint-02.5-report.md) - Site Público & Pré‑Cadastro.
 
 ## 🚀 Como Rodar Localmente
 
