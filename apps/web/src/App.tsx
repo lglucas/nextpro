@@ -24,6 +24,8 @@ import { PrivacidadePage } from '@/features/site/pages/PrivacidadePage'
 import { BlogPage } from '@/features/site/pages/BlogPage'
 import { ParceirosPage } from '@/features/site/pages/ParceirosPage'
 import { PreCadastroPage } from '@/features/site/pages/PreCadastroPage'
+import { TermsGate } from '@/features/legal/components/TermsGate'
+import { AceiteTermosPage } from '@/features/legal/pages/AceiteTermosPage'
 import './App.css'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -69,17 +71,22 @@ function App() {
           {/* Rotas Protegidas do App Principal */}
           <Route path="/app" element={
             <PrivateRoute>
-              <AppLayout />
+              <TermsGate>
+                <AppLayout />
+              </TermsGate>
             </PrivateRoute>
           }>
             <Route index element={<HomePage />} />
             <Route path="meu-perfil" element={<MeuPerfilPage />} />
+            <Route path="aceite-termos" element={<AceiteTermosPage />} />
           </Route>
 
           {/* Rotas do Dashboard Administrativo */}
           <Route path="/dashboard" element={
             <PrivateRoute>
-              <DashboardLayout />
+              <TermsGate>
+                <DashboardLayout />
+              </TermsGate>
             </PrivateRoute>
           }>
             <Route index element={<DashboardPage />} />
