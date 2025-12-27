@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield } from 'lucide-react'
+import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
 
 interface Guardian {
   id: string
@@ -37,6 +38,7 @@ export function StudentsPage() {
   const [guardians, setGuardians] = useState<Guardian[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
   
@@ -245,16 +247,49 @@ export function StudentsPage() {
             {role === 'super_admin' ? 'Gerencie alunos de todas as unidades.' : 'Gerencie os atletas da sua escola.'}
           </p>
         </div>
-        {!isCreating && (
-          <button 
-            onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
-          >
-            <UserPlus className="w-4 h-4" />
-            Novo Aluno
-          </button>
-        )}
+        {!isCreating && !isImporting ? (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsImporting(true)}
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"
+            >
+              Importar CSV
+            </button>
+            <button
+              onClick={() => setIsCreating(true)}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              Novo Aluno
+            </button>
+          </div>
+        ) : null}
       </div>
+
+      {isImporting && !isCreating ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-600">Importação em lote</p>
+            <button
+              type="button"
+              onClick={() => setIsImporting(false)}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50"
+            >
+              Fechar
+            </button>
+          </div>
+          <StudentCsvImport
+            role={role}
+            userSchoolId={userSchoolId}
+            schools={schools}
+            onImported={async () => {
+              await fetchStudents()
+              await fetchGuardians()
+              setIsImporting(false)
+            }}
+          />
+        </div>
+      ) : null}
 
       {/* Form de Criação */}
       {isCreating && (
