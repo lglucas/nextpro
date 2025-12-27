@@ -1,6 +1,6 @@
 # 🏆 NextPro - Plataforma de Gestão Esportiva
 
-> **Sprint 2.5 Concluída ✅** (v0.6.13)
+> **Sprint 3 em andamento 🚧** (última release: v0.6.13)
 
 O **NextPro** é uma solução completa para digitalização de escolinhas de futebol, gestão de carreiras de atletas e engajamento familiar. Focada em PWA (Web First) para alta acessibilidade.
 
@@ -27,10 +27,12 @@ Atualmente estamos na **Fase 1 (Setup & Alicerce)**. O sistema já possui autent
   - Site institucional multi‑páginas (rota `/`).
   - Wizard do censo em `/pre-cadastro` com persistência e envio.
   - CTO: listagem de pré‑cadastros + status de onboarding.
+  - Contato em `/contato` com gravação no Supabase (`contact_messages`) e anti-spam opcional (Turnstile).
 
 - **App do Usuário (Atleta):**
   - Landing Page personalizada.
   - Visualização de perfil básico.
+  - (Em validação) Gate de Termos de Uso com log de aceite (Sprint 3).
 
 ## 🛠️ Stack Tecnológica
 
@@ -51,7 +53,8 @@ nextpro/
 ├── planning/           # Documentação de Produto & Roadmap
 │   ├── 1-roadmap-sprints.md
 │   ├── sprint-02-report.md
-│   └── sprint-02.5-report.md
+│   ├── sprint-02.5-report.md
+│   └── sprint-03-report.md
 ├── supabase/           # Migrations e Configs de Banco
 └── packages/           # Libs compartilhadas (UI Kit - WIP)
 ```
@@ -65,6 +68,7 @@ Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte
 - [📝 Relatório Sprint 1](./planning/sprint-01-report.md) - Setup inicial.
 - [📝 Relatório Sprint 2](./planning/sprint-02-report.md) - Dashboard & Entidades.
 - [📝 Relatório Sprint 2.5](./planning/sprint-02.5-report.md) - Site Público & Pré‑Cadastro.
+- [📝 Relatório Sprint 3](./planning/sprint-03-report.md) - Execução parcial e próximos passos.
 
 ## 🚀 Como Rodar Localmente
 
@@ -96,9 +100,13 @@ Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte
     cp apps/web/.env.example apps/web/.env
     ```
     Preencha com suas chaves do Supabase (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
+    Opcional (anti-spam/captcha):
+    - `VITE_TURNSTILE_SITE_KEY` (Cloudflare Turnstile) para habilitar verificação no Contato e Pré‑Cadastro.
 
 4.  **Banco de Dados**
     Rode os scripts SQL localizados em `supabase/migrations/` no SQL Editor do seu projeto Supabase para criar as tabelas necessárias (`profiles`, `schools`, `audit_logs`).
+    Se você estiver usando o Contato:
+    - Rode `06_create_contact_messages.sql`.
 
 5.  **Execute**
     ```bash
