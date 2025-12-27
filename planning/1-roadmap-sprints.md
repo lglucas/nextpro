@@ -49,7 +49,7 @@
 **Status:** ✅ Concluído (MVP v0.6.13)
 **Objetivo:** Capturar demanda e iniciar o funil de cadastro pelo site, com pré-cadastro de responsáveis/alunos e vínculo com escolinhas, preparando o fluxo de aprovação em camadas.
 - [x] **Site Público (Marketing):** Site institucional multi‑páginas com CTA e navegação.
-- [ ] **Captura de Leads:** Formulário simples (contato) e eventos para métricas (GA/Meta) conforme estratégia.
+- [x] **Captura de Leads:** Formulário de contato com persistência no Supabase (eventos GA/Meta pendentes).
 - [x] **Pré-Cadastro (Wizard):** Blocos Guardião/Dependentes/Vínculo, com persistência e retomada.
 - [x] **Status de Onboarding:** `pendente_escola` → `aguardando_contrato` → `ativo` (com gestão no CTO).
 - [ ] **Confirmação da Escola:** Tela/lista para SchoolAdmin aceitar/rejeitar pré-cadastros.
@@ -65,7 +65,7 @@
 - [x] **Vínculo Familiar:** Lógica para conectar `Guardian` ao `Athlete` (Tabela `guardians`).
 - [x] **Gestão de Matrículas:** Adicionar/Remover alunos de turmas.
 - [ ] **Importação em Massa (CSV):** Script/Tela para importar alunos da planilha legada.
-- [ ] **Termos de Uso (Legal):** Tela de aceite obrigatório com log de IP/Timestamp/Versão.
+- [x] **Termos de Uso (Legal):** Gate de aceite obrigatório com log (IP/Timestamp/Versão) (em validação).
 
 ### 📱 Sprint 4: O "Check-in" e Presença (05/01 - 11/01)
 **Objetivo:** A operação diária básica.
