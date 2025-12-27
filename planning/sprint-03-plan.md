@@ -36,7 +36,7 @@
 - [x] Interface de Chamada (`ClassAttendancePage`).
 
 ### 5. Importação e Exportação
-- [ ] Importação de alunos via CSV.
+- [x] Importação de alunos via CSV (MVP).
 - [ ] Exportação de lista de presença (PDF).
 
 ### 6. Legal (Termos de Uso)

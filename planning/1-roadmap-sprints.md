@@ -64,7 +64,7 @@
 - [x] **Cadastro de Aluno:** Formulário completo (Dados Pessoais + Saúde + Responsáveis).
 - [x] **Vínculo Familiar:** Lógica para conectar `Guardian` ao `Athlete` (Tabela `guardians`).
 - [x] **Gestão de Matrículas:** Adicionar/Remover alunos de turmas.
-- [ ] **Importação em Massa (CSV):** Script/Tela para importar alunos da planilha legada.
+- [x] **Importação em Massa (CSV):** Tela MVP para importar alunos da planilha legada.
 - [x] **Termos de Uso (Legal):** Gate de aceite obrigatório com log (IP/Timestamp/Versão) (em validação).
 
 ### 📱 Sprint 4: O "Check-in" e Presença (05/01 - 11/01)

@@ -10,6 +10,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **CTO:** Modo de visualização (trocar persona) disponível apenas para Super Admin.
 - **Site:** Contato grava mensagens no Supabase (`contact_messages`).
 - **Segurança:** Turnstile opcional no Contato e no envio do Pré‑Cadastro.
+- **SchoolAdmin:** Importação CSV de alunos (MVP) no painel.
 - **Legal:** Gate de Termos com log de aceite (em branch `sprint-03-terms-aceite`).
 
 ## [0.6.13] - 2025-12-26
