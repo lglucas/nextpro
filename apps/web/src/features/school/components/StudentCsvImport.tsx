@@ -34,18 +34,21 @@ export function StudentCsvImport({
   onImported: () => Promise<void>
 }) {
   const [selectedSchoolId, setSelectedSchoolId] = useState('')
-  const [rows, setRows] = useState<ReturnType<typeof mapImportRow>[]>([])
-  const [errors, setErrors] = useState<string[]>([])
+  const [parsedRows, setParsedRows] = useState<Record<string, string>[]>([])
+  const [runtimeErrors, setRuntimeErrors] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<null | { insertedStudents: number; createdGuardians: number; skippedDuplicates: number }>(null)
 
   const effectiveSchoolId = role === 'super_admin' ? selectedSchoolId : userSchoolId || ''
+  const rows = useMemo(() => parsedRows.map((r) => mapImportRow(r, role, effectiveSchoolId)), [effectiveSchoolId, parsedRows, role])
+  const validationErrors = useMemo(() => validateImportRows(rows), [rows])
+  const errors = useMemo(() => [...validationErrors, ...runtimeErrors], [runtimeErrors, validationErrors])
   const previewRows = useMemo(() => rows.slice(0, 10), [rows])
 
   const handleFile = async (file: File) => {
     setResult(null)
-    setErrors([])
-    setRows([])
+    setRuntimeErrors([])
+    setParsedRows([])
 
     const text = await readFileAsText(file)
     const firstLine = text.split(/\r?\n/)[0] || ''
@@ -53,13 +56,11 @@ export function StudentCsvImport({
     const parsed = parseCsv(text, delimiter)
 
     if (parsed.headers.length === 0) {
-      setErrors(['CSV vazio ou inválido.'])
+      setRuntimeErrors(['CSV vazio ou inválido.'])
       return
     }
 
-    const mapped = parsed.rows.map((r) => mapImportRow(r, role, effectiveSchoolId))
-    setRows(mapped)
-    setErrors(validateImportRows(mapped))
+    setParsedRows(parsed.rows)
   }
 
   return (
@@ -172,7 +173,7 @@ export function StudentCsvImport({
                   await onImported()
                 } catch (e: unknown) {
                   const message = e instanceof Error ? e.message : 'Erro ao importar CSV'
-                  setErrors([message])
+                  setRuntimeErrors([message])
                 } finally {
                   setBusy(false)
                 }

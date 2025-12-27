@@ -136,7 +136,7 @@ export async function importStudentCsvRows(rows: ImportRow[]): Promise<ImportRes
 
     for (const row of schoolRows) {
       const birthIso = toIsoDate(row.student_birth_date)
-      const studentKey = `${row.student_full_name.toLowerCase()}|${birthIso}|${schoolId}`
+      const studentKey = `${row.student_full_name.trim().toLowerCase()}|${birthIso}|${schoolId}`
       if (studentKeys.has(studentKey)) {
         result.skippedDuplicates += 1
         continue
@@ -154,9 +154,9 @@ export async function importStudentCsvRows(rows: ImportRow[]): Promise<ImportRes
         const payload = {
           school_id: schoolId,
           full_name: row.guardian_full_name,
-          cpf: row.guardian_cpf || null,
-          phone: row.guardian_phone || null,
-          email: row.guardian_email || null,
+          cpf: cpfKey || null,
+          phone: phoneKey || null,
+          email: row.guardian_email?.trim() || null,
         }
 
         const { data: insertedGuardian, error: insertGuardianError } = await supabase
@@ -166,21 +166,21 @@ export async function importStudentCsvRows(rows: ImportRow[]): Promise<ImportRes
           .single()
 
         if (insertGuardianError) {
-          if (row.guardian_cpf) {
+          if (cpfKey) {
             const { data: existing, error: existingError } = await supabase
               .from('guardians')
               .select('id, cpf, phone')
               .eq('school_id', schoolId)
-              .eq('cpf', row.guardian_cpf)
+              .eq('cpf', cpfKey)
               .maybeSingle()
             if (existingError || !existing?.id) throw new Error(insertGuardianError.message)
             guardianId = existing.id
-          } else if (row.guardian_phone) {
+          } else if (phoneKey) {
             const { data: existing, error: existingError } = await supabase
               .from('guardians')
               .select('id, cpf, phone')
               .eq('school_id', schoolId)
-              .eq('phone', row.guardian_phone)
+              .eq('phone', phoneKey)
               .maybeSingle()
             if (existingError || !existing?.id) throw new Error(insertGuardianError.message)
             guardianId = existing.id
