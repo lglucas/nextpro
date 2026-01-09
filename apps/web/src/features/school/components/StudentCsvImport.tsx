@@ -42,7 +42,18 @@ export function StudentCsvImport({
   const effectiveSchoolId = role === 'super_admin' ? selectedSchoolId : userSchoolId || ''
   const rows = useMemo(() => parsedRows.map((r) => mapImportRow(r, role, effectiveSchoolId)), [effectiveSchoolId, parsedRows, role])
   const validationErrors = useMemo(() => validateImportRows(rows), [rows])
-  const errors = useMemo(() => [...validationErrors, ...runtimeErrors], [runtimeErrors, validationErrors])
+  const missingSchoolForSuperAdmin = role === 'super_admin' && !effectiveSchoolId && parsedRows.length > 0
+  const errors = useMemo(() => {
+    const filteredValidationErrors = missingSchoolForSuperAdmin
+      ? validationErrors.filter((e) => !e.includes('school_id ausente'))
+      : validationErrors
+
+    const merged = [...filteredValidationErrors, ...runtimeErrors]
+    if (missingSchoolForSuperAdmin) {
+      merged.unshift('Selecione uma escola acima (ou preencha a coluna school_id no CSV).')
+    }
+    return merged
+  }, [missingSchoolForSuperAdmin, runtimeErrors, validationErrors])
   const previewRows = useMemo(() => rows.slice(0, 10), [rows])
 
   const handleFile = async (file: File) => {
