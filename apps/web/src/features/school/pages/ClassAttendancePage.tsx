@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { generateAttendanceReport } from '@/utils/pdf'
 import { 
   Calendar, 
   Clock, 
@@ -350,14 +351,41 @@ export function ClassAttendancePage() {
                     {new Date(selectedSession.date).toLocaleDateString('pt-BR')} • {selectedSession.topic || 'Sem tema definido'}
                   </p>
                 </div>
-                <button 
-                  onClick={saveAttendance}
-                  disabled={isSaving}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  {isSaving ? 'Salvando...' : 'Salvar Chamada'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      generateAttendanceReport({
+                        className,
+                        session: {
+                          date: selectedSession.date,
+                          start_time: selectedSession.start_time,
+                          end_time: selectedSession.end_time,
+                          topic: selectedSession.topic,
+                        },
+                        rows: students.map((student) => {
+                          const row = attendanceData[student.id]
+                          return {
+                            student: student.full_name,
+                            status: row?.status ?? 'present',
+                            notes: row?.notes ?? '',
+                          }
+                        }),
+                      })
+                    }}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                  >
+                    Exportar PDF
+                  </button>
+                  <button 
+                    onClick={saveAttendance}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSaving ? 'Salvando...' : 'Salvar Chamada'}
+                  </button>
+                </div>
               </div>
 
               <div className="p-4 overflow-y-auto max-h-[600px]">
