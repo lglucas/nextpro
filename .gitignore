@@ -31,3 +31,6 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Arquivos internos de teste
+planning/sample-import-*.csv

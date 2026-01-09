@@ -78,19 +78,18 @@ export function DashboardPage() {
     fetchStats()
   }, [])
 
-  // Mock Data (misturado com real)
   const kpiData = {
     students: realStats.students.toString(),
-    revenue: 'R$ 45.200', // Mock (Financeiro ainda não implementado)
-    attendance: '94.5%', // Mock (Complexo calcular agora)
-    newEnrollments: '48' // Mock
+    revenue: '—',
+    attendance: '—',
+    newEnrollments: '—'
   }
 
   const stats = [
-    { name: 'Total de Alunos', value: kpiData.students, change: '+12%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '+2', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
-    { name: 'Taxa de Presença', value: kpiData.attendance, change: '+2.1%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { name: 'Avaliações', value: realStats.evaluations.toString(), change: '+18%', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { name: 'Total de Alunos', value: kpiData.students, change: '', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
+    { name: 'Taxa de Presença', value: kpiData.attendance, change: 'Em breve', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { name: 'Avaliações', value: realStats.evaluations.toString(), change: '', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
   ]
 
   const handleExportPDF = () => {
@@ -126,9 +125,11 @@ export function DashboardPage() {
               <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
-              <span className="text-sm font-medium text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">
-                {stat.change}
-              </span>
+              {stat.change ? (
+                <span className="text-sm font-medium text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-full">
+                  {stat.change}
+                </span>
+              ) : null}
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-1">{stat.value}</h3>
             <p className="text-sm text-slate-500">{stat.name}</p>
@@ -143,7 +144,6 @@ export function DashboardPage() {
           <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Últimas 24h</span>
         </div>
         <div className="divide-y divide-slate-100">
-          {/* Mock Logs - Futuramente virá do Supabase */}
           {auditLogs.map((log, i) => (
             <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-4">
