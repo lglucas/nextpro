@@ -23,7 +23,7 @@
 ### 🏁 Sprint 1: O "Hello World" Profissional (15/12 - 21/12)
 **Status:** ✅ Concluído (com adiantamentos)
 **Objetivo:** Ter o ambiente de desenvolvimento pronto, CI/CD configurado e Banco de Dados estruturado.
-- [x] **Setup Monorepo:** Configurar Turborepo (Apps: Web, Admin; Packages: UI, Config).
+- [x] **Setup Monorepo:** Estrutura `apps/web` com scripts NPM e alias `@`.
 - [x] **Setup Supabase:** Criar projeto, configurar Auth (Email/Senha + Google) e Storage.
 - [x] **Database Schema V1:** Criar tabelas `organizations`, `schools`, `users`, `profiles`.
 - [x] **Frontend Skeleton:** Instalar React, Tailwind, Framer Motion e configurar i18n (i18next).

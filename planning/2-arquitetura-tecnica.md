@@ -9,7 +9,7 @@
 ## 1. Stack Tecnológica
 
 ### Frontend (Web/PWA)
-- **Framework:** React 18+ (via Vite)
+- **Framework:** React 19 (via Vite)
 - **Linguagem:** TypeScript 5.x (Strict Mode)
 - **Estilização:** Tailwind CSS 3.x (Utility-first)
 - **Animações:** Framer Motion (Gestos e Transições fluidas)
@@ -27,7 +27,7 @@
 - **Realtime:** Supabase Realtime (Websockets para notificações)
 
 ### Infraestrutura & DevOps
-- **Repositório:** GitHub (Monorepo com Turborepo ou PNPM Workspaces)
+- **Repositório:** GitHub (Monorepo simples com `apps/web`)
 - **Hospedagem Frontend:** cPanel (Deploy via FTP/Git Action de arquivos estáticos buildados)
 - **CI/CD:** GitHub Actions (Lint, Test, Build, Deploy)
 

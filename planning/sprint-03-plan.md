@@ -37,7 +37,7 @@
 
 ### 5. Importação e Exportação
 - [x] Importação de alunos via CSV (MVP).
-- [ ] Exportação de lista de presença (PDF).
+- [x] Exportação de lista de presença (PDF).
 
 ### 6. Legal (Termos de Uso)
 - [x] Gate de aceite obrigatório para acessar `/app` e `/dashboard`.
