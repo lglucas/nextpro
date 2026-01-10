@@ -7,11 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
-- **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).
-- **Attendance:** Botão "QR Check-in" na chamada para gerar QR/link da sessão.
-- **Database/RLS:** Policies para atleta ler seus vínculos e registrar presença do dia via QR.
 ### Changed
 ### Fixed
+
+## [0.6.15] - 2026-01-10
+### Added
+- **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).
+- **Attendance:** Botão "QR Check-in" na chamada para gerar QR/link da sessão.
+- **Attendance:** Expiração configurável do QR (1h/2h/3h) e exibição do horário limite.
+- **Attendance:** Contagem de check-ins em tempo real no modal do QR.
+- **Database/RLS:** Policies para atleta ler seus vínculos e registrar presença do dia via QR.
+- **Database:** Campo `qr_checkin_expires_at` em `class_sessions` para validar expiração no banco.
 
 ## [0.6.14] - 2026-01-09
 ### Added

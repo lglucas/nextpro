@@ -19,6 +19,22 @@ function parseSessionIdFromValue(value: string): string | null {
   }
 }
 
+function parseExpiresAtFromValue(value: string): number | null {
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  try {
+    const maybeUrl = new URL(trimmed)
+    const raw = maybeUrl.searchParams.get('expiresAt')
+    if (!raw) return null
+    const parsed = Number(raw)
+    if (!Number.isFinite(parsed)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
 function isUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
@@ -32,8 +48,17 @@ export function CheckInPage() {
     return value?.trim() ? value.trim() : ''
   }, [searchParams])
 
+  const initialExpiresAt = useMemo(() => {
+    const value = searchParams.get('expiresAt')
+    if (!value) return null
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed)) return null
+    return parsed
+  }, [searchParams])
+
   const [manualValue, setManualValue] = useState('')
   const [sessionId, setSessionId] = useState(initialSessionId)
+  const [expiresAt, setExpiresAt] = useState<number | null>(initialExpiresAt)
   const [status, setStatus] = useState<CheckInStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [students, setStudents] = useState<Array<{ id: string; full_name: string }>>([])
@@ -48,8 +73,12 @@ export function CheckInPage() {
   }, [])
 
   useEffect(() => {
-    setSessionId(initialSessionId)
-  }, [initialSessionId])
+    const timeoutId = window.setTimeout(() => {
+      setSessionId(initialSessionId)
+      setExpiresAt(initialExpiresAt)
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [initialExpiresAt, initialSessionId])
 
   useEffect(() => {
     let mounted = true
@@ -130,11 +159,14 @@ export function CheckInPage() {
           const rawValue = results?.[0]?.rawValue
           if (rawValue) {
             const nextSessionId = parseSessionIdFromValue(rawValue)
+            const nextExpiresAt = parseExpiresAtFromValue(rawValue)
             if (nextSessionId && isUuid(nextSessionId)) {
               setSessionId(nextSessionId)
-              setSearchParams({ sessionId: nextSessionId }, { replace: true })
+              setExpiresAt(nextExpiresAt)
+              if (nextExpiresAt) setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+              else setSearchParams({ sessionId: nextSessionId }, { replace: true })
               stopScanner()
-              await submitCheckIn(nextSessionId)
+              await submitCheckIn({ sessionId: nextSessionId, expiresAt: nextExpiresAt })
               return
             }
           }
@@ -163,14 +195,28 @@ export function CheckInPage() {
     setStatus('idle')
   }
 
-  const submitCheckIn = async (nextSessionId?: string) => {
+  const submitCheckIn = async (next?: { sessionId?: string; expiresAt?: number | null }) => {
     setErrorMessage(null)
 
-    const effectiveSessionId = (nextSessionId ?? sessionId).trim()
+    const effectiveSessionId = (next?.sessionId ?? sessionId).trim()
+    const effectiveExpiresAt = next?.expiresAt ?? expiresAt
     if (!user) return
 
     if (!isUuid(effectiveSessionId)) {
       setErrorMessage('Session ID inválido. Escaneie de novo ou cole o link completo.')
+      setStatus('error')
+      return
+    }
+
+    if (!effectiveExpiresAt) {
+      setErrorMessage('QR inválido ou antigo. Peça para o professor gerar um novo QR.')
+      setStatus('error')
+      return
+    }
+
+    const nowSeconds = Math.floor(Date.now() / 1000)
+    if (nowSeconds > effectiveExpiresAt) {
+      setErrorMessage('Este QR expirou. Peça para o professor gerar um novo QR.')
       setStatus('error')
       return
     }
@@ -209,9 +255,13 @@ export function CheckInPage() {
       const text = await navigator.clipboard.readText()
       setManualValue(text)
       const nextSessionId = parseSessionIdFromValue(text)
+      const nextExpiresAt = parseExpiresAtFromValue(text)
       if (nextSessionId) {
         setSessionId(nextSessionId)
-        if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
+        setExpiresAt(nextExpiresAt)
+        if (isUuid(nextSessionId) && nextExpiresAt)
+          setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+        else if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
       }
     } catch {
       setErrorMessage('Não consegui ler a área de transferência.')
@@ -312,14 +362,18 @@ export function CheckInPage() {
               disabled={status === 'checking_in'}
               onClick={async () => {
                 const nextSessionId = parseSessionIdFromValue(manualValue)
+                const nextExpiresAt = parseExpiresAtFromValue(manualValue)
                 if (!nextSessionId) {
                   setErrorMessage('Cole um valor antes de confirmar.')
                   setStatus('error')
                   return
                 }
                 setSessionId(nextSessionId)
-                if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
-                await submitCheckIn(nextSessionId)
+                setExpiresAt(nextExpiresAt)
+                if (isUuid(nextSessionId) && nextExpiresAt)
+                  setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+                else if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
+                await submitCheckIn({ sessionId: nextSessionId, expiresAt: nextExpiresAt })
               }}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50"
             >
@@ -363,7 +417,7 @@ export function CheckInPage() {
               </div>
               <button
                 type="button"
-                onClick={() => submitCheckIn(sessionId)}
+                onClick={() => submitCheckIn({ sessionId, expiresAt })}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
               >
                 Registrar

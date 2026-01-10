@@ -79,6 +79,8 @@ create policy "Users check in own attendance"
         and s.id = student_id
         and s.user_id = auth.uid()
         and sess.date = current_date
+        and sess.qr_checkin_expires_at is not null
+        and now() <= sess.qr_checkin_expires_at
     )
   );
 
@@ -105,6 +107,7 @@ create policy "Users update own attendance"
         and s.id = student_id
         and s.user_id = auth.uid()
         and sess.date = current_date
+        and sess.qr_checkin_expires_at is not null
+        and now() <= sess.qr_checkin_expires_at
     )
   );
-
