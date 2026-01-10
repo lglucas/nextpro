@@ -10,6 +10,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.6.17] - 2026-01-10
+### Added
+- **Gamificação (DB):** Estrutura inicial de XP/níveis (`student_progress`, `student_xp_events`).
+- **Gamificação (DB):** Estrutura base de badges e tiers (`badges`, `tiers`, `student_badges`).
+- **Gamificação (DB):** Trigger de XP por presença (presença = +XP base via `system_settings.xp_base`).
+- **App (Atleta):** Exibir XP e nível após check-in via QR (com aviso de level up).
+- **App (Atleta):** Card do atleta no Meu Perfil com nível e barra de XP.
+
 ## [0.6.16] - 2026-01-10
 ### Fixed
 - **Attendance/RLS:** Bloquear check-in via QR para atleta inativo (`students.active = false`).

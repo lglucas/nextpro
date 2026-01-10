@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 
 type CheckInStatus = 'idle' | 'scanning' | 'checking_in' | 'success' | 'error'
 
+type StudentProgress = { xp_total: number; level: number }
+
 function parseSessionIdFromValue(value: string): string | null {
   const trimmed = value.trim()
   if (!trimmed) return null
@@ -39,6 +41,15 @@ function isUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
 
+function parseJsonbInt(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value)
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return Math.trunc(parsed)
+  }
+  return null
+}
+
 export function CheckInPage() {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -63,6 +74,10 @@ export function CheckInPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [students, setStudents] = useState<Array<{ id: string; full_name: string }>>([])
   const [selectedStudentId, setSelectedStudentId] = useState<string>('')
+  const [xpBase, setXpBase] = useState<number | null>(null)
+  const [progress, setProgress] = useState<StudentProgress | null>(null)
+  const [showLevelUp, setShowLevelUp] = useState(false)
+  const prevLevelRef = useRef<number | null>(null)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -114,6 +129,66 @@ export function CheckInPage() {
       mounted = false
     }
   }, [user])
+
+  useEffect(() => {
+    let mounted = true
+
+    const run = async () => {
+      if (!user) return
+      const { data, error } = await supabase.from('system_settings').select('value').eq('key', 'xp_base').maybeSingle()
+      if (!mounted) return
+      if (error) return
+      const parsed = parseJsonbInt(data?.value)
+      if (parsed != null) setXpBase(parsed)
+    }
+
+    run()
+
+    return () => {
+      mounted = false
+    }
+  }, [user])
+
+  useEffect(() => {
+    let mounted = true
+
+    const run = async () => {
+      if (!user) return
+      if (!selectedStudentId) {
+        setProgress(null)
+        prevLevelRef.current = null
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('student_progress')
+        .select('xp_total, level')
+        .eq('student_id', selectedStudentId)
+        .maybeSingle()
+
+      if (!mounted) return
+
+      if (error) {
+        setProgress(null)
+        prevLevelRef.current = null
+        return
+      }
+
+      if (data) {
+        setProgress(data as StudentProgress)
+        prevLevelRef.current = (data as StudentProgress).level
+      } else {
+        setProgress(null)
+        prevLevelRef.current = null
+      }
+    }
+
+    run()
+
+    return () => {
+      mounted = false
+    }
+  }, [selectedStudentId, user])
 
   useEffect(() => {
     return () => {
@@ -263,6 +338,25 @@ export function CheckInPage() {
       setErrorMessage(error.message || 'Erro ao registrar presença.')
       setStatus('error')
       return
+    }
+
+    if (selectedStudentId) {
+      const { data } = await supabase
+        .from('student_progress')
+        .select('xp_total, level')
+        .eq('student_id', selectedStudentId)
+        .maybeSingle()
+
+      if (data) {
+        const nextProgress = data as StudentProgress
+        const previousLevel = prevLevelRef.current
+        setProgress(nextProgress)
+        prevLevelRef.current = nextProgress.level
+        if (previousLevel != null && nextProgress.level > previousLevel) {
+          setShowLevelUp(true)
+          window.setTimeout(() => setShowLevelUp(false), 2500)
+        }
+      }
     }
 
     setStatus('success')
@@ -421,8 +515,27 @@ export function CheckInPage() {
                     ? 'Você pode fechar esta tela.'
                     : errorMessage || 'Tente novamente ou use o campo manual.'}
                 </p>
+                {status === 'success' && (progress || xpBase != null) && (
+                  <div className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-green-900">
+                    {progress && (
+                      <span className="px-2 py-1 rounded-full bg-green-100 border border-green-200">
+                        Nível {progress.level} • {progress.xp_total} XP
+                      </span>
+                    )}
+                    {xpBase != null && (
+                      <span className="px-2 py-1 rounded-full bg-green-100 border border-green-200">+{xpBase} XP</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
+          </div>
+        )}
+
+        {showLevelUp && progress && (
+          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 animate-pulse">
+            <p className="text-sm font-semibold text-amber-900">Level up!</p>
+            <p className="mt-1 text-amber-800">Você subiu para o nível {progress.level}.</p>
           </div>
         )}
 

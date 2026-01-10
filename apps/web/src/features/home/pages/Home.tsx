@@ -56,7 +56,7 @@ export function HomePage() {
           </div>
           <h3 className="font-semibold text-slate-900 mb-1">Meu Perfil</h3>
           <p className="text-sm text-slate-500 mb-4">Atualize suas estatísticas</p>
-          <Link to="#" className="text-sm text-purple-600 font-medium flex items-center hover:underline">
+          <Link to="/app/meu-perfil" className="text-sm text-purple-600 font-medium flex items-center hover:underline">
             Editar perfil <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
