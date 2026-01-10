@@ -1,79 +1,149 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Plus, Search, FileDown, MapPin, Building2, Pencil, Trash2, X } from 'lucide-react'
 import { generateSchoolsReport } from '@/utils/pdf'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/contexts/AuthContext'
 
-// Mock Data Type
 interface School {
   id: string
   name: string
-  document: string
-  address: string
+  document: string | null
+  address: string | null
   active: boolean
   studentsCount: number
 }
 
-const MOCK_SCHOOLS: School[] = [
-  { id: '1', name: 'Escolinha do Zico - Unidade RJ', document: '12.345.678/0001-90', address: 'Av. das Américas, 1000', active: true, studentsCount: 150 },
-  { id: '2', name: 'Ronaldo Academy - SP', document: '98.765.432/0001-10', address: 'Rua Funchal, 500', active: true, studentsCount: 85 },
-  { id: '3', name: 'NextPro Training Center', document: '45.678.901/0001-23', address: 'Centro Esportivo, S/N', active: false, studentsCount: 0 },
-]
-
 export function SchoolsPage() {
-  const [schools, setSchools] = useState<School[]>(MOCK_SCHOOLS)
+  const { role } = useAuth()
+  const canManage = role === 'super_admin'
+  const [schools, setSchools] = useState<School[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingSchool, setEditingSchool] = useState<School | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
   
   // Form States
   const [formData, setFormData] = useState({ name: '', document: '', address: '' })
 
+  const fetchSchools = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+
+    const { data, error } = await supabase
+      .from('schools')
+      .select('id, name, document, address, active, students(count)')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      setSchools([])
+      setLoadError(error.message)
+      setLoading(false)
+      return
+    }
+
+    const rows = (data || []) as unknown as Array<{
+      id: string
+      name: string
+      document: string | null
+      address: string | null
+      active: boolean | null
+      students?: Array<{ count: number }>
+    }>
+
+    setSchools(
+      rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        document: r.document ?? null,
+        address: r.address ?? null,
+        active: r.active ?? true,
+        studentsCount: r.students?.[0]?.count ?? 0,
+      }))
+    )
+
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void fetchSchools()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [fetchSchools])
+
   const filteredSchools = schools.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.document.includes(searchTerm)
+    (s.document || '').includes(searchTerm)
   )
 
   const handleExportPDF = () => {
     generateSchoolsReport(filteredSchools)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    if (!canManage) {
+      alert('Você não tem permissão para excluir escolas.')
+      return
+    }
     if (confirm('Tem certeza que deseja excluir esta escola?')) {
-      setSchools(prev => prev.filter(s => s.id !== id))
+      setSaving(true)
+      const { error } = await supabase.from('schools').delete().eq('id', id)
+      setSaving(false)
+      if (error) {
+        alert(`Erro ao excluir: ${error.message}`)
+        return
+      }
+      await fetchSchools()
     }
   }
 
   const handleEdit = (school: School) => {
+    if (!canManage) return
     setEditingSchool(school)
-    setFormData({ name: school.name, document: school.document, address: school.address })
+    setFormData({ name: school.name, document: school.document || '', address: school.address || '' })
     setIsModalOpen(true)
   }
 
   const handleAddNew = () => {
+    if (!canManage) return
     setEditingSchool(null)
     setFormData({ name: '', document: '', address: '' })
     setIsModalOpen(true)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!canManage) {
+      alert('Você não tem permissão para criar/editar escolas.')
+      return
+    }
+
+    const payload = {
+      name: formData.name.trim(),
+      document: formData.document.trim() || null,
+      address: formData.address.trim() || null,
+    }
+
+    setSaving(true)
     if (editingSchool) {
-      // Edit
-      setSchools(prev => prev.map(s => 
-        s.id === editingSchool.id 
-          ? { ...s, ...formData }
-          : s
-      ))
-    } else {
-      // Add
-      const newSchool: School = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...formData,
-        active: true,
-        studentsCount: 0
+      const { error } = await supabase.from('schools').update(payload).eq('id', editingSchool.id)
+      setSaving(false)
+      if (error) {
+        alert(`Erro ao salvar: ${error.message}`)
+        return
       }
-      setSchools(prev => [...prev, newSchool])
+    } else {
+      const { error } = await supabase.from('schools').insert({ ...payload, active: true })
+      setSaving(false)
+      if (error) {
+        alert(`Erro ao criar: ${error.message}`)
+        return
+      }
     }
     setIsModalOpen(false)
+    await fetchSchools()
   }
 
   return (
@@ -92,13 +162,15 @@ export function SchoolsPage() {
             <FileDown className="w-4 h-4" />
             Exportar PDF
           </button>
-          <button 
-            onClick={handleAddNew}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Nova Escola
-          </button>
+          {canManage ? (
+            <button 
+              onClick={handleAddNew}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nova Escola
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -118,6 +190,19 @@ export function SchoolsPage() {
 
       {/* List */}
       <div className="grid gap-4">
+        {loading ? (
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <p className="text-sm text-slate-600">Carregando escolas...</p>
+          </div>
+        ) : null}
+
+        {!loading && loadError ? (
+          <div className="bg-amber-50 p-6 rounded-xl border border-amber-200 shadow-sm">
+            <p className="text-sm font-semibold text-amber-900">Não foi possível carregar as escolas</p>
+            <p className="mt-1 text-sm text-amber-800">{loadError}</p>
+          </div>
+        ) : null}
+
         {filteredSchools.map(school => (
           <div key={school.id} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-primary/30 transition-colors">
             <div className="flex items-start gap-4">
@@ -134,7 +219,7 @@ export function SchoolsPage() {
                 <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    {school.address}
+                    {school.address || '---'}
                   </span>
                   <span>•</span>
                   <span>{school.studentsCount} alunos</span>
@@ -142,26 +227,30 @@ export function SchoolsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0 mt-2 sm:mt-0">
-              <button 
-                onClick={() => handleEdit(school)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-              >
-                <Pencil className="w-4 h-4" />
-                Editar
-              </button>
-              <button 
-                onClick={() => handleDelete(school.id)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-                Excluir
-              </button>
-            </div>
+            {canManage ? (
+              <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0 mt-2 sm:mt-0">
+                <button 
+                  onClick={() => handleEdit(school)}
+                  disabled={saving}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Editar
+                </button>
+                <button 
+                  onClick={() => void handleDelete(school.id)}
+                  disabled={saving}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Excluir
+                </button>
+              </div>
+            ) : null}
           </div>
         ))}
 
-        {filteredSchools.length === 0 && (
+        {!loading && !loadError && filteredSchools.length === 0 && (
           <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
             <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-slate-900">Nenhuma escola encontrada</h3>
@@ -189,6 +278,7 @@ export function SchoolsPage() {
                 <input 
                   type="text" 
                   required
+                  disabled={saving}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   value={formData.name}
                   onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -199,6 +289,7 @@ export function SchoolsPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Documento (CNPJ/CPF)</label>
                 <input 
                   type="text" 
+                  disabled={saving}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   value={formData.document}
                   onChange={e => setFormData(prev => ({ ...prev, document: e.target.value }))}
@@ -209,6 +300,7 @@ export function SchoolsPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Endereço</label>
                 <input 
                   type="text" 
+                  disabled={saving}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   value={formData.address}
                   onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
@@ -219,15 +311,17 @@ export function SchoolsPage() {
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)}
+                  disabled={saving}
                   className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
+                  disabled={saving}
                   className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium"
                 >
-                  Salvar
+                  {saving ? 'Salvando...' : 'Salvar'}
                 </button>
               </div>
             </form>

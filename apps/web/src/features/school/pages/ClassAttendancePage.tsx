@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { generateAttendanceReport } from '@/utils/pdf'
+import * as QRCode from 'qrcode'
 import { 
   Calendar, 
   Clock, 
@@ -10,7 +12,10 @@ import {
   Plus, 
   ArrowLeft,
   Save,
-  Trash
+  Trash,
+  QrCode,
+  Copy,
+  X
 } from 'lucide-react'
 
 interface ClassSession {
@@ -59,6 +64,10 @@ export function ClassAttendancePage() {
   const [selectedSession, setSelectedSession] = useState<ClassSession | null>(null)
   const [attendanceData, setAttendanceData] = useState<Record<string, Attendance>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const [qrOpen, setQrOpen] = useState(false)
+  const [qrLoading, setQrLoading] = useState(false)
+  const [qrValue, setQrValue] = useState('')
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
 
   const fetchClassDetails = useCallback(async () => {
     const { data } = await supabase.from('classes').select('name').eq('id', classId).single()
@@ -131,6 +140,9 @@ export function ClassAttendancePage() {
 
   const handleSelectSession = async (session: ClassSession) => {
     setSelectedSession(session)
+    setQrOpen(false)
+    setQrDataUrl(null)
+    setQrValue('')
     // Fetch existing attendance
     const { data } = await supabase
       .from('attendances')
@@ -155,6 +167,33 @@ export function ClassAttendancePage() {
     }
 
     setAttendanceData(initialData)
+  }
+
+  const openCheckInQr = async () => {
+    if (!selectedSession) return
+    setQrLoading(true)
+    try {
+      const value = `${window.location.origin}/app/check-in?sessionId=${selectedSession.id}`
+      const dataUrl = await QRCode.toDataURL(value, { width: 280, margin: 1 })
+      setQrValue(value)
+      setQrDataUrl(dataUrl)
+      setQrOpen(true)
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error)
+      alert('Erro ao gerar QR Code.')
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  const copyCheckInLink = async () => {
+    if (!qrValue) return
+    try {
+      await navigator.clipboard.writeText(qrValue)
+      alert('Link copiado!')
+    } catch {
+      alert('Não consegui copiar. Copie manualmente pelo campo.')
+    }
   }
 
   const updateStatus = (studentId: string, status: Attendance['status']) => {
@@ -350,15 +389,109 @@ export function ClassAttendancePage() {
                     {new Date(selectedSession.date).toLocaleDateString('pt-BR')} • {selectedSession.topic || 'Sem tema definido'}
                   </p>
                 </div>
-                <button 
-                  onClick={saveAttendance}
-                  disabled={isSaving}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  {isSaving ? 'Salvando...' : 'Salvar Chamada'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={openCheckInQr}
+                    disabled={qrLoading}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                  >
+                    <QrCode className="w-4 h-4" />
+                    {qrLoading ? 'Gerando...' : 'QR Check-in'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      generateAttendanceReport({
+                        className,
+                        session: {
+                          date: selectedSession.date,
+                          start_time: selectedSession.start_time,
+                          end_time: selectedSession.end_time,
+                          topic: selectedSession.topic,
+                        },
+                        rows: students.map((student) => {
+                          const row = attendanceData[student.id]
+                          return {
+                            student: student.full_name,
+                            status: row?.status ?? 'present',
+                            notes: row?.notes ?? '',
+                          }
+                        }),
+                      })
+                    }}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                  >
+                    Exportar PDF
+                  </button>
+                  <button 
+                    onClick={saveAttendance}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSaving ? 'Salvando...' : 'Salvar Chamada'}
+                  </button>
+                </div>
               </div>
+
+              {qrOpen && (
+                <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                  <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">QR Code de Check-in</p>
+                        <p className="text-xs text-slate-500">Alunos escaneiam para registrar presença</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setQrOpen(false)}
+                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"
+                        aria-label="Fechar"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="p-5">
+                      <div className="flex items-center justify-center">
+                        {qrDataUrl ? (
+                          <img src={qrDataUrl} alt="QR Code de check-in" className="w-[280px] h-[280px] rounded-lg border border-slate-200 bg-white" />
+                        ) : (
+                          <div className="w-[280px] h-[280px] rounded-lg border border-slate-200 bg-slate-50" />
+                        )}
+                      </div>
+
+                      <div className="mt-4">
+                        <p className="text-xs text-slate-500">Link</p>
+                        <input
+                          value={qrValue}
+                          readOnly
+                          className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50"
+                        />
+                      </div>
+
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={copyCheckInLink}
+                          className="flex-1 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                        >
+                          <Copy className="w-4 h-4" />
+                          Copiar link
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setQrOpen(false)}
+                          className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                        >
+                          Ok
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="p-4 overflow-y-auto max-h-[600px]">
                 <table className="w-full">

@@ -7,11 +7,25 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
+- **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).
+- **Attendance:** Botão "QR Check-in" na chamada para gerar QR/link da sessão.
+- **Database/RLS:** Policies para atleta ler seus vínculos e registrar presença do dia via QR.
+### Changed
+### Fixed
+
+## [0.6.14] - 2026-01-09
+### Added
 - **CTO:** Modo de visualização (trocar persona) disponível apenas para Super Admin.
 - **Site:** Contato grava mensagens no Supabase (`contact_messages`).
 - **Segurança:** Turnstile opcional no Contato e no envio do Pré‑Cadastro.
 - **SchoolAdmin:** Importação CSV de alunos (MVP) no painel.
+- **SchoolAdmin:** Exportação PDF da lista de presença por aula.
 - **Legal:** Gate de Termos com log de aceite (em branch `sprint-03-terms-aceite`).
+### Changed
+- **Docs:** Alinhar README/Planning com stack e fluxo real do monorepo.
+- **Dashboard:** Remover KPIs fictícios e sinalizar itens "Em breve".
+### Fixed
+- **Repo:** Ignorar CSVs internos de teste em `planning/`.
 
 ## [0.6.13] - 2025-12-26
 ### Added
