@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.6.16] - 2026-01-10
+### Fixed
+- **Attendance/RLS:** Bloquear check-in via QR para atleta inativo (`students.active = false`).
+
 ## [0.6.15] - 2026-01-10
 ### Added
 - **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).

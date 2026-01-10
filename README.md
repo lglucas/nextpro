@@ -1,6 +1,6 @@
 # 🏆 NextPro - Plataforma de Gestão Esportiva
 
-> **Sprint 3 em andamento 🚧** (última release: v0.6.15)
+> **Sprint 4 em andamento 🚧** (última release: v0.6.16)
 
 O **NextPro** é uma solução completa para digitalização de escolinhas de futebol, gestão de carreiras de atletas e engajamento familiar. Focada em PWA (Web First) para alta acessibilidade.
 

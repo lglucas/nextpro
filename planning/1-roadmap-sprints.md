@@ -70,8 +70,8 @@
 ### 📱 Sprint 4: O "Check-in" e Presença (05/01 - 11/01)
 **Objetivo:** A operação diária básica.
 - [x] **Lista de Chamada Manual:** Interface para o treinador marcar presença (`ClassAttendancePage`).
-- [ ] **Gerador de QR Code:** O Técnico ou Admin gera o QR da aula.
-- [ ] **Leitor de QR (PWA):** O Aluno lê o QR e marca presença.
+- [x] **Gerador de QR Code:** O Técnico ou Admin gera o QR da aula.
+- [x] **Leitor de QR (PWA):** O Aluno lê o QR e marca presença.
 - [ ] **Regra de Negócio:** Presença só conta se o aluno estiver "Ativo" (Financeiro OK).
 
 ### 🏆 Sprint 5: Gamificação Parte 1 - Engine (12/01 - 18/01)

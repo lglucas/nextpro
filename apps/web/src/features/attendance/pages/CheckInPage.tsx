@@ -229,6 +229,24 @@ export function CheckInPage() {
 
     setStatus('checking_in')
 
+    const { data: studentRow, error: studentError } = await supabase
+      .from('students')
+      .select('active')
+      .eq('id', selectedStudentId)
+      .maybeSingle()
+
+    if (studentError) {
+      setErrorMessage(studentError.message || 'Erro ao validar atleta.')
+      setStatus('error')
+      return
+    }
+
+    if (!studentRow?.active) {
+      setErrorMessage('Seu atleta está inativo. Procure a escolinha para regularizar.')
+      setStatus('error')
+      return
+    }
+
     const { error } = await supabase
       .from('attendances')
       .upsert(

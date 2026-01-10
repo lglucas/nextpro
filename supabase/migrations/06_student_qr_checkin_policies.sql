@@ -69,6 +69,7 @@ create policy "Users check in own attendance"
       from public.students s
       where s.id = student_id
         and s.user_id = auth.uid()
+        and s.active = true
     )
     and exists (
       select 1
@@ -78,6 +79,7 @@ create policy "Users check in own attendance"
       where sess.id = session_id
         and s.id = student_id
         and s.user_id = auth.uid()
+        and s.active = true
         and sess.date = current_date
         and sess.qr_checkin_expires_at is not null
         and now() <= sess.qr_checkin_expires_at
@@ -94,6 +96,7 @@ create policy "Users update own attendance"
       from public.students s
       where s.id = attendances.student_id
         and s.user_id = auth.uid()
+        and s.active = true
     )
   )
   with check (
@@ -106,6 +109,7 @@ create policy "Users update own attendance"
       where sess.id = session_id
         and s.id = student_id
         and s.user_id = auth.uid()
+        and s.active = true
         and sess.date = current_date
         and sess.qr_checkin_expires_at is not null
         and now() <= sess.qr_checkin_expires_at
