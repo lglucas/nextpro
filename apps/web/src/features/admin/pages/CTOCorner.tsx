@@ -403,11 +403,13 @@ export function CTOCornerPage() {
                             inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                             ${u.role === 'super_admin' ? 'bg-purple-100 text-purple-700' : 
                               u.role === 'school_admin' ? 'bg-amber-100 text-amber-700' :
+                              u.role === 'coach' ? 'bg-green-100 text-green-700' :
                               u.role === 'partner' ? 'bg-blue-100 text-blue-700' : 
                               'bg-slate-100 text-slate-700'}
                           `}>
                             {u.role === 'super_admin' ? 'Super Admin' : 
                              u.role === 'school_admin' ? 'Gestor de Escola' :
+                             u.role === 'coach' ? 'Professor' :
                              u.role === 'partner' ? 'Sócio' : 'Atleta'}
                           </span>
                         </td>
@@ -435,6 +437,14 @@ export function CTOCornerPage() {
                                 className="text-xs text-amber-600 hover:bg-amber-50 px-2 py-1 rounded"
                               >
                                 Virar Gestor
+                              </button>
+                            )}
+                            {u.role !== 'coach' && (
+                              <button
+                                onClick={() => handleUpdateRole(u.id, 'coach')}
+                                className="text-xs text-green-700 hover:bg-green-50 px-2 py-1 rounded"
+                              >
+                                Virar Professor
                               </button>
                             )}
                             {u.role !== 'user' && (
