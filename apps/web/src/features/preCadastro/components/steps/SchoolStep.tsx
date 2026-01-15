@@ -7,9 +7,11 @@ const UF_OPTIONS = [
 export function SchoolStep({
   value,
   onChange,
+  disabled,
 }: {
   value: PreCadastroSchoolInfo
   onChange: (next: PreCadastroSchoolInfo) => void
+  disabled?: boolean
 }) {
   return (
     <div className="grid sm:grid-cols-2 gap-4">
@@ -18,6 +20,7 @@ export function SchoolStep({
         <select
           value={value.uf}
           onChange={(e) => onChange({ ...value, uf: e.target.value })}
+          disabled={disabled}
           className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
         >
           {UF_OPTIONS.map((uf) => (
@@ -33,6 +36,7 @@ export function SchoolStep({
         <input
           value={value.city}
           onChange={(e) => onChange({ ...value, city: e.target.value })}
+          disabled={disabled}
           className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
           placeholder="Cidade"
         />
@@ -43,6 +47,7 @@ export function SchoolStep({
         <input
           value={value.name}
           onChange={(e) => onChange({ ...value, name: e.target.value })}
+          disabled={disabled}
           className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
           placeholder="Nome da escolinha"
         />
@@ -53,4 +58,3 @@ export function SchoolStep({
     </div>
   )
 }
-

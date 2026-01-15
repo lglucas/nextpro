@@ -53,6 +53,7 @@ export interface PreCadastroDraftData {
 export interface PreRegistrationRow {
   id: string
   user_id: string
+  school_id?: string | null
   status: PreCadastroStatus
   onboarding_status?: PreCadastroOnboardingStatus
   data: unknown
@@ -60,6 +61,9 @@ export interface PreRegistrationRow {
   consented_at?: string | null
   consent_version?: string | null
   submitted_meta?: unknown
+  school_reviewed_at?: string | null
+  school_reviewed_by?: string | null
+  school_review_note?: string | null
   created_at: string
   updated_at: string
 }

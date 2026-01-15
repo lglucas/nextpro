@@ -6,6 +6,7 @@ import { RegisterPage } from '@/features/auth/pages/Register'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
+import { PreCadastrosPage } from '@/features/dashboard/pages/PreCadastros'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import { StudentsPage } from '@/features/school/pages/StudentsPage'
 import { ClassesPage } from '@/features/school/pages/ClassesPage'
@@ -101,6 +102,7 @@ function App() {
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
             <Route path="classes" element={<ClassesPage />} />
+            <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
             <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
             <Route path="reports" element={<Navigate to="/dashboard" replace />} />
