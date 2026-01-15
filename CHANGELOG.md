@@ -10,6 +10,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.6.18] - 2026-01-15
+### Added
+- **RLS (Coach):** Policies para professor (coach) operar em turmas, matrículas e chamadas na própria escola.
+### Fixed
+- **Dashboard:** Rotas de atalho para evitar redirecionamento ao site público quando acessar caminhos ainda não implementados (`/dashboard/attendance`, `/dashboard/reports`).
+
 ## [0.6.17] - 2026-01-10
 ### Added
 - **Gamificação (DB):** Estrutura inicial de XP/níveis (`student_progress`, `student_xp_events`).

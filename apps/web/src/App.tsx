@@ -102,6 +102,8 @@ function App() {
             <Route path="students" element={<StudentsPage />} />
             <Route path="classes" element={<ClassesPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
+            <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
+            <Route path="reports" element={<Navigate to="/dashboard" replace />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
