@@ -7,12 +7,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
+### Changed
+### Fixed
+
+## [0.6.21] - 2026-01-15
+### Added
 - **Pré‑Cadastro (SchoolAdmin):** Página `/dashboard/pre-cadastros` para validar (confirmar/rejeitar) envios da escolinha.
 - **Pré‑Cadastro (Convite):** Link com `schoolId` para atrelar o censo à escola e liberar triagem por gestor.
 - **Supabase (Pré‑Cadastro):** Campos `school_id`, `school_reviewed_*` em `pre_registrations` para revisão da escola.
 ### Changed
 - **Pré‑Cadastro:** Login/cadastro preservam parâmetros do convite ao voltar para `/pre-cadastro`.
-### Fixed
 
 ## [0.6.20] - 2026-01-15
 ### Added
