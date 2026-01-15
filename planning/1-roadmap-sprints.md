@@ -82,22 +82,38 @@
 - [ ] **Perfil do Atleta (Card):** Visualização estilo "FUT Card" com foto e nível.
   
 **Notas Estratégicas (Conversa de 17/12):**
-- **NextPro Academy (Carreira de Scouts):** Definir níveis (Iniciante, Analista, Elite) com pesos na avaliação (0.5x, 1.0x, 2.0x). Conteúdos/cursos ficam fora do MVP, mas a mecânica de níveis e pesos entra como base da Engine.
+- **NextPro Academy (Carreira de Scouts):** Definir 5 níveis com pesos na avaliação (e anti-fraude com evidências). Conteúdos/cursos podem entrar por etapas, mas a mecânica de níveis/peso entra como base do produto.
 - **Protocolo Pinóquio (Confiabilidade):** Projetar métricas internas visíveis ao staff: `mentiras_confirmadas`, `confiabilidade_avaliador` e **shadow ban silencioso** (peso → 0) para avaliadores recorrentes; sem aviso ao usuário final.
 - **Censo Socioeconômico (Wizard):** Estruturar blocos Guardião/Dependentes/Vínculo para futura coleta; perguntas direcionadas poderão ser ajustadas conforme parceiros (ex.: seguradoras).
 - **Aprovação em Camadas:** Documentar status do fluxo (Pendente Escola → Aguardando Contrato → Ativo) para integração com Termos/Assinatura em sprint de Legal.
 
+### 🧠 Sprint 5.1: Engines (Técnica + Social + Benefícios) — Especificação e Fundações (19/01 - 25/01)
+**Objetivo:** Consolidar o “produto final” das 3 engines e construir as fundações de dados/segurança para executar tudo com auditoria e comparabilidade por temporada.
+
+**Entregáveis (produto e engenharia):**
+- [ ] **Manual definitivo das 3 engines:** Técnico, Social e Benefícios (com regras, saídas, anti-fraude, temporadas e integrações).
+- [ ] **Camada comum (shared):** Temporada anual + núcleo + sessão de treino + trilha de eventos e evidências.
+- [ ] **Rubrica técnica versionada:** Catálogo de perguntas por posição (base + variações), com governança por temporada.
+- [ ] **Modelo de avaliação multi-fonte:** Camadas A–D, reputação de avaliadores e “Protocolo Pinóquio” (punição silenciosa).
+- [ ] **Contrato de UI/UX do técnico:** Fluxo obrigatório “3 piores → 3 melhores” com seleção de perguntas estilo iFood e notas 0–10.
+- [ ] **Contrato de Social (sem live):** Moedas/presentes no feed, fanbase (seguir vs fã), cooldown progressivo e tiers por percentil com ciclo de 15 dias.
+- [ ] **Integração Social → Benefícios:** Cashback parcial de moedas para gasto no marketplace (sem afetar nota técnica).
+- [ ] **Clube (mercantil):** Assinaturas em 3 níveis + catálogo de 10–15 itens avulsos (sem alterar score técnico).
+
 ### 🌟 Sprint 6: Avaliação Técnica Diária (19/01 - 25/01)
 **Objetivo:** O input do Treinador.
 - [ ] **Tela "Pós-Treino":** Lista de presentes para o técnico avaliar.
-- [ ] **Input Rápido:** Selecionar "Destaque Positivo" e "Destaque Negativo" (Orçamento de pontos).
-- [ ] **Feedback:** O aluno recebe notificação do feedback (sem saber a nota exata numérica, apenas o badge/conceito).
+- [ ] **Gating obrigatório:** Selecionar 3 piores (avaliar) para liberar 3 melhores (avaliar).
+- [ ] **Perguntas por atleta (treino):** 3 perguntas com nota 0–10 via seleção de menus (base + posição).
+- [ ] **Posição no treino:** Sugestão automática por frequência e confirmação do técnico quando necessário.
+- [ ] **Feedback ao atleta:** Notificação e histórico (sem expor nota crua para o atleta; foco em conceitos/tiers).
 
 ### 📊 Sprint 7: Avaliação Mensal & Algoritmo (26/01 - 01/02)
 **Objetivo:** A "Prova Real".
-- [ ] **Formulário 40 Critérios:** Tela para avaliação profunda (Scouting).
-- [ ] **Algoritmo de Normalização:** Script para ponderar as notas e aplicar a Curva de Gauss (evitar inflação).
-- [ ] **Radar Chart:** Visualização gráfica das habilidades (Físico, Técnico, Tático, Mental).
+- [ ] **Formulário 20–40 critérios por atleta:** Prova mensal por turma (técnico responde por aluno).
+- [ ] **Variação por posição:** Total de perguntas pode ser maior; perguntas base comuns a todas as posições.
+- [ ] **Normalização e pesos por fonte:** Ponderar notas por camada e reputação; reduzir inflação.
+- [ ] **Skill tree / Radar:** Visualização por posição e por temporada (compatível com card EA FC).
 
 ### 🚫 Sprint 8: Financeiro e Bloqueio (02/02 - 08/02)
 **Objetivo:** A ferramenta de cobrança.
@@ -108,16 +124,18 @@
 
 ### 💬 Sprint 9: Feed Social e Comunidade (09/02 - 15/02)
 **Objetivo:** Engajamento da família.
-- [ ] **Feed da Turma:** Postagens automáticas ("João ganhou a medalha X") + Posts manuais.
-- [ ] **Interação:** Curtir e Comentar (apenas para Fans aprovados).
-- [ ] **Moderação:** Filtro de palavras proibidas e botão de denúncia.
-- [ ] **Mural de Avisos:** SchoolAdmin posta comunicados oficiais.
+- [ ] **Feed:** Postagens da turma e do atleta (padrão Instagram).
+- [ ] **Seguidores vs Fanbase:** Seguir é livre; “ser fã” é vínculo do apoiador com o atleta.
+- [ ] **Interações básicas:** Curtir (1 grátis por post), comentar, compartilhar, moderação e denúncias.
+- [ ] **Presentes no feed (moedas):** Reações/presentes pagos; compra exige verificação (telefone + CPF no pagamento).
+- [ ] **Tiers e ciclo:** Reavaliação a cada 15 dias (subida/queda de tiers por percentil), reset por temporada.
 
 ### 🛒 Sprint 10: Marketplace & Vouchers (16/02 - 22/02)
 **Objetivo:** Monetização inicial.
 - [ ] **Catálogo de Vouchers:** Listagem de parceiros com filtros geográficos (Geo-fencing simples).
 - [ ] **Resgate:** Usuário clica em "Resgatar", gera um código único.
 - [ ] **Painel Parceiro (MVP):** Visualização básica de quantos vouchers foram resgatados.
+- [ ] **Pontos de Benefícios / Cashback:** Saldo de fidelidade para compras e resgates, incluindo cashback parcial vindo do Social.
 
 ### 🧪 Sprint 11: Testes e Polish (23/02 - 01/03)
 **Objetivo:** Garantia de Qualidade.

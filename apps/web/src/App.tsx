@@ -31,7 +31,12 @@ import './App.css'
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
   
-  if (loading) return null // ou loading spinner
+  if (loading)
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <p className="text-sm text-slate-600">Carregando…</p>
+      </div>
+    )
   
   if (!session) {
     return <Navigate to="/login" replace />

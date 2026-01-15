@@ -3,13 +3,15 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield } from 'lucide-react'
 import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
+import { normalizeCpf, normalizePhone } from '@/features/school/utils/csv'
 
 interface Guardian {
   id: string
   full_name: string
-  cpf: string
-  phone: string
-  email: string
+  cpf?: string | null
+  phone?: string | null
+  email?: string | null
+  school_id?: string | null
 }
 
 interface Student {
@@ -41,6 +43,7 @@ export function StudentsPage() {
   const [isImporting, setIsImporting] = useState(false)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
+  const [studentSearchTerm, setStudentSearchTerm] = useState('')
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -145,9 +148,21 @@ export function StudentsPage() {
     }
 
     try {
+      const effectiveSchoolId = userSchoolId || formData.school_id
+      if (!effectiveSchoolId) {
+        alert('Selecione uma escola antes de criar o responsável.')
+        return
+      }
+
+      const cpfKey = guardianForm.cpf ? normalizeCpf(guardianForm.cpf) : ''
+      const phoneKey = guardianForm.phone ? normalizePhone(guardianForm.phone) : ''
+
       const payload = {
-        ...guardianForm,
-        school_id: userSchoolId || formData.school_id
+        school_id: effectiveSchoolId,
+        full_name: guardianForm.full_name.trim(),
+        cpf: cpfKey ? cpfKey : null,
+        phone: phoneKey ? phoneKey : null,
+        email: guardianForm.email.trim() ? guardianForm.email.trim() : null,
       }
       
       const { data, error } = await supabase
@@ -166,7 +181,12 @@ export function StudentsPage() {
       }
     } catch (error) {
       console.error('Erro ao criar responsável:', error)
-      alert('Erro ao criar responsável. Verifique se o CPF já existe.')
+      const err = error as { code?: string; message?: string }
+      if (err?.code === '23505') {
+        alert('CPF já cadastrado. Verifique se já existe um responsável com esse CPF.')
+        return
+      }
+      alert(`Erro ao criar responsável: ${err?.message || 'tente novamente.'}`)
     }
   }
 
@@ -231,11 +251,41 @@ export function StudentsPage() {
     return `Sub-${Math.ceil(age / 2) * 2}`
   }
 
-  // Filter guardians for search
-  const filteredGuardians = guardians.filter(g => 
-    g.full_name.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
-    g.cpf?.includes(guardianSearchTerm)
-  )
+  const effectiveSchoolId = userSchoolId || formData.school_id
+  const normalizedGuardianSearch = guardianSearchTerm.trim().toLowerCase()
+  const guardianSearchDigits = normalizeCpf(guardianSearchTerm.trim())
+  const guardiansInScope =
+    role === 'super_admin' ? guardians.filter((g) => g.school_id === effectiveSchoolId) : guardians
+  const filteredGuardians = normalizedGuardianSearch
+    ? guardiansInScope.filter((g) => {
+        const name = (g.full_name || '').toLowerCase()
+        const cpf = g.cpf || ''
+        const phone = g.phone || ''
+        const email = (g.email || '').toLowerCase()
+        return (
+          name.includes(normalizedGuardianSearch) ||
+          email.includes(normalizedGuardianSearch) ||
+          (guardianSearchDigits ? cpf.includes(guardianSearchDigits) || phone.includes(guardianSearchDigits) : false)
+        )
+      })
+    : guardiansInScope
+
+  const normalizedStudentSearch = studentSearchTerm.trim().toLowerCase()
+  const visibleStudents = normalizedStudentSearch
+    ? students.filter((student) => {
+        const guardianName = student.guardian?.full_name || ''
+        const guardianPhone = student.guardian?.phone || ''
+        const guardianEmail = student.guardian?.email || ''
+        return (
+          student.full_name.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianName.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianPhone.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianEmail.toLowerCase().includes(normalizedStudentSearch)
+        )
+      })
+    : students
+
+  const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
 
   return (
     <div className="space-y-6">
@@ -302,6 +352,29 @@ export function StudentsPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {role === 'super_admin' ? (
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  Escola
+                </h4>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Selecione a escola</label>
+                <select
+                  name="school_id"
+                  value={formData.school_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  required
+                >
+                  <option value="">Selecione uma escola...</option>
+                  {schools.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
             
             {/* ETAPA 1: RESPONSÁVEL */}
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
@@ -315,7 +388,9 @@ export function StudentsPage() {
                   {!isCreatingGuardian ? (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Buscar Responsável (Nome ou CPF)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Buscar Responsável (Nome, CPF, Telefone ou Email)
+                        </label>
                         <div className="flex gap-2">
                           <div className="relative flex-1">
                             <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
@@ -329,18 +404,23 @@ export function StudentsPage() {
                           </div>
                           <button 
                             type="button"
+                            disabled={role === 'super_admin' && !formData.school_id}
                             onClick={() => setIsCreatingGuardian(true)}
-                            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+                            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             + Novo
                           </button>
                         </div>
+                        {role === 'super_admin' && !formData.school_id ? (
+                          <p className="mt-2 text-xs text-slate-600">Selecione uma escola acima para buscar/criar responsáveis.</p>
+                        ) : null}
                       </div>
                       
                       {/* Resultados da Busca */}
-                      {guardianSearchTerm && (
-                        <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg bg-white divide-y divide-slate-100">
-                          {filteredGuardians.length > 0 ? filteredGuardians.map(g => (
+                      <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg bg-white divide-y divide-slate-100">
+                        {role === 'super_admin' && !formData.school_id ? (
+                          <div className="p-4 text-center text-sm text-slate-500">Selecione uma escola para listar responsáveis.</div>
+                        ) : visibleGuardianResults.length > 0 ? visibleGuardianResults.map(g => (
                             <div 
                               key={g.id} 
                               onClick={() => setSelectedGuardian(g)}
@@ -348,15 +428,14 @@ export function StudentsPage() {
                             >
                               <div>
                                 <p className="text-sm font-medium text-slate-900">{g.full_name}</p>
-                                <p className="text-xs text-slate-500">CPF: {g.cpf || 'N/A'} • Tel: {g.phone}</p>
+                                <p className="text-xs text-slate-500">CPF: {g.cpf || 'N/A'} • Tel: {g.phone || 'N/A'}</p>
                               </div>
                               <UserCheck className="w-4 h-4 text-slate-400" />
                             </div>
                           )) : (
-                            <div className="p-4 text-center text-sm text-slate-500">Nenhum responsável encontrado.</div>
-                          )}
-                        </div>
-                      )}
+                          <div className="p-4 text-center text-sm text-slate-500">Nenhum responsável encontrado.</div>
+                        )}
+                      </div>
                     </>
                   ) : (
                     // Form de Criação Rápida de Responsável
@@ -436,24 +515,6 @@ export function StudentsPage() {
               </h4>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {role === 'super_admin' && (
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Escola</label>
-                    <select 
-                      name="school_id"
-                      value={formData.school_id}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                      required
-                    >
-                      <option value="">Selecione uma escola...</option>
-                      {schools.map(s => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Nome Completo</label>
                   <input 
@@ -553,6 +614,19 @@ export function StudentsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          {!isCreating && !isImporting ? (
+            <div className="p-4 border-b border-slate-100 bg-white">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                <input
+                  value={studentSearchTerm}
+                  onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  placeholder="Buscar aluno ou responsável..."
+                  className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
+                />
+              </div>
+            </div>
+          ) : null}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 border-b border-slate-100">
@@ -566,7 +640,7 @@ export function StudentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {students.map((student) => (
+                {visibleStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
