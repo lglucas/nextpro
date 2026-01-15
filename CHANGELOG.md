@@ -10,12 +10,15 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
-## [0.6.19] - 2026-01-15
+## [0.6.20] - 2026-01-15
 ### Added
 - **RLS (Profiles):** Super Admin pode listar e atualizar perfis (role e escola) no painel.
 - **RLS (Coach):** Professor (coach) pode criar/editar/remover suas próprias turmas (`teacher_id = auth.uid()`).
 ### Fixed
 - **Turmas:** Impede criar turma sem escola vinculada (evita erro `invalid input syntax for type uuid: ""`).
+- **RLS (Profiles):** Corrige recursão infinita nas policies que travava login/validação de termos.
+- **RLS (Class Students):** Corrige recursão infinita que quebrava contagem/listagem de turmas.
+- **QA (Manual):** Fluxo Turmas → Matrículas → Chamada/QR validado ponta a ponta.
 
 ## [0.6.18] - 2026-01-15
 ### Added
