@@ -25,6 +25,7 @@ export async function upsertMyPreCadastroDraft(
     consentedAt?: string | null
     consentVersion?: string | null
     submittedMeta?: Record<string, unknown>
+    schoolId?: string | null
   },
 ) {
   const onboardingStatus: PreCadastroOnboardingStatus = options?.onboardingStatus ?? (status === 'submitted' ? 'pendente_escola' : 'draft')
@@ -42,6 +43,7 @@ export async function upsertMyPreCadastroDraft(
       : {})
   const payload = {
     user_id: userId,
+    school_id: options?.schoolId ?? null,
     status,
     onboarding_status: onboardingStatus,
     data: draft as unknown,

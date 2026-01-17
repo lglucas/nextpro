@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 
 type CheckInStatus = 'idle' | 'scanning' | 'checking_in' | 'success' | 'error'
 
+type StudentProgress = { xp_total: number; level: number }
+
 function parseSessionIdFromValue(value: string): string | null {
   const trimmed = value.trim()
   if (!trimmed) return null
@@ -19,8 +21,33 @@ function parseSessionIdFromValue(value: string): string | null {
   }
 }
 
+function parseExpiresAtFromValue(value: string): number | null {
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  try {
+    const maybeUrl = new URL(trimmed)
+    const raw = maybeUrl.searchParams.get('expiresAt')
+    if (!raw) return null
+    const parsed = Number(raw)
+    if (!Number.isFinite(parsed)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
 function isUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function parseJsonbInt(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value)
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return Math.trunc(parsed)
+  }
+  return null
 }
 
 export function CheckInPage() {
@@ -32,12 +59,25 @@ export function CheckInPage() {
     return value?.trim() ? value.trim() : ''
   }, [searchParams])
 
+  const initialExpiresAt = useMemo(() => {
+    const value = searchParams.get('expiresAt')
+    if (!value) return null
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed)) return null
+    return parsed
+  }, [searchParams])
+
   const [manualValue, setManualValue] = useState('')
   const [sessionId, setSessionId] = useState(initialSessionId)
+  const [expiresAt, setExpiresAt] = useState<number | null>(initialExpiresAt)
   const [status, setStatus] = useState<CheckInStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [students, setStudents] = useState<Array<{ id: string; full_name: string }>>([])
   const [selectedStudentId, setSelectedStudentId] = useState<string>('')
+  const [xpBase, setXpBase] = useState<number | null>(null)
+  const [progress, setProgress] = useState<StudentProgress | null>(null)
+  const [showLevelUp, setShowLevelUp] = useState(false)
+  const prevLevelRef = useRef<number | null>(null)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -48,8 +88,12 @@ export function CheckInPage() {
   }, [])
 
   useEffect(() => {
-    setSessionId(initialSessionId)
-  }, [initialSessionId])
+    const timeoutId = window.setTimeout(() => {
+      setSessionId(initialSessionId)
+      setExpiresAt(initialExpiresAt)
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [initialExpiresAt, initialSessionId])
 
   useEffect(() => {
     let mounted = true
@@ -85,6 +129,66 @@ export function CheckInPage() {
       mounted = false
     }
   }, [user])
+
+  useEffect(() => {
+    let mounted = true
+
+    const run = async () => {
+      if (!user) return
+      const { data, error } = await supabase.from('system_settings').select('value').eq('key', 'xp_base').maybeSingle()
+      if (!mounted) return
+      if (error) return
+      const parsed = parseJsonbInt(data?.value)
+      if (parsed != null) setXpBase(parsed)
+    }
+
+    run()
+
+    return () => {
+      mounted = false
+    }
+  }, [user])
+
+  useEffect(() => {
+    let mounted = true
+
+    const run = async () => {
+      if (!user) return
+      if (!selectedStudentId) {
+        setProgress(null)
+        prevLevelRef.current = null
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('student_progress')
+        .select('xp_total, level')
+        .eq('student_id', selectedStudentId)
+        .maybeSingle()
+
+      if (!mounted) return
+
+      if (error) {
+        setProgress(null)
+        prevLevelRef.current = null
+        return
+      }
+
+      if (data) {
+        setProgress(data as StudentProgress)
+        prevLevelRef.current = (data as StudentProgress).level
+      } else {
+        setProgress(null)
+        prevLevelRef.current = null
+      }
+    }
+
+    run()
+
+    return () => {
+      mounted = false
+    }
+  }, [selectedStudentId, user])
 
   useEffect(() => {
     return () => {
@@ -130,11 +234,14 @@ export function CheckInPage() {
           const rawValue = results?.[0]?.rawValue
           if (rawValue) {
             const nextSessionId = parseSessionIdFromValue(rawValue)
+            const nextExpiresAt = parseExpiresAtFromValue(rawValue)
             if (nextSessionId && isUuid(nextSessionId)) {
               setSessionId(nextSessionId)
-              setSearchParams({ sessionId: nextSessionId }, { replace: true })
+              setExpiresAt(nextExpiresAt)
+              if (nextExpiresAt) setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+              else setSearchParams({ sessionId: nextSessionId }, { replace: true })
               stopScanner()
-              await submitCheckIn(nextSessionId)
+              await submitCheckIn({ sessionId: nextSessionId, expiresAt: nextExpiresAt })
               return
             }
           }
@@ -163,14 +270,28 @@ export function CheckInPage() {
     setStatus('idle')
   }
 
-  const submitCheckIn = async (nextSessionId?: string) => {
+  const submitCheckIn = async (next?: { sessionId?: string; expiresAt?: number | null }) => {
     setErrorMessage(null)
 
-    const effectiveSessionId = (nextSessionId ?? sessionId).trim()
+    const effectiveSessionId = (next?.sessionId ?? sessionId).trim()
+    const effectiveExpiresAt = next?.expiresAt ?? expiresAt
     if (!user) return
 
     if (!isUuid(effectiveSessionId)) {
       setErrorMessage('Session ID inválido. Escaneie de novo ou cole o link completo.')
+      setStatus('error')
+      return
+    }
+
+    if (!effectiveExpiresAt) {
+      setErrorMessage('QR inválido ou antigo. Peça para o professor gerar um novo QR.')
+      setStatus('error')
+      return
+    }
+
+    const nowSeconds = Math.floor(Date.now() / 1000)
+    if (nowSeconds > effectiveExpiresAt) {
+      setErrorMessage('Este QR expirou. Peça para o professor gerar um novo QR.')
       setStatus('error')
       return
     }
@@ -182,6 +303,24 @@ export function CheckInPage() {
     }
 
     setStatus('checking_in')
+
+    const { data: studentRow, error: studentError } = await supabase
+      .from('students')
+      .select('active')
+      .eq('id', selectedStudentId)
+      .maybeSingle()
+
+    if (studentError) {
+      setErrorMessage(studentError.message || 'Erro ao validar atleta.')
+      setStatus('error')
+      return
+    }
+
+    if (!studentRow?.active) {
+      setErrorMessage('Seu atleta está inativo. Procure a escolinha para regularizar.')
+      setStatus('error')
+      return
+    }
 
     const { error } = await supabase
       .from('attendances')
@@ -201,6 +340,25 @@ export function CheckInPage() {
       return
     }
 
+    if (selectedStudentId) {
+      const { data } = await supabase
+        .from('student_progress')
+        .select('xp_total, level')
+        .eq('student_id', selectedStudentId)
+        .maybeSingle()
+
+      if (data) {
+        const nextProgress = data as StudentProgress
+        const previousLevel = prevLevelRef.current
+        setProgress(nextProgress)
+        prevLevelRef.current = nextProgress.level
+        if (previousLevel != null && nextProgress.level > previousLevel) {
+          setShowLevelUp(true)
+          window.setTimeout(() => setShowLevelUp(false), 2500)
+        }
+      }
+    }
+
     setStatus('success')
   }
 
@@ -209,9 +367,13 @@ export function CheckInPage() {
       const text = await navigator.clipboard.readText()
       setManualValue(text)
       const nextSessionId = parseSessionIdFromValue(text)
+      const nextExpiresAt = parseExpiresAtFromValue(text)
       if (nextSessionId) {
         setSessionId(nextSessionId)
-        if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
+        setExpiresAt(nextExpiresAt)
+        if (isUuid(nextSessionId) && nextExpiresAt)
+          setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+        else if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
       }
     } catch {
       setErrorMessage('Não consegui ler a área de transferência.')
@@ -312,14 +474,18 @@ export function CheckInPage() {
               disabled={status === 'checking_in'}
               onClick={async () => {
                 const nextSessionId = parseSessionIdFromValue(manualValue)
+                const nextExpiresAt = parseExpiresAtFromValue(manualValue)
                 if (!nextSessionId) {
                   setErrorMessage('Cole um valor antes de confirmar.')
                   setStatus('error')
                   return
                 }
                 setSessionId(nextSessionId)
-                if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
-                await submitCheckIn(nextSessionId)
+                setExpiresAt(nextExpiresAt)
+                if (isUuid(nextSessionId) && nextExpiresAt)
+                  setSearchParams({ sessionId: nextSessionId, expiresAt: String(nextExpiresAt) }, { replace: true })
+                else if (isUuid(nextSessionId)) setSearchParams({ sessionId: nextSessionId }, { replace: true })
+                await submitCheckIn({ sessionId: nextSessionId, expiresAt: nextExpiresAt })
               }}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50"
             >
@@ -349,8 +515,27 @@ export function CheckInPage() {
                     ? 'Você pode fechar esta tela.'
                     : errorMessage || 'Tente novamente ou use o campo manual.'}
                 </p>
+                {status === 'success' && (progress || xpBase != null) && (
+                  <div className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-green-900">
+                    {progress && (
+                      <span className="px-2 py-1 rounded-full bg-green-100 border border-green-200">
+                        Nível {progress.level} • {progress.xp_total} XP
+                      </span>
+                    )}
+                    {xpBase != null && (
+                      <span className="px-2 py-1 rounded-full bg-green-100 border border-green-200">+{xpBase} XP</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
+          </div>
+        )}
+
+        {showLevelUp && progress && (
+          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 animate-pulse">
+            <p className="text-sm font-semibold text-amber-900">Level up!</p>
+            <p className="mt-1 text-amber-800">Você subiu para o nível {progress.level}.</p>
           </div>
         )}
 
@@ -363,7 +548,7 @@ export function CheckInPage() {
               </div>
               <button
                 type="button"
-                onClick={() => submitCheckIn(sessionId)}
+                onClick={() => submitCheckIn({ sessionId, expiresAt })}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
               >
                 Registrar

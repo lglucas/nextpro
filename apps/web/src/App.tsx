@@ -6,6 +6,7 @@ import { RegisterPage } from '@/features/auth/pages/Register'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
+import { PreCadastrosPage } from '@/features/dashboard/pages/PreCadastros'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import { StudentsPage } from '@/features/school/pages/StudentsPage'
 import { ClassesPage } from '@/features/school/pages/ClassesPage'
@@ -31,7 +32,12 @@ import './App.css'
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
   
-  if (loading) return null // ou loading spinner
+  if (loading)
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <p className="text-sm text-slate-600">Carregando…</p>
+      </div>
+    )
   
   if (!session) {
     return <Navigate to="/login" replace />
@@ -96,7 +102,10 @@ function App() {
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
             <Route path="classes" element={<ClassesPage />} />
+            <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
+            <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
+            <Route path="reports" element={<Navigate to="/dashboard" replace />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

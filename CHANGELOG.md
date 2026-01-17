@@ -7,11 +7,73 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
-- **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).
-- **Attendance:** Botão "QR Check-in" na chamada para gerar QR/link da sessão.
-- **Database/RLS:** Policies para atleta ler seus vínculos e registrar presença do dia via QR.
 ### Changed
 ### Fixed
+
+## [0.7.0] - 2026-01-17
+### Added
+- **Engines (Base):** Temporadas, núcleos e vínculo escola→núcleo por temporada (DB + RLS).
+- **Engines (Base):** Trilha de eventos (`engine_events`) para auditoria por engine (DB + RLS).
+- **Engine Técnica:** Catálogo versionado de perguntas (`technical_questions`) por temporada/posição.
+- **CTO:** Aba Engines para gerir temporadas, núcleos e rubricas.
+- **Planning:** Sprint 5.1 detalhado + ADR-002 (fundações das 3 engines).
+### Fixed
+- **Dashboard:** Evita crash ao renderizar `audit_logs.details` (objeto JSON) e remove query em tabela inexistente (`evaluations`).
+
+## [0.6.23] - 2026-01-17
+### Added
+- **Alunos:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
+- **Turmas:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
+- **Alunos:** Upload de foto no cadastro/edição com preview.
+- **Alunos:** Remover foto (apaga no Storage e limpa `photo_url`).
+- **Supabase (Storage):** Bucket `student-photos` com policies de upload por escola.
+### Fixed
+- **Chamada/QR:** Impede marcar presença como “presente” para aluno inativo (UI + trigger no banco).
+
+## [0.6.21] - 2026-01-15
+### Added
+- **Pré‑Cadastro (SchoolAdmin):** Página `/dashboard/pre-cadastros` para validar (confirmar/rejeitar) envios da escolinha.
+- **Pré‑Cadastro (Convite):** Link com `schoolId` para atrelar o censo à escola e liberar triagem por gestor.
+- **Supabase (Pré‑Cadastro):** Campos `school_id`, `school_reviewed_*` em `pre_registrations` para revisão da escola.
+### Changed
+- **Pré‑Cadastro:** Login/cadastro preservam parâmetros do convite ao voltar para `/pre-cadastro`.
+
+## [0.6.20] - 2026-01-15
+### Added
+- **RLS (Profiles):** Super Admin pode listar e atualizar perfis (role e escola) no painel.
+- **RLS (Coach):** Professor (coach) pode criar/editar/remover suas próprias turmas (`teacher_id = auth.uid()`).
+### Fixed
+- **Turmas:** Impede criar turma sem escola vinculada (evita erro `invalid input syntax for type uuid: ""`).
+- **RLS (Profiles):** Corrige recursão infinita nas policies que travava login/validação de termos.
+- **RLS (Class Students):** Corrige recursão infinita que quebrava contagem/listagem de turmas.
+- **QA (Manual):** Fluxo Turmas → Matrículas → Chamada/QR validado ponta a ponta.
+
+## [0.6.18] - 2026-01-15
+### Added
+- **RLS (Coach):** Policies para professor (coach) operar em turmas, matrículas e chamadas na própria escola.
+### Fixed
+- **Dashboard:** Rotas de atalho para evitar redirecionamento ao site público quando acessar caminhos ainda não implementados (`/dashboard/attendance`, `/dashboard/reports`).
+
+## [0.6.17] - 2026-01-10
+### Added
+- **Gamificação (DB):** Estrutura inicial de XP/níveis (`student_progress`, `student_xp_events`).
+- **Gamificação (DB):** Estrutura base de badges e tiers (`badges`, `tiers`, `student_badges`).
+- **Gamificação (DB):** Trigger de XP por presença (presença = +XP base via `system_settings.xp_base`).
+- **App (Atleta):** Exibir XP e nível após check-in via QR (com aviso de level up).
+- **App (Atleta):** Card do atleta no Meu Perfil com nível e barra de XP.
+
+## [0.6.16] - 2026-01-10
+### Fixed
+- **Attendance/RLS:** Bloquear check-in via QR para atleta inativo (`students.active = false`).
+
+## [0.6.15] - 2026-01-10
+### Added
+- **Attendance:** Check-in de presença por QR Code (rota `/app/check-in`).
+- **Attendance:** Botão "QR Check-in" na chamada para gerar QR/link da sessão.
+- **Attendance:** Expiração configurável do QR (1h/2h/3h) e exibição do horário limite.
+- **Attendance:** Contagem de check-ins em tempo real no modal do QR.
+- **Database/RLS:** Policies para atleta ler seus vínculos e registrar presença do dia via QR.
+- **Database:** Campo `qr_checkin_expires_at` em `class_sessions` para validar expiração no banco.
 
 ## [0.6.14] - 2026-01-09
 ### Added

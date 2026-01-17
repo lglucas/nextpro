@@ -10,7 +10,8 @@ import {
   BarChart3,
   ShieldAlert,
   UserPlus,
-  GraduationCap
+  GraduationCap,
+  ClipboardList
 } from 'lucide-react'
 
 export function DashboardLayout() {
@@ -43,8 +44,9 @@ export function DashboardLayout() {
   const navigation = [
     { name: 'Visão Geral', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Escolas', href: '/dashboard/schools', icon: Users, show: role === 'super_admin' },
-    { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' },
-    { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' },
+    { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
+    { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
+    { name: 'Pré‑cadastros', href: '/dashboard/pre-cadastros', icon: ClipboardList, show: role === 'school_admin' || role === 'super_admin' },
     { name: 'Relatórios', href: '/dashboard/reports', icon: BarChart3 },
     // Cantinho do CTO
     { name: 'Cantinho do CTO', href: '/dashboard/settings', icon: ShieldAlert, show: role === 'super_admin', special: true },
@@ -133,6 +135,7 @@ export function DashboardLayout() {
                   <option value="super_admin">CTO (Super Admin)</option>
                   <option value="partner">Sócio (Partner)</option>
                   <option value="school_admin">Gestor de Escolinha</option>
+                  <option value="coach">Professor (Coach)</option>
                   <option value="user">Usuário</option>
                 </select>
                 {roleOverride ? (

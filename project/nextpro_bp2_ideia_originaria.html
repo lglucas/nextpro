@@ -1,0 +1,1269 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super App Futebol - Business Plan (Parte 2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .page-break { page-break-after: always; }
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+        
+        .highlight-box {
+            border-left: 4px solid #3b82f6;
+            background: #eff6ff;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        
+        .disclaimer-box {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }
+        
+        .revenue-stream {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .revenue-stream:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .phase-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        
+        .feature-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation hint -->
+    <div class="bg-blue-900 text-white py-2 px-4 text-center text-sm no-print">
+        Business Plan - Parte 2 de 2
+    </div>
+
+    <div class="container mx-auto px-4 py-12 max-w-5xl">
+
+        <!-- Produto: O Super App -->
+        <div class="section-card page-break">
+            <h2 class="text-4xl font-bold text-gray-900 mb-8">O Produto: Super App Futebol</h2>
+            
+            <div class="highlight-box mb-8">
+                <p class="font-semibold text-blue-900 text-lg mb-2">Visão do Produto</p>
+                <p class="text-blue-800">
+                    O Super App Futebol é uma plataforma web mobile-first, modular e escalável, que digitaliza todo 
+                    o ecossistema de formação de jovens jogadores. Não é apenas um sistema de gestão - é uma rede 
+                    social gamificada, um marketplace de benefícios, um CRM para escolinhas, e uma plataforma de 
+                    inteligência de dados sobre talentos do futebol.
+                </p>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Princípios de Design do Produto</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">📱</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Mobile-First</h4>
+                    <p class="text-sm text-gray-700">
+                        Nosso público é majoritariamente mobile. Interface otimizada para telas pequenas, 
+                        touch-friendly, funcional até em redes 3G.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🎮</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Gamificação Profunda</h4>
+                    <p class="text-sm text-gray-700">
+                        Três sistemas de pontos independentes criam múltiplas camadas de engajamento e 
+                        sustentam diferentes modelos de receita.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🧩</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Modular e Escalável</h4>
+                    <p class="text-sm text-gray-700">
+                        Arquitetura que permite adicionar novos tipos de parceiros, funcionalidades e 
+                        verticais sem reescrever o core.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🎨</div>
+                    <h4 class="font-bold text-gray-900 mb-2">UX Simplificado</h4>
+                    <p class="text-sm text-gray-700">
+                        Público com baixa alfabetização digital. Tutoriais em cada ação, ícones intuitivos, 
+                        linguagem simples e direta.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🔒</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Privacy by Design</h4>
+                    <p class="text-sm text-gray-700">
+                        LGPD desde o primeiro dia. Consentimentos claros, dados de menores protegidos, 
+                        direito ao esquecimento implementado.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <h4 class="font-bold text-gray-900 mb-2">Performance First</h4>
+                    <p class="text-sm text-gray-700">
+                        Carregamento <3s, interações fluidas, otimização de imagens automática, 
+                        cache inteligente.
+                    </p>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 mt-12">Jornadas por Persona</h3>
+            
+            <p class="text-gray-700 mb-6">
+                Cada tipo de usuário tem uma experiência customizada. Abaixo detalhamos as jornadas principais 
+                e funcionalidades core de cada persona. Para wireframes completos e especificações técnicas 
+                detalhadas, consulte o documento complementar de Especificações Técnicas.
+            </p>
+            
+            <!-- Persona 1: Admin CTO -->
+            <div class="bg-gradient-to-r from-red-50 to-red-100 p-8 rounded-lg mb-6 border-2 border-red-200">
+                <div class="flex items-start mb-4">
+                    <div class="text-4xl mr-4">🔧</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-red-900 mb-2">Admin CTO</h4>
+                        <p class="text-red-800 text-sm">Controle total técnico e operacional do sistema</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg mt-4">
+                    <h5 class="font-bold text-gray-900 mb-3">Funcionalidades Principais</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-red-900 mb-2">Gestão de Entidades</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Aprovar/rejeitar novas escolinhas</li>
+                                <li>Gerenciar núcleos regionais</li>
+                                <li>Busca global de alunos</li>
+                                <li>Gestão de patrocinadores</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-red-900 mb-2">Sistema e Segurança</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Logs de auditoria completos</li>
+                                <li>Backup manual e automático</li>
+                                <li>Health check do sistema</li>
+                                <li>Configurações avançadas</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-red-900 mb-2">Gamificação</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Configurar regras de pontuação</li>
+                                <li>Ajustar multiplicadores</li>
+                                <li>Criar badges e conquistas</li>
+                                <li>Gerenciar níveis/tiers</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-red-900 mb-2">Analytics</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>KPIs do produto</li>
+                                <li>Métricas de engajamento</li>
+                                <li>Funil de conversão</li>
+                                <li>Cohort analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-red-900 text-white p-4 rounded text-sm">
+                    <strong>Acesso:</strong> MFA obrigatório, IP whitelisting opcional, rate limiting proteção
+                </div>
+            </div>
+            
+            <!-- Persona 2: Admin Sócios -->
+            <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-8 rounded-lg mb-6 border-2 border-purple-200">
+                <div class="flex items-start mb-4">
+                    <div class="text-4xl mr-4">📊</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-purple-900 mb-2">Admin Sócios</h4>
+                        <p class="text-purple-800 text-sm">Visão executiva do negócio - Business Intelligence</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg mt-4">
+                    <h5 class="font-bold text-gray-900 mb-3">Dashboards Disponíveis</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-purple-900 mb-2">Financeiro</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Receita mensal/anual por fonte</li>
+                                <li>Receita por escolhinha/núcleo</li>
+                                <li>Projeções de crescimento</li>
+                                <li>ROI de campanhas</li>
+                                <li>Custos operacionais</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-purple-900 mb-2">Operacional</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Alunos ativos/inativos</li>
+                                <li>Taxa de aprovação (peneirões)</li>
+                                <li>Engajamento por escolhinha</li>
+                                <li>Performance de professores</li>
+                                <li>Churn rate</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-purple-900 mb-2">Parcerias</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>ROI por patrocinador</li>
+                                <li>Conversões geradas</li>
+                                <li>Pipeline de novos parceiros</li>
+                                <li>Contratos ativos/expirando</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-purple-900 mb-2">Crescimento</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Metas vs realizado</li>
+                                <li>Expansão geográfica</li>
+                                <li>Market share regional</li>
+                                <li>Benchmarks de mercado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-purple-900 text-white p-4 rounded text-sm">
+                    <strong>Diferença para CTO:</strong> Sem acesso a configurações técnicas, logs de sistema ou 
+                    capacidade de deletar dados. Apenas visualização e exportação de relatórios.
+                </div>
+            </div>
+            
+            <!-- Persona 3: Escolinha -->
+            <div class="bg-gradient-to-r from-green-50 to-green-100 p-8 rounded-lg mb-6 border-2 border-green-200">
+                <div class="flex items-start mb-4">
+                    <div class="text-4xl mr-4">⚽</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-green-900 mb-2">Escolinha</h4>
+                        <p class="text-green-800 text-sm">Gestão completa dos alunos e operação diária</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg mt-4">
+                    <h5 class="font-bold text-gray-900 mb-3">Workflow Diário Típico</h5>
+                    <div class="space-y-4 text-sm">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <p class="font-semibold text-green-900">1. Antes do Treino (16h30)</p>
+                            <p class="text-gray-700">
+                                • Gera QR code de presença do dia<br>
+                                • Revisa lista de alunos confirmados<br>
+                                • Prepara avaliações planejadas
+                            </p>
+                        </div>
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <p class="font-semibold text-green-900">2. Durante o Treino (17h-19h)</p>
+                            <p class="text-gray-700">
+                                • Alunos/pais escaneiam QR ao chegar (presença automática)<br>
+                                • Fallback: check-in manual para quem não tem celular<br>
+                                • Observações anotadas no perfil de alunos específicos
+                            </p>
+                        </div>
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <p class="font-semibold text-green-900">3. Após o Treino (19h30)</p>
+                            <p class="text-gray-700">
+                                • Avaliar habilidades de 3-5 alunos (rodízio semanal)<br>
+                                • Publicar notícia/foto do treino<br>
+                                • Pais recebem notificação automática com resumo
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="font-bold text-gray-900 mb-3 mt-6">Funcionalidades Core</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Gestão de Alunos</p>
+                            <p class="text-gray-700 text-xs">
+                                Cadastrar, editar, ativar/desativar, histórico completo, exportar dados
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Presença (QR Code)</p>
+                            <p class="text-gray-700 text-xs">
+                                QR code por treino, scanner mobile, check-in manual, relatórios de presença
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Avaliação de Habilidades</p>
+                            <p class="text-gray-700 text-xs">
+                                10 habilidades técnicas + 3 mentais, escala 1-10, observações, histórico
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Rankings</p>
+                            <p class="text-gray-700 text-xs">
+                                Top 10 semanal, mensal, anual. Por categoria, posição, faixa etária
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Comunicação</p>
+                            <p class="text-gray-700 text-xs">
+                                Publicar notícias, upload de fotos/vídeos, eventos, comunicados
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-green-900 mb-1">Relatórios</p>
+                            <p class="text-gray-700 text-xs">
+                                Estatísticas da escolhinha, performance por turma, exportar PDF
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Persona 4: Aluno (Card/Figurinha) -->
+            <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-8 rounded-lg mb-6 border-2 border-yellow-200">
+                <div class="flex items-start mb-4">
+                    <div class="text-4xl mr-4">🌟</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-yellow-900 mb-2">Aluno - A Estrela do App</h4>
+                        <p class="text-yellow-800 text-sm">Perfil gamificado estilo card/figurinha colecionável</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg mt-4">
+                    <h5 class="font-bold text-gray-900 mb-3">Conceito do Card</h5>
+                    <p class="text-gray-700 text-sm mb-4">
+                        Inspirado em cards de FIFA/UEFA, cada aluno tem um perfil visual atrativo que funciona como 
+                        uma "figurinha digital". O design é pensado para ser compartilhável, printável e futuramente 
+                        "mintável" como NFT (para maiores de 18 anos).
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-yellow-900 mb-2">Elementos do Card</p>
+                            <ul class="text-gray-700 space-y-1">
+                                <li>• <strong>Foto:</strong> Upload pelo pai/escolinha</li>
+                                <li>• <strong>Dados:</strong> Nome, idade, posição, pé dominante</li>
+                                <li>• <strong>Overall Rating:</strong> Nota geral 1-10 (média das habilidades)</li>
+                                <li>• <strong>Habilidades:</strong> Radar chart com 10 skills técnicas</li>
+                                <li>• <strong>Nível:</strong> Bronze/Prata/Ouro/Diamante (baseado em pontos)</li>
+                                <li>• <strong>Conquistas:</strong> Badges visuais conquistados</li>
+                                <li>• <strong>Estatísticas:</strong> Jogos, gols, assistências, MVPs</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-yellow-900 mb-2">3 Sistemas de Pontos</p>
+                            <ul class="text-gray-700 space-y-1">
+                                <li>• <strong>⚽ Pontos Futebol:</strong> Evolução técnica (2.450 pts)</li>
+                                <li>• <strong>🎁 Pontos Benefícios:</strong> Compras dos pais (1.320 pts)</li>
+                                <li>• <strong>❤️ Pontos Sociais:</strong> Engajamento fanbase (890 pts)</li>
+                            </ul>
+                            <p class="text-xs text-gray-600 mt-3 bg-yellow-50 p-2 rounded">
+                                <strong>Futuramente:</strong> Cada tipo de ponto poderá ser convertido em tokens 
+                                $CRAQUE, que quando o jogador fizer 18 anos pode ser usado para criar NFT dele mesmo, 
+                                vender parte dos direitos econômicos, etc.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="font-bold text-gray-900 mb-3 mt-6">Abas do Perfil</h5>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs">
+                        <div class="bg-gray-100 p-3 rounded">
+                            <div class="text-xl mb-1">📋</div>
+                            <p class="font-semibold">Info</p>
+                            <p class="text-gray-600">Dados gerais</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded">
+                            <div class="text-xl mb-1">📊</div>
+                            <p class="font-semibold">Stats</p>
+                            <p class="text-gray-600">Estatísticas</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded">
+                            <div class="text-xl mb-1">📸</div>
+                            <p class="font-semibold">Galeria</p>
+                            <p class="text-gray-600">Fotos/Vídeos</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded">
+                            <div class="text-xl mb-1">❤️</div>
+                            <p class="font-semibold">Fanbase</p>
+                            <p class="text-gray-600">Apoiadores</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded">
+                            <div class="text-xl mb-1">🎁</div>
+                            <p class="font-semibold">Prêmios</p>
+                            <p class="text-gray-600">Conquistas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Persona 5: Pais/Responsáveis -->
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-lg mb-6 border-2 border-blue-200">
+                <div class="flex items-start mb-4">
+                    <div class="text-4xl mr-4">👨‍👩‍👦</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-blue-900 mb-2">Pais/Responsáveis</h4>
+                        <p class="text-blue-800 text-sm">Acompanhamento ativo + Clube de Benefícios</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg mt-4">
+                    <h5 class="font-bold text-gray-900 mb-3">Motivações e Comportamentos</h5>
+                    <div class="bg-blue-50 p-4 rounded mb-4">
+                        <p class="text-blue-900 text-sm mb-2">
+                            <strong>Insight Psicológico:</strong> Pais de jovens jogadores são uma das audiências mais 
+                            engajadas que existem. O sonho do filho se tornar jogador profissional move montanhas.
+                        </p>
+                        <ul class="text-blue-800 text-xs space-y-1 list-disc list-inside">
+                            <li>Checam o app múltiplas vezes por dia</li>
+                            <li>Compartilham conquistas do filho nas redes sociais</li>
+                            <li>Competem (saudavelmente) com outros pais</li>
+                            <li>Dispostos a gastar para dar vantagem ao filho</li>
+                            <li>Influenciadores na comunidade local</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-blue-900 mb-2">Acompanhamento do Filho</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Dashboard com desempenho semanal</li>
+                                <li>Notificações: próximo treino, nova avaliação, conquista</li>
+                                <li>Confirmar presença em treinos</li>
+                                <li>Ver evolução de habilidades (gráficos)</li>
+                                <li>Feed de atividades do filho</li>
+                                <li>Chat com escolinha</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-900 mb-2">Clube de Benefícios 🎁</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Acumula pontos comprando em parceiros</li>
+                                <li>Resgata cupons de desconto</li>
+                                <li>Produtos grátis ou com desconto</li>
+                                <li>Serviços premium (plano saúde, nutrição)</li>
+                                <li>Taxa conversão: 100 pts = R$ 1,00</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-900 mb-2">Fanbase Management</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Convidar familiares e amigos</li>
+                                <li>Ver ranking de apoiadores</li>
+                                <li>Coordenar participação em gincanas</li>
+                                <li>Compartilhar perfil do filho</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-900 mb-2">Financeiro (quando houver)</p>
+                            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+                                <li>Ver mensalidades em aberto</li>
+                                <li>Pagar via PIX/cartão</li>
+                                <li>Histórico de pagamentos</li>
+                                <li>Recibos digitais</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Persona 6 e 7 (Fanbase e Patrocinador) - versão resumida -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-lg border-2 border-pink-200">
+                    <div class="text-3xl mb-2">❤️</div>
+                    <h4 class="text-xl font-bold text-pink-900 mb-2">Fanbase</h4>
+                    <p class="text-sm text-pink-800 mb-4">
+                        Familiares e amigos que apoiam um jogador específico
+                    </p>
+                    <ul class="text-xs text-gray-700 space-y-1">
+                        <li>• Feed de atividades do jogador apoiado</li>
+                        <li>• Participar de missões de gincanas</li>
+                        <li>• Ganhar pontos por engajamento social</li>
+                        <li>• Competir no ranking de apoiadores</li>
+                        <li>• Compartilhar conquistas nas redes</li>
+                    </ul>
+                    <div class="mt-4 bg-pink-900 text-white p-3 rounded text-xs">
+                        <strong>Mecânica viral:</strong> Cada apoiador pode convidar mais pessoas, criando 
+                        efeito de rede exponencial.
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-lg border-2 border-orange-200">
+                    <div class="text-3xl mb-2">🤝</div>
+                    <h4 class="text-xl font-bold text-orange-900 mb-2">Patrocinador</h4>
+                    <p class="text-sm text-orange-800 mb-4">
+                        Parceiros comerciais que criam campanhas e gincanas
+                    </p>
+                    <ul class="text-xs text-gray-700 space-y-1">
+                        <li>• Dashboard com ROI, impressões, conversões</li>
+                        <li>• Criar gincanas com prêmios</li>
+                        <li>• Definir missões para usuários</li>
+                        <li>• Rastrear vendas geradas pela plataforma</li>
+                        <li>• Analytics por escolhinha/região</li>
+                    </ul>
+                    <div class="mt-4 bg-orange-900 text-white p-3 rounded text-xs">
+                        <strong>Valor:</strong> Acesso a audiência ultra-engajada com tracking preciso de ROI.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema de Gamificação Detalhado -->
+        <div class="section-card page-break">
+            <h2 class="text-4xl font-bold text-gray-900 mb-8">Sistema de Gamificação - Os 3 Pontos</h2>
+            
+            <p class="text-gray-700 mb-6">
+                O coração do Super App é um sistema de gamificação em três camadas independentes. Cada sistema 
+                de pontos tem objetivos diferentes, públicos diferentes e sustenta diferentes modelos de receita.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Pontos Futebol -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-xl shadow-lg">
+                    <div class="text-5xl mb-3">⚽</div>
+                    <h3 class="text-2xl font-bold mb-3">Pontos de Futebol</h3>
+                    <p class="text-blue-100 text-sm mb-4">
+                        Mede a evolução técnica e dedicação do jogador
+                    </p>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3 mb-3">
+                        <p class="font-semibold text-sm mb-2">Como Ganhar:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Presença em treino: +10 pts</li>
+                            <li>• Avaliação positiva: +20-50 pts</li>
+                            <li>• Melhoria habilidade: +30 pts</li>
+                            <li>• Gol em jogo oficial: +25 pts</li>
+                            <li>• MVP do jogo: +50 pts</li>
+                            <li>• Assistência: +15 pts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3">
+                        <p class="font-semibold text-sm mb-2">Para Que Serve:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Rankings da escolhinha</li>
+                            <li>• Seleção para peneirões</li>
+                            <li>• Badges e troféus virtuais</li>
+                            <li>• Histórico para scouts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4 text-xs bg-blue-900 bg-opacity-50 p-2 rounded">
+                        ⏳ <strong>Não expira</strong> • 🔒 <strong>Não transferível</strong>
+                    </div>
+                </div>
+                
+                <!-- Pontos Benefícios -->
+                <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-xl shadow-lg">
+                    <div class="text-5xl mb-3">🎁</div>
+                    <h3 class="text-2xl font-bold mb-3">Pontos de Benefícios</h3>
+                    <p class="text-green-100 text-sm mb-4">
+                        Engaja pais/família em compras com parceiros
+                    </p>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3 mb-3">
+                        <p class="font-semibold text-sm mb-2">Como Ganhar:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Compra em parceiro: +valor gasto</li>
+                            <li>• Check-in em loja: +10 pts</li>
+                            <li>• Indicação de amigo: +50 pts</li>
+                            <li>• Assinatura de serviço: +200 pts</li>
+                            <li>• Review de produto: +15 pts</li>
+                            <li>• Primeira compra: bônus +100 pts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3">
+                        <p class="font-semibold text-sm mb-2">Para Que Serve:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Cupons de desconto</li>
+                            <li>• Produtos gratuitos</li>
+                            <li>• Serviços premium</li>
+                            <li>• Taxa: 100 pts = R$ 1</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4 text-xs bg-green-900 bg-opacity-50 p-2 rounded">
+                        ⏳ <strong>Expira em 12 meses</strong> • 🔄 <strong>Transferível na família</strong>
+                    </div>
+                </div>
+                
+                <!-- Pontos Sociais -->
+                <div class="bg-gradient-to-br from-pink-500 to-pink-700 text-white p-6 rounded-xl shadow-lg">
+                    <div class="text-5xl mb-3">❤️</div>
+                    <h3 class="text-2xl font-bold mb-3">Pontos Sociais</h3>
+                    <p class="text-pink-100 text-sm mb-4">
+                        Viralização e engajamento da fanbase
+                    </p>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3 mb-3">
+                        <p class="font-semibold text-sm mb-2">Como Ganhar:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Seguir perfil: +5 pts</li>
+                            <li>• Curtir post: +2 pts</li>
+                            <li>• Comentar: +3 pts</li>
+                            <li>• Compartilhar: +10 pts</li>
+                            <li>• Trazer apoiador: +20 pts</li>
+                            <li>• Assistir live: +15 pts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded p-3">
+                        <p class="font-semibold text-sm mb-2">Para Que Serve:</p>
+                        <ul class="text-xs space-y-1">
+                            <li>• Ranking de popularidade</li>
+                            <li>• Prêmios de gincanas</li>
+                            <li>• Destaque no feed</li>
+                            <li>• Brindes coletivos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4 text-xs bg-pink-900 bg-opacity-50 p-2 rounded">
+                        ⏳ <strong>Reseta por gincana</strong> • 👥 <strong>Coletivo (soma para aluno)</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <p class="font-semibold text-blue-900 mb-2">🎯 Estratégia de Separação</p>
+                <p class="text-blue-800 text-sm">
+                    A separação em 3 sistemas permite que diferentes stakeholders participem sem conflito de interesses:
+                    <strong>Professores</strong> controlam pontos futebol (meritocracia esportiva), 
+                    <strong>pais</strong> acumulam pontos benefícios (consumo), <strong>fanbase</strong> gera pontos 
+                    sociais (viralização). Cada um alimenta um modelo de receita diferente.
+                </p>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 mt-8">Níveis e Progressão</h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="text-center p-6 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg border-2 border-amber-400">
+                    <div class="text-4xl mb-2">🥉</div>
+                    <h4 class="font-bold text-amber-900">Bronze</h4>
+                    <p class="text-sm text-amber-800">0-500 pts</p>
+                    <p class="text-xs text-amber-700 mt-2">Iniciante</p>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg border-2 border-gray-400">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <h4 class="font-bold text-gray-900">Prata</h4>
+                    <p class="text-sm text-gray-800">501-1.500 pts</p>
+                    <p class="text-xs text-gray-700 mt-2">Intermediário</p>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-lg border-2 border-yellow-500">
+                    <div class="text-4xl mb-2">🥇</div>
+                    <h4 class="font-bold text-yellow-900">Ouro</h4>
+                    <p class="text-sm text-yellow-800">1.501-3.000 pts</p>
+                    <p class="text-xs text-yellow-700 mt-2">Avançado</p>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 rounded-lg border-2 border-purple-400">
+                    <div class="text-4xl mb-2">💎</div>
+                    <h4 class="font-bold text-purple-900">Diamante</h4>
+                    <p class="text-sm text-purple-800">3.000+ pts</p>
+                    <p class="text-xs text-purple-700 mt-2">Elite</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modelo de Negócio -->
+        <div class="section-card page-break">
+            <h2 class="text-4xl font-bold text-gray-900 mb-8">Modelo de Negócio</h2>
+            
+            <div class="disclaimer-box mb-8">
+                <p class="font-semibold text-amber-900 mb-2">⚠️ Nota Importante</p>
+                <p class="text-amber-800 text-sm">
+                    Os modelos de receita apresentados abaixo são <strong>exemplos ilustrativos</strong> baseados em 
+                    benchmarks de mercado. Não temos acesso aos números reais de faturamento atual, estrutura de 
+                    custos ou contratos existentes. Estes modelos precisam ser validados e refinados com dados 
+                    concretos do Alécio.
+                </p>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Fontes de Receita (Revenue Streams)</h3>
+            
+            <!-- Revenue Stream 1 -->
+            <div class="revenue-stream">
+                <div class="flex items-start mb-3">
+                    <div class="text-3xl mr-4">🤝</div>
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-900">1. Patrocínios e Parcerias Comerciais</h4>
+                        <p class="text-sm text-gray-600">Principal fonte de receita - já existe na operação atual</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-green-600">~50-60%</p>
+                        <p class="text-xs text-gray-500">da receita</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-700 mb-3"><strong>Modelos Possíveis:</strong></p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-900 mb-1">Modelo A: Fixo Mensal</p>
+                            <p class="text-gray-700 text-xs">
+                                Patrocinador paga R$ 5.000-15.000/mês por pacote que inclui: 
+                                presença em uniformes, gincanas mensais, posts nas redes.
+                            </p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 mb-1">Modelo B: Por Performance</p>
+                            <p class="text-gray-700 text-xs">
+                                R$ 2.000 fixo + 5% das vendas geradas através do app (rastreadas 
+                                via cupons únicos).
+                            </p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 mb-1">Modelo C: Híbrido</p>
+                            <p class="text-gray-700 text-xs">
+                                R$ 3.000 fixo + CPM (custo por mil impressões) de R$ 15 + 
+                                bônus por conversões.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-green-50 p-3 rounded text-xs text-green-900">
+                        <strong>Exemplo de cálculo:</strong> 10 patrocinadores × R$ 8.000/mês = R$ 80.000/mês
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Stream 2 -->
+            <div class="revenue-stream">
+                <div class="flex items-start mb-3">
+                    <div class="text-3xl mr-4">⚽</div>
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-900">2. Assinaturas/Mensalidades das Escolinhas</h4>
+                        <p class="text-sm text-gray-600">SaaS para escolhinhas usarem a plataforma</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-green-600">~15-20%</p>
+                        <p class="text-xs text-gray-500">da receita</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-700 mb-3"><strong>Modelos Possíveis:</strong></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-900 mb-1">Freemium</p>
+                            <p class="text-gray-700 text-xs mb-2">
+                                • <strong>Grátis:</strong> Até 50 alunos, funcionalidades básicas<br>
+                                • <strong>Pro (R$ 300/mês):</strong> Até 150 alunos, relatórios avançados<br>
+                                • <strong>Premium (R$ 600/mês):</strong> Ilimitado, API, white-label
+                            </p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 mb-1">Por Aluno</p>
+                            <p class="text-gray-700 text-xs">
+                                R$ 3-5 por aluno ativo/mês. Escolhinha com 100 alunos paga R$ 300-500/mês. 
+                                Escalável e justo.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-green-50 p-3 rounded text-xs text-green-900">
+                        <strong>Exemplo:</strong> 15 escolhinhas × R$ 400/mês média = R$ 6.000/mês
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Stream 3 -->
+            <div class="revenue-stream">
+                <div class="flex items-start mb-3">
+                    <div class="text-3xl mr-4">💳</div>
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-900">3. Comissões do Clube de Benefícios</h4>
+                        <p class="text-sm text-gray-600">Afiliação com parceiros comerciais</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-green-600">~10-15%</p>
+                        <p class="text-xs text-gray-500">da receita</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg text-sm">
+                    <p class="text-gray-700 mb-3">
+                        Quando um pai/mãe resgata um cupom e faz compra em parceiro, ganhamos comissão:
+                    </p>
+                    <ul class="text-gray-700 space-y-1 list-disc list-inside mb-3">
+                        <li>Varejo físico: 2-5% da venda</li>
+                        <li>E-commerce: 5-15% da venda</li>
+                        <li>Serviços (planos, cursos): 10-30% do primeiro pagamento</li>
+                    </ul>
+                    <div class="bg-green-50 p-3 rounded text-xs text-green-900">
+                        <strong>Exemplo:</strong> R$ 200.000 em vendas geradas × 5% comissão média = R$ 10.000/mês
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Stream 4 -->
+            <div class="revenue-stream">
+                <div class="flex items-start mb-3">
+                    <div class="text-3xl mr-4">📊</div>
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-900">4. Venda de Dados e Relatórios</h4>
+                        <p class="text-sm text-gray-600">Relatórios estruturados para clubes e scouts</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-green-600">~5-10%</p>
+                        <p class="text-xs text-gray-500">da receita</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg text-sm">
+                    <p class="text-gray-700 mb-3">
+                        <strong>Não vendemos dados pessoais</strong> (LGPD). Vendemos <strong>insights agregados</strong> 
+                        e relatórios individuais dos jogadores (com consentimento):
+                    </p>
+                    <ul class="text-gray-700 space-y-1 text-xs">
+                        <li>• <strong>Relatório Completo de Jogador:</strong> R$ 500-1.000 por jogador 
+                        (histórico 2-3 anos, evolução, avaliações, vídeos)</li>
+                        <li>• <strong>Analytics Regional:</strong> R$ 5.000/mês para clube ter acesso 
+                        a dashboard com todos jogadores de um núcleo</li>
+                        <li>• <strong>Reports Customizados:</strong> Sob demanda para scouts internacionais</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Revenue Streams 5, 6, 7 - versão mais compacta -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition-all">
+                    <div class="text-2xl mb-2">🎓</div>
+                    <h5 class="font-bold text-gray-900 mb-1">5. Cursos e Capacitação</h5>
+                    <p class="text-xs text-gray-700 mb-2">
+                        Cursos online para professores de escolinhas: metodologias, nutrição esportiva, 
+                        psicologia do esporte.
+                    </p>
+                    <p class="text-xs text-green-600 font-semibold">~2-3% receita</p>
+                </div>
+                
+                <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition-all">
+                    <div class="text-2xl mb-2">🎪</div>
+                    <h5 class="font-bold text-gray-900 mb-1">6. Eventos e Peneirões</h5>
+                    <p class="text-xs text-gray-700 mb-2">
+                        Taxa de inscrição para peneirões regionais: R$ 50-100 por aluno. 
+                        400 alunos × R$ 75 = R$ 30.000 por evento.
+                    </p>
+                    <p class="text-xs text-green-600 font-semibold">~5% receita</p>
+                </div>
+                
+                <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition-all">
+                    <div class="text-2xl mb-2">🪙</div>
+                    <h5 class="font-bold text-gray-900 mb-1">7. Tokenização (Futuro)</h5>
+                    <p class="text-xs text-gray-700 mb-2">
+                        Quando jogadores fazem 18 anos: mint de NFTs, venda de tokens $CRAQUE, 
+                        % dos direitos econômicos futuros.
+                    </p>
+                    <p class="text-xs text-purple-600 font-semibold">Fase 3-4 (2-3 anos)</p>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 mt-12">Projeções Financeiras (Cenários Ilustrativos)</h3>
+            
+            <div class="disclaimer-box mb-6">
+                <p class="text-amber-800 text-sm">
+                    <strong>Disclaimer:</strong> Os números abaixo são projeções hipotéticas baseadas em premissas 
+                    de crescimento conservadoras. Não refletem números reais da operação atual. Servem como framework 
+                    para discussão e planejamento.
+                </p>
+            </div>
+            
+            <table class="text-sm">
+                <thead>
+                    <tr class="bg-blue-100">
+                        <th>Métrica</th>
+                        <th>Ano 1</th>
+                        <th>Ano 2</th>
+                        <th>Ano 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Escolinhas Ativas</td>
+                        <td>15 → 25</td>
+                        <td>25 → 40</td>
+                        <td>40 → 60</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Alunos Ativos</td>
+                        <td>4.500 → 7.500</td>
+                        <td>7.500 → 12.000</td>
+                        <td>12.000 → 18.000</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Pais Ativos (80%)</td>
+                        <td>3.600 → 6.000</td>
+                        <td>6.000 → 9.600</td>
+                        <td>9.600 → 14.400</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Fanbase Total (10x alunos)</td>
+                        <td>45K → 75K</td>
+                        <td>75K → 120K</td>
+                        <td>120K → 180K</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Patrocinadores</td>
+                        <td>10 → 18</td>
+                        <td>18 → 30</td>
+                        <td>30 → 45</td>
+                    </tr>
+                    <tr class="bg-green-50">
+                        <td class="font-semibold">Receita Mensal (média)</td>
+                        <td>R$ 80K → R$ 140K</td>
+                        <td>R$ 140K → R$ 220K</td>
+                        <td>R$ 220K → R$ 350K</td>
+                    </tr>
+                    <tr class="bg-green-100">
+                        <td class="font-semibold">Receita Anual</td>
+                        <td>R$ 1.3M</td>
+                        <td>R$ 2.2M</td>
+                        <td>R$ 3.4M</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 mt-12">Estrutura de Custos (Estimativa)</h3>
+            
+            <table class="text-sm">
+                <thead>
+                    <tr class="bg-red-100">
+                        <th>Categoria</th>
+                        <th>Ano 1</th>
+                        <th>Ano 2</th>
+                        <th>% Receita</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Infraestrutura (Cloud, SaaS)</td>
+                        <td>R$ 30K</td>
+                        <td>R$ 60K</td>
+                        <td>2-3%</td>
+                    </tr>
+                    <tr>
+                        <td>Equipe (ano 2+)</td>
+                        <td>R$ 0</td>
+                        <td>R$ 360K</td>
+                        <td>15-20%</td>
+                    </tr>
+                    <tr>
+                        <td>Marketing e Aquisição</td>
+                        <td>R$ 100K</td>
+                        <td>R$ 200K</td>
+                        <td>10%</td>
+                    </tr>
+                    <tr>
+                        <td>Operação (eventos, prêmios)</td>
+                        <td>R$ 200K</td>
+                        <td>R$ 400K</td>
+                        <td>15-20%</td>
+                    </tr>
+                    <tr>
+                        <td>Jurídico, Contábil, Misc</td>
+                        <td>R$ 80K</td>
+                        <td>R$ 120K</td>
+                        <td>5-7%</td>
+                    </tr>
+                    <tr class="bg-red-50 font-bold">
+                        <td>TOTAL CUSTOS</td>
+                        <td>R$ 410K</td>
+                        <td>R$ 1.14M</td>
+                        <td>~50%</td>
+                    </tr>
+                    <tr class="bg-green-100 font-bold">
+                        <td>EBITDA</td>
+                        <td>R$ 890K (68%)</td>
+                        <td>R$ 1.06M (48%)</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p class="text-xs text-gray-600 mt-4">
+                * Ano 1 assume CTO solo (Lucas) sem salário (equity-only). Ano 2+ assume contratação de 
+                2-3 desenvolvedores pleno/júnior para escalar.
+            </p>
+        </div>
+
+        <!-- Go-to-Market -->
+        <div class="section-card page-break">
+            <h2 class="text-4xl font-bold text-gray-900 mb-8">Estratégia de Go-to-Market</h2>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Fase 1: Piloto (Semanas 8-10)</h3>
+            
+            <div class="phase-card mb-6">
+                <h4 class="text-xl font-bold mb-3">🎯 Objetivo: Validar MVP com 3-5 Escolhinhas</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="font-semibold mb-2">Seleção das Escolhinhas Piloto</p>
+                        <ul class="space-y-1 text-white text-opacity-90">
+                            <li>• Geograficamente próximas (facilita suporte presencial)</li>
+                            <li>• Perfis diversos: pequena, média, grande</li>
+                            <li>• Diretores engajados e tech-friendly</li>
+                            <li>• Já têm relação estabelecida com Alécio</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">Atividades do Piloto</p>
+                        <ul class="space-y-1 text-white text-opacity-90">
+                            <li>• Workshop de onboarding (4h presencial)</li>
+                            <li>• Cadastro de todos alunos em 1 semana</li>
+                            <li>• Acompanhamento diário por 30 dias</li>
+                            <li>• Coleta de feedback estruturado</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 bg-white bg-opacity-20 p-3 rounded">
+                    <p class="font-semibold text-sm">Critérios de Sucesso:</p>
+                    <p class="text-xs text-white text-opacity-90 mt-1">
+                        ✓ 80% dos alunos cadastrados | ✓ 70% pais ativos D30 | ✓ NPS >40 | 
+                        ✓ <5 bugs críticos | ✓ Feedback positivo de professores
+                    </p>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Fase 2: Rollout do Núcleo (Semanas 11-16)</h3>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg mb-6">
+                <h4 class="text-xl font-bold text-blue-900 mb-4">📈 Expansão Controlada</h4>
+                <p class="text-blue-800 text-sm mb-4">
+                    Após validação do piloto e correção de bugs, expandir para todas escolhinhas do núcleo 
+                    de forma escalonada (2-3 escolhinhas por semana).
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-white p-4 rounded">
+                        <p class="font-semibold text-blue-900 mb-2">Semanas 11-12</p>
+                        <p class="text-gray-700 text-xs">
+                            Onboarding de mais 4 escolhinhas. Total: 7-9 escolhinhas ativas.
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 rounded">
+                        <p class="font-semibold text-blue-900 mb-2">Semanas 13-14</p>
+                        <p class="text-gray-700 text-xs">
+                            Onboarding das restantes. Total: ~15 escolhinhas no núcleo piloto.
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 rounded">
+                        <p class="font-semibold text-blue-900 mb-2">Semanas 15-16</p>
+                        <p class="text-gray-700 text-xs">
+                            Estabilização, otimizações, preparação para próximo núcleo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Fase 3: Expansão Nacional (Meses 5-12)</h3>
+            
+            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                <p class="text-gray-700 text-sm mb-4">
+                    Com o modelo validado e ajustado, expandir para novos núcleos regionais seguindo 
+                    o ritmo de 1 núcleo a cada 2-3 meses.
+                </p>
+                
+                <table class="text-sm">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th>Período</th>
+                            <th>Núcleo</th>
+                            <th>Escolhinhas</th>
+                            <th>Alunos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mês 1-3</td>
+                            <td>Núcleo Piloto (Sul)</td>
+                            <td>15</td>
+                            <td>~4.500</td>
+                        </tr>
+                        <tr>
+                            <td>Mês 5-7</td>
+                            <td>Núcleo 2 (Sudeste)</td>
+                            <td>+10</td>
+                            <td>+3.000</td>
+                        </tr>
+                        <tr>
+                            <td>Mês 8-10</td>
+                            <td>Núcleo 3 (Centro-Oeste)</td>
+                            <td>+8</td>
+                            <td>+2.400</td>
+                        </tr>
+                        <tr>
+                            <td>Mês 11-12</td>
+                            <td>Núcleo 4 (Nordeste)</td>
+                            <td>+12</td>
+                            <td>+3.600</td>
+                        </tr>
+                        <tr class="font-bold bg-green-50">
+                            <td>Total Ano 1</td>
+                            <td>4 Núcleos</td>
+                            <td>45 escolhinhas</td>
+                            <td>~13.500 alunos</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Estratégia de Marketing e Aquisição</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">📱</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Marketing Boca-a-Boca</h5>
+                    <p class="text-xs text-gray-700">
+                        Pais compartilham naturalmente conquistas dos filhos nas redes sociais. 
+                        Facilitamos com botões de share otimizados.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🎪</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Eventos Presenciais</h5>
+                    <p class="text-xs text-gray-700">
+                        Peneirões regionais como showcase do app. Demonstrações ao vivo, 
+                        QR codes para download, sorteios.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🤝</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Parcerias Políticas</h5>
+                    <p class="text-xs text-gray-700">
+                        Prefeitos e vereadores divulgam o app em suas bases eleitorais. 
+                        Win-win: político se promove, nós ganhamos visibilidade.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">📺</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Mídia Local</h5>
+                    <p class="text-xs text-gray-700">
+                        Matérias em jornais locais, rádios comunitárias, TVs regionais 
+                        sobre os "craques do futuro" da cidade.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">💰</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Incentivo via Patrocinadores</h5>
+                    <p class="text-xs text-gray-700">
+                        Patrocinadores oferecem prêmios para primeiros 1.000 cadastrados, 
+                        impulsionando downloads iniciais.
+                    </p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="text-2xl mb-2">🎓</div>
+                    <h5 class="font-bold text-gray-900 mb-2">Workshops para Escolinhas</h5>
+                    <p class="text-xs text-gray-700">
+                        Treinamentos gratuitos sobre como usar o app atraem escolhinhas 
+                        ainda não parceiras.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-yellow-50 border-l-4 border-yellow-500 p-6">
+                <h4 class="font-bold text-yellow-900 mb-3">💡 Estratégia de CAC Zero</h4>
+                <p class="text-yellow-800 text-sm">
+                    Nosso modelo de distribuição é <strong>B2B2C</strong>: não pagamos para adquirir usuários finais 
+                    (pais/alunos). As escolhinhas são nossos canais de distribuição. Quando uma escolhinha ativa o app, 
+                    todos seus 200-400 alunos e respectivas famílias vêm junto. <strong>CAC efetivo: ~R$ 0</strong> 
+                    para usuários finais.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center py-8 border-t-2 border-gray-200">
+            <p class="text-gray-500 text-sm">
+                Super App Futebol - Business Plan v1.0 (Draft Inicial)
+            </p>
+            <p class="text-gray-400 text-xs mt-2">
+                Documento confidencial • Outubro 2025 • Parte 2 de 3
+            </p>
+            <div class="mt-6 flex justify-center gap-4 text-xs text-gray-500">
+                <a href="superapp_fute_bp.html" class="hover:text-blue-600">← Parte 1</a>
+                <span>|</span>
+                <a href="superapp_fute_bp3.html" class="hover:text-blue-600">Parte 3 →</a>
+                <span>|</span>
+                <a href="superapp_fute.html" class="hover:text-blue-600">Ver Especificações Técnicas →</a>
+            </div>
+        </div>
+
+    </div>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4500bace34bf49e0baae547a084f0186","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

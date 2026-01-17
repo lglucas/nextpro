@@ -15,7 +15,7 @@ interface RawAuditLog {
   action: string
   user_email?: string | null
   created_at: string
-  details?: string | null
+  details?: unknown
   payload?: unknown
 }
 
@@ -39,15 +39,10 @@ export function DashboardPage() {
           .from('classes')
           .select('*', { count: 'exact', head: true })
 
-        // Tentativa de buscar avaliações (se a tabela existir)
-        const { count: evaluationsCount } = await supabase
-          .from('evaluations')
-          .select('*', { count: 'exact', head: true })
-
         setRealStats({
           students: studentsCount || 0,
           classes: classesCount || 0,
-          evaluations: evaluationsCount || 0
+          evaluations: 0
         })
 
         // Fetch Audit Logs
@@ -64,7 +59,14 @@ export function DashboardPage() {
               action: log.action,
               user: log.user_email || 'Sistema',
               time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-              detail: log.details || JSON.stringify(log.payload),
+              detail:
+                log.details == null
+                  ? log.payload == null
+                    ? ''
+                    : JSON.stringify(log.payload)
+                  : typeof log.details === 'string'
+                    ? log.details
+                    : JSON.stringify(log.details),
             }))
           )
         } else {
@@ -89,7 +91,7 @@ export function DashboardPage() {
     { name: 'Total de Alunos', value: kpiData.students, change: '', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
     { name: 'Turmas Ativas', value: realStats.classes.toString(), change: '', icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100' },
     { name: 'Taxa de Presença', value: kpiData.attendance, change: 'Em breve', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { name: 'Avaliações', value: realStats.evaluations.toString(), change: '', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { name: 'Avaliações', value: realStats.evaluations.toString(), change: 'Em breve', icon: BarChart3, color: 'text-orange-600', bg: 'bg-orange-100' },
   ]
 
   const handleExportPDF = () => {

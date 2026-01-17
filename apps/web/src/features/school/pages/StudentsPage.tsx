@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield } from 'lucide-react'
+import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power } from 'lucide-react'
 import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
+import { normalizeCpf, normalizePhone } from '@/features/school/utils/csv'
 
 interface Guardian {
   id: string
   full_name: string
-  cpf: string
-  phone: string
-  email: string
+  cpf?: string | null
+  phone?: string | null
+  email?: string | null
+  school_id?: string | null
 }
 
 interface Student {
@@ -18,6 +20,10 @@ interface Student {
   birth_date: string
   guardian_id: string
   guardian?: Guardian // Join
+  school_id?: string
+  photo_url?: string | null
+  blood_type?: string | null
+  allergies?: string | null
   category: string
   active: boolean
   class_students?: Array<{
@@ -39,13 +45,19 @@ export function StudentsPage() {
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+  const [savingStudent, setSavingStudent] = useState(false)
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
+  const [studentSearchTerm, setStudentSearchTerm] = useState('')
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
   const [selectedGuardian, setSelectedGuardian] = useState<Guardian | null>(null)
   const [isCreatingGuardian, setIsCreatingGuardian] = useState(false)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
+  const [photoRemoveRequested, setPhotoRemoveRequested] = useState(false)
 
   // Form Data (Aluno)
   const [formData, setFormData] = useState({
@@ -127,6 +139,14 @@ export function StudentsPage() {
     fetchProfileAndData()
   }, [fetchProfileAndData])
 
+  useEffect(() => {
+    return () => {
+      if (photoPreviewUrl && photoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreviewUrl)
+      }
+    }
+  }, [photoPreviewUrl])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -145,9 +165,21 @@ export function StudentsPage() {
     }
 
     try {
+      const effectiveSchoolId = userSchoolId || formData.school_id
+      if (!effectiveSchoolId) {
+        alert('Selecione uma escola antes de criar o responsável.')
+        return
+      }
+
+      const cpfKey = guardianForm.cpf ? normalizeCpf(guardianForm.cpf) : ''
+      const phoneKey = guardianForm.phone ? normalizePhone(guardianForm.phone) : ''
+
       const payload = {
-        ...guardianForm,
-        school_id: userSchoolId || formData.school_id
+        school_id: effectiveSchoolId,
+        full_name: guardianForm.full_name.trim(),
+        cpf: cpfKey ? cpfKey : null,
+        phone: phoneKey ? phoneKey : null,
+        email: guardianForm.email.trim() ? guardianForm.email.trim() : null,
       }
       
       const { data, error } = await supabase
@@ -166,7 +198,12 @@ export function StudentsPage() {
       }
     } catch (error) {
       console.error('Erro ao criar responsável:', error)
-      alert('Erro ao criar responsável. Verifique se o CPF já existe.')
+      const err = error as { code?: string; message?: string }
+      if (err?.code === '23505') {
+        alert('CPF já cadastrado. Verifique se já existe um responsável com esse CPF.')
+        return
+      }
+      alert(`Erro ao criar responsável: ${err?.message || 'tente novamente.'}`)
     }
   }
 
@@ -192,20 +229,55 @@ export function StudentsPage() {
     }
 
     try {
+      setSavingStudent(true)
+      const effectiveSchoolId = userSchoolId || formData.school_id
       const payload = {
         ...formData,
-        school_id: userSchoolId || formData.school_id,
+        school_id: effectiveSchoolId,
         guardian_id: selectedGuardian?.id,
         category: calculateCategory(formData.birth_date)
       }
 
-      const { error } = await supabase.from('students').insert(payload)
+      const saveQuery = editingStudentId
+        ? supabase.from('students').update(payload).eq('id', editingStudentId).select('id, school_id').single()
+        : supabase.from('students').insert(payload).select('id, school_id').single()
 
-      if (error) throw error
+      const { data: savedStudent, error: saveError } = await saveQuery
+      if (saveError) throw saveError
 
-      alert('Aluno cadastrado com sucesso!')
+      alert(editingStudentId ? 'Aluno atualizado com sucesso!' : 'Aluno cadastrado com sucesso!')
+
+      if (savedStudent?.id && effectiveSchoolId) {
+        const objectPath = `${effectiveSchoolId}/${savedStudent.id}`
+
+        if (photoRemoveRequested && !photoFile) {
+          await supabase.storage.from('student-photos').remove([objectPath])
+          const { error: updatePhotoError } = await supabase.from('students').update({ photo_url: null }).eq('id', savedStudent.id)
+          if (updatePhotoError) throw updatePhotoError
+        }
+
+        if (photoFile) {
+          const { error: uploadError } = await supabase.storage.from('student-photos').upload(objectPath, photoFile, {
+            upsert: true,
+            contentType: photoFile.type || undefined,
+          })
+          if (uploadError) throw uploadError
+
+          const publicUrl = supabase.storage.from('student-photos').getPublicUrl(objectPath).data.publicUrl
+          const photoUrlWithVersion = `${publicUrl}?v=${Date.now()}`
+          const { error: updatePhotoError } = await supabase.from('students').update({ photo_url: photoUrlWithVersion }).eq('id', savedStudent.id)
+          if (updatePhotoError) throw updatePhotoError
+        }
+      }
+
       setIsCreating(false)
+      setEditingStudentId(null)
       setSelectedGuardian(null)
+      setGuardianSearchTerm('')
+      setIsCreatingGuardian(false)
+      setPhotoFile(null)
+      setPhotoPreviewUrl(null)
+      setPhotoRemoveRequested(false)
       fetchStudents()
       
       // Reset form
@@ -219,7 +291,9 @@ export function StudentsPage() {
 
     } catch (error) {
       console.error('Erro ao salvar:', error)
-      alert('Erro ao cadastrar aluno.')
+      alert(editingStudentId ? 'Erro ao atualizar aluno.' : 'Erro ao cadastrar aluno.')
+    } finally {
+      setSavingStudent(false)
     }
   }
 
@@ -231,11 +305,132 @@ export function StudentsPage() {
     return `Sub-${Math.ceil(age / 2) * 2}`
   }
 
-  // Filter guardians for search
-  const filteredGuardians = guardians.filter(g => 
-    g.full_name.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
-    g.cpf?.includes(guardianSearchTerm)
-  )
+  const effectiveSchoolId = userSchoolId || formData.school_id
+  const normalizedGuardianSearch = guardianSearchTerm.trim().toLowerCase()
+  const guardianSearchDigits = normalizeCpf(guardianSearchTerm.trim())
+  const guardiansInScope =
+    role === 'super_admin' ? guardians.filter((g) => g.school_id === effectiveSchoolId) : guardians
+  const filteredGuardians = normalizedGuardianSearch
+    ? guardiansInScope.filter((g) => {
+        const name = (g.full_name || '').toLowerCase()
+        const cpf = g.cpf || ''
+        const phone = g.phone || ''
+        const email = (g.email || '').toLowerCase()
+        return (
+          name.includes(normalizedGuardianSearch) ||
+          email.includes(normalizedGuardianSearch) ||
+          (guardianSearchDigits ? cpf.includes(guardianSearchDigits) || phone.includes(guardianSearchDigits) : false)
+        )
+      })
+    : guardiansInScope
+
+  const normalizedStudentSearch = studentSearchTerm.trim().toLowerCase()
+  const visibleStudents = normalizedStudentSearch
+    ? students.filter((student) => {
+        const guardianName = student.guardian?.full_name || ''
+        const guardianPhone = student.guardian?.phone || ''
+        const guardianEmail = student.guardian?.email || ''
+        return (
+          student.full_name.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianName.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianPhone.toLowerCase().includes(normalizedStudentSearch) ||
+          guardianEmail.toLowerCase().includes(normalizedStudentSearch)
+        )
+      })
+    : students
+
+  const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
+
+  const openCreateForm = () => {
+    setIsImporting(false)
+    setEditingStudentId(null)
+    setSelectedGuardian(null)
+    setGuardianSearchTerm('')
+    setIsCreatingGuardian(false)
+    setPhotoFile(null)
+    setPhotoPreviewUrl(null)
+    setPhotoRemoveRequested(false)
+    setFormData({
+      full_name: '',
+      birth_date: '',
+      blood_type: '',
+      allergies: '',
+      school_id: userSchoolId || '',
+    })
+    setIsCreating(true)
+  }
+
+  const openEditForm = (student: Student) => {
+    setIsImporting(false)
+    setEditingStudentId(student.id)
+    setGuardianSearchTerm('')
+    setIsCreatingGuardian(false)
+    setPhotoFile(null)
+    setPhotoPreviewUrl(student.photo_url || null)
+    setPhotoRemoveRequested(false)
+    const school_id = (student.school_id || userSchoolId || formData.school_id || '').trim()
+    setFormData({
+      full_name: student.full_name || '',
+      birth_date: student.birth_date || '',
+      blood_type: student.blood_type || '',
+      allergies: student.allergies || '',
+      school_id,
+    })
+    const guardianFromList = guardians.find((g) => g.id === student.guardian_id) || null
+    if (guardianFromList) {
+      setSelectedGuardian(guardianFromList)
+    } else if (student.guardian?.id) {
+      setSelectedGuardian({
+        id: student.guardian.id,
+        full_name: student.guardian.full_name,
+        cpf: null,
+        phone: student.guardian.phone ?? null,
+        email: student.guardian.email ?? null,
+        school_id: school_id || null,
+      })
+    } else {
+      setSelectedGuardian(null)
+    }
+    setIsCreating(true)
+  }
+
+  const handleDeleteStudent = async (student: Student) => {
+    const ok = confirm(`Excluir o aluno "${student.full_name}"? Esta ação não pode ser desfeita.`)
+    if (!ok) return
+    try {
+      setSavingStudent(true)
+      if (student.school_id) {
+        await supabase.storage.from('student-photos').remove([`${student.school_id}/${student.id}`])
+      }
+      const { error } = await supabase.from('students').delete().eq('id', student.id)
+      if (error) throw error
+      await fetchStudents()
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error)
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao excluir aluno.')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
+
+  const handleToggleActive = async (student: Student) => {
+    const next = !student.active
+    const ok = confirm(`${next ? 'Ativar' : 'Inativar'} o aluno "${student.full_name}"?`)
+    if (!ok) return
+    try {
+      setSavingStudent(true)
+      const { error } = await supabase.from('students').update({ active: next }).eq('id', student.id)
+      if (error) throw error
+      await fetchStudents()
+    } catch (error) {
+      console.error('Erro ao atualizar status do aluno:', error)
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status do aluno.')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -256,7 +451,7 @@ export function StudentsPage() {
               Importar CSV
             </button>
             <button
-              onClick={() => setIsCreating(true)}
+              onClick={openCreateForm}
               className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
             >
               <UserPlus className="w-4 h-4" />
@@ -295,13 +490,42 @@ export function StudentsPage() {
       {isCreating && (
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-4">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-slate-900">Novo Cadastro de Aluno</h3>
-            <button onClick={() => setIsCreating(false)} className="text-slate-400 hover:text-slate-600">
+            <h3 className="text-lg font-semibold text-slate-900">{editingStudentId ? 'Editar aluno' : 'Novo Cadastro de Aluno'}</h3>
+            <button
+              onClick={() => {
+                setIsCreating(false)
+                setEditingStudentId(null)
+              }}
+              className="text-slate-400 hover:text-slate-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {role === 'super_admin' ? (
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  Escola
+                </h4>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Selecione a escola</label>
+                <select
+                  name="school_id"
+                  value={formData.school_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  required
+                >
+                  <option value="">Selecione uma escola...</option>
+                  {schools.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
             
             {/* ETAPA 1: RESPONSÁVEL */}
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
@@ -315,7 +539,9 @@ export function StudentsPage() {
                   {!isCreatingGuardian ? (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Buscar Responsável (Nome ou CPF)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Buscar Responsável (Nome, CPF, Telefone ou Email)
+                        </label>
                         <div className="flex gap-2">
                           <div className="relative flex-1">
                             <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
@@ -329,18 +555,23 @@ export function StudentsPage() {
                           </div>
                           <button 
                             type="button"
+                            disabled={role === 'super_admin' && !formData.school_id}
                             onClick={() => setIsCreatingGuardian(true)}
-                            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+                            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             + Novo
                           </button>
                         </div>
+                        {role === 'super_admin' && !formData.school_id ? (
+                          <p className="mt-2 text-xs text-slate-600">Selecione uma escola acima para buscar/criar responsáveis.</p>
+                        ) : null}
                       </div>
                       
                       {/* Resultados da Busca */}
-                      {guardianSearchTerm && (
-                        <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg bg-white divide-y divide-slate-100">
-                          {filteredGuardians.length > 0 ? filteredGuardians.map(g => (
+                      <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg bg-white divide-y divide-slate-100">
+                        {role === 'super_admin' && !formData.school_id ? (
+                          <div className="p-4 text-center text-sm text-slate-500">Selecione uma escola para listar responsáveis.</div>
+                        ) : visibleGuardianResults.length > 0 ? visibleGuardianResults.map(g => (
                             <div 
                               key={g.id} 
                               onClick={() => setSelectedGuardian(g)}
@@ -348,15 +579,14 @@ export function StudentsPage() {
                             >
                               <div>
                                 <p className="text-sm font-medium text-slate-900">{g.full_name}</p>
-                                <p className="text-xs text-slate-500">CPF: {g.cpf || 'N/A'} • Tel: {g.phone}</p>
+                                <p className="text-xs text-slate-500">CPF: {g.cpf || 'N/A'} • Tel: {g.phone || 'N/A'}</p>
                               </div>
                               <UserCheck className="w-4 h-4 text-slate-400" />
                             </div>
                           )) : (
-                            <div className="p-4 text-center text-sm text-slate-500">Nenhum responsável encontrado.</div>
-                          )}
-                        </div>
-                      )}
+                          <div className="p-4 text-center text-sm text-slate-500">Nenhum responsável encontrado.</div>
+                        )}
+                      </div>
                     </>
                   ) : (
                     // Form de Criação Rápida de Responsável
@@ -434,26 +664,62 @@ export function StudentsPage() {
                 <UserPlus className="w-4 h-4 text-primary" />
                 2. Dados do Aluno
               </h4>
+
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-600 font-bold">
+                  {photoPreviewUrl ? (
+                    <img src={photoPreviewUrl} alt="Foto do aluno" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{formData.full_name.trim() ? formData.full_name.trim()[0]?.toUpperCase() : 'NP'}</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Foto do aluno (opcional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={savingStudent}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+                      if (!file) {
+                        setPhotoFile(null)
+                        setPhotoPreviewUrl((prev) => (prev && prev.startsWith('blob:') ? null : prev))
+                        return
+                      }
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert('A imagem deve ter no máximo 2MB.')
+                        e.target.value = ''
+                        return
+                      }
+                      setPhotoRemoveRequested(false)
+                      setPhotoFile(file)
+                      const nextUrl = URL.createObjectURL(file)
+                      setPhotoPreviewUrl(nextUrl)
+                    }}
+                    className="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-900 file:text-white hover:file:bg-slate-800 disabled:opacity-50"
+                  />
+                  <p className="mt-1 text-xs text-slate-500">Formatos comuns (JPG/PNG/WebP). Máx. 2MB.</p>
+                  {editingStudentId ? (
+                    <div className="mt-2 flex items-center gap-3">
+                      <button
+                        type="button"
+                        disabled={savingStudent || (!photoPreviewUrl && !photoFile)}
+                        onClick={() => {
+                          setPhotoRemoveRequested(true)
+                          setPhotoFile(null)
+                          setPhotoPreviewUrl(null)
+                        }}
+                        className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
+                      >
+                        Remover foto
+                      </button>
+                      {photoRemoveRequested ? <span className="text-xs text-slate-500">Remoção pendente (salve para aplicar).</span> : null}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {role === 'super_admin' && (
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Escola</label>
-                    <select 
-                      name="school_id"
-                      value={formData.school_id}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                      required
-                    >
-                      <option value="">Selecione uma escola...</option>
-                      {schools.map(s => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Nome Completo</label>
                   <input 
@@ -517,17 +783,22 @@ export function StudentsPage() {
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
               <button
                 type="button"
-                onClick={() => setIsCreating(false)}
-                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                onClick={() => {
+                  setIsCreating(false)
+                  setEditingStudentId(null)
+                }}
+                disabled={savingStudent}
+                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+                disabled={savingStudent}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                Concluir Cadastro
+                {savingStudent ? 'Salvando...' : editingStudentId ? 'Salvar alterações' : 'Concluir Cadastro'}
               </button>
             </div>
           </form>
@@ -545,7 +816,7 @@ export function StudentsPage() {
             Comece adicionando os atletas da sua escola para gerenciar presenças e avaliações.
           </p>
           <button 
-            onClick={() => setIsCreating(true)}
+            onClick={openCreateForm}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Cadastrar Primeiro Aluno
@@ -553,6 +824,19 @@ export function StudentsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          {!isCreating && !isImporting ? (
+            <div className="p-4 border-b border-slate-100 bg-white">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                <input
+                  value={studentSearchTerm}
+                  onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  placeholder="Buscar aluno ou responsável..."
+                  className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
+                />
+              </div>
+            </div>
+          ) : null}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 border-b border-slate-100">
@@ -566,12 +850,16 @@ export function StudentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {students.map((student) => (
+                {visibleStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                          {student.full_name.charAt(0).toUpperCase()}
+                        <div className="w-8 h-8 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center text-primary font-bold text-xs">
+                          {student.photo_url ? (
+                            <img src={student.photo_url} alt={student.full_name} className="w-full h-full object-cover" />
+                          ) : (
+                            student.full_name.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-slate-900">{student.full_name}</p>
@@ -611,8 +899,32 @@ export function StudentsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-slate-400 hover:text-primary transition-colors mx-1">
+                      <button
+                        type="button"
+                        onClick={() => openEditForm(student)}
+                        disabled={savingStudent}
+                        className="text-slate-400 hover:text-primary transition-colors mx-1 disabled:opacity-50"
+                        aria-label="Editar aluno"
+                      >
                         <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleActive(student)}
+                        disabled={savingStudent}
+                        className="text-slate-400 hover:text-amber-600 transition-colors mx-1 disabled:opacity-50"
+                        aria-label={student.active ? 'Inativar aluno' : 'Ativar aluno'}
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteStudent(student)}
+                        disabled={savingStudent}
+                        className="text-slate-400 hover:text-red-600 transition-colors mx-1 disabled:opacity-50"
+                        aria-label="Excluir aluno"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
                   </tr>

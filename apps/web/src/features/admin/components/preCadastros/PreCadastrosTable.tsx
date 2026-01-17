@@ -27,6 +27,7 @@ export function PreCadastrosTable({
   expandedId,
   onToggleExpanded,
   onUpdateOnboardingStatus,
+  allowedOnboardingStatuses,
 }: {
   rows: PreRegistrationRow[]
   loading: boolean
@@ -34,7 +35,10 @@ export function PreCadastrosTable({
   expandedId: string | null
   onToggleExpanded: (id: string) => void
   onUpdateOnboardingStatus: (id: string, onboardingStatus: PreCadastroOnboardingStatus) => void
+  allowedOnboardingStatuses?: PreCadastroOnboardingStatus[]
 }) {
+  const allowed = allowedOnboardingStatuses ?? ['pendente_escola', 'aguardando_contrato', 'ativo', 'rejeitado']
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm text-left">
@@ -67,6 +71,7 @@ export function PreCadastrosTable({
               const isExpanded = expandedId === row.id
               const onboardingStatus: PreCadastroOnboardingStatus =
                 row.onboarding_status && row.onboarding_status in ONBOARDING_LABELS ? row.onboarding_status : row.status === 'submitted' ? 'pendente_escola' : 'draft'
+              const selectValue = allowed.includes(onboardingStatus) ? onboardingStatus : allowed[0] ?? onboardingStatus
               return (
                 <Fragment key={row.id}>
                   <tr className="hover:bg-slate-50 transition-colors">
@@ -109,15 +114,15 @@ export function PreCadastrosTable({
                       <div className="flex flex-col items-end gap-2">
                         {row.status === 'submitted' ? (
                           <select
-                            value={onboardingStatus}
+                            value={selectValue}
                             onChange={(e) => onUpdateOnboardingStatus(row.id, e.target.value as PreCadastroOnboardingStatus)}
                             disabled={updatingId === row.id}
                             className="text-xs px-2 py-1 rounded border border-slate-200 bg-white text-slate-700 disabled:opacity-50"
                           >
-                            <option value="pendente_escola">Pendente escola</option>
-                            <option value="aguardando_contrato">Aguardando contrato</option>
-                            <option value="ativo">Ativo</option>
-                            <option value="rejeitado">Rejeitado</option>
+                            {allowed.includes('pendente_escola') ? <option value="pendente_escola">Pendente escola</option> : null}
+                            {allowed.includes('aguardando_contrato') ? <option value="aguardando_contrato">Aguardando contrato</option> : null}
+                            {allowed.includes('ativo') ? <option value="ativo">Ativo</option> : null}
+                            {allowed.includes('rejeitado') ? <option value="rejeitado">Rejeitado</option> : null}
                           </select>
                         ) : null}
 

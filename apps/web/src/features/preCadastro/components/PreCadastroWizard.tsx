@@ -15,7 +15,11 @@ import { ConsentStep } from '@/features/preCadastro/components/steps/ConsentStep
 const STEPS = ['Responsável', 'Escolinha', 'Filhos', 'Censo', 'Confirmação']
 const CONSENT_VERSION = '2025-12-26-v1'
 
-export function PreCadastroWizard() {
+export function PreCadastroWizard({
+  inviteSchool,
+}: {
+  inviteSchool?: { id: string; uf: string; city: string; name: string } | null
+}) {
   const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [status, setStatus] = useState<PreCadastroStatus>('draft')
@@ -26,12 +30,29 @@ export function PreCadastroWizard() {
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [botTrap, setBotTrap] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [schoolId, setSchoolId] = useState<string | null>(() => (inviteSchool?.id ? inviteSchool.id : null))
   const startedAtRef = useRef<number>(Date.now())
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
   const canGoBack = step > 0 && status !== 'submitted'
   const canGoNext = step < STEPS.length - 1 && status !== 'submitted'
   const isLast = step === STEPS.length - 1
+  const lockSchoolFields = Boolean(inviteSchool?.id && inviteSchool.uf && inviteSchool.city && inviteSchool.name)
+
+  const applyInviteSchool = useCallback(
+    (base: PreCadastroDraftData) => {
+      if (!inviteSchool) return base
+      return {
+        ...base,
+        school: {
+          uf: inviteSchool.uf || base.school.uf,
+          city: inviteSchool.city || base.school.city,
+          name: inviteSchool.name || base.school.name,
+        },
+      }
+    },
+    [inviteSchool],
+  )
 
   const validateStep = useCallback(() => {
     if (step === 0) return draft.guardian.fullName.trim() !== '' && draft.guardian.email.trim() !== ''
@@ -77,6 +98,7 @@ export function PreCadastroWizard() {
           onboardingStatus: nextStatus === 'submitted' ? 'pendente_escola' : 'draft',
           consentedAt: nextStatus === 'submitted' ? nowIso : null,
           consentVersion: nextStatus === 'submitted' ? CONSENT_VERSION : null,
+          schoolId,
           submittedMeta:
             nextStatus === 'submitted'
               ? {
@@ -102,7 +124,7 @@ export function PreCadastroWizard() {
         setSaving(false)
       }
     },
-    [botTrap, draft, turnstileSiteKey, turnstileToken, user],
+    [botTrap, draft, schoolId, turnstileSiteKey, turnstileToken, user],
   )
 
   useEffect(() => {
@@ -113,16 +135,18 @@ export function PreCadastroWizard() {
 
       const local = loadPreCadastroFromLocalStorage(user.id)
       if (local) {
-        setDraft(local)
+        setDraft(applyInviteSchool(local))
       } else {
-        setDraft(createEmptyPreCadastroDraft(user.email))
+        setDraft(applyInviteSchool(createEmptyPreCadastroDraft(user.email)))
       }
+      setSchoolId(inviteSchool?.id || null)
 
       try {
         const row = await getMyPreCadastroDraft(user.id)
         if (row?.data) {
-          setDraft(row.data as unknown as PreCadastroDraftData)
+          setDraft(applyInviteSchool(row.data as unknown as PreCadastroDraftData))
           setStatus(row.status)
+          setSchoolId(row.school_id ?? inviteSchool?.id ?? null)
           if (row.status === 'submitted') setStep(STEPS.length - 1)
         }
       } catch (e: unknown) {
@@ -134,7 +158,7 @@ export function PreCadastroWizard() {
     }
 
     load()
-  }, [user])
+  }, [applyInviteSchool, inviteSchool?.id, user])
 
   if (!user) return null
 
@@ -169,7 +193,7 @@ export function PreCadastroWizard() {
 
       <div className="mt-8">
         {step === 0 ? <GuardianStep value={draft.guardian} onChange={(guardian) => setDraft((d) => ({ ...d, guardian }))} /> : null}
-        {step === 1 ? <SchoolStep value={draft.school} onChange={(school) => setDraft((d) => ({ ...d, school }))} /> : null}
+        {step === 1 ? <SchoolStep value={draft.school} onChange={(school) => setDraft((d) => ({ ...d, school }))} disabled={lockSchoolFields} /> : null}
         {step === 2 ? <ChildrenStep value={draft.children} onChange={(children) => setDraft((d) => ({ ...d, children }))} /> : null}
         {step === 3 ? <SocioEconomicStep value={draft.socio} onChange={(socio) => setDraft((d) => ({ ...d, socio }))} /> : null}
         {step === 4 ? (

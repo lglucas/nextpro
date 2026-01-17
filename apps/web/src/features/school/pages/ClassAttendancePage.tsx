@@ -34,6 +34,7 @@ interface Student {
   id: string
   full_name: string
   photo_url?: string
+  active?: boolean | null
 }
 
 interface Attendance {
@@ -68,6 +69,10 @@ export function ClassAttendancePage() {
   const [qrLoading, setQrLoading] = useState(false)
   const [qrValue, setQrValue] = useState('')
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+  const [qrExpiresInHours, setQrExpiresInHours] = useState<1 | 2 | 3>(3)
+  const [qrExpiresAtSeconds, setQrExpiresAtSeconds] = useState<number | null>(null)
+  const [qrCheckInsCount, setQrCheckInsCount] = useState(0)
+  const [qrCheckInsLoading, setQrCheckInsLoading] = useState(false)
 
   const fetchClassDetails = useCallback(async () => {
     const { data } = await supabase.from('classes').select('name').eq('id', classId).single()
@@ -94,7 +99,7 @@ export function ClassAttendancePage() {
   const fetchStudents = useCallback(async () => {
     const { data } = await supabase
       .from('class_students')
-      .select('student:students(id, full_name, photo_url)')
+      .select('student:students(id, full_name, photo_url, active)')
       .eq('class_id', classId)
       .order('student(full_name)')
     
@@ -106,6 +111,18 @@ export function ClassAttendancePage() {
     }
   }, [classId])
 
+  const fetchQrCheckInsCount = useCallback(async (sessionId: string) => {
+    setQrCheckInsLoading(true)
+    const { count } = await supabase
+      .from('attendances')
+      .select('id', { count: 'exact', head: true })
+      .eq('session_id', sessionId)
+      .eq('notes', 'qr')
+
+    setQrCheckInsCount(count ?? 0)
+    setQrCheckInsLoading(false)
+  }, [])
+
   useEffect(() => {
     if (classId) {
       fetchClassDetails()
@@ -113,6 +130,28 @@ export function ClassAttendancePage() {
       fetchStudents()
     }
   }, [classId, fetchClassDetails, fetchSessions, fetchStudents])
+
+  useEffect(() => {
+    if (!qrOpen) return
+    if (!selectedSession) return
+
+    void fetchQrCheckInsCount(selectedSession.id)
+
+    const channel = supabase
+      .channel(`attendance-checkins:${selectedSession.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'attendances', filter: `session_id=eq.${selectedSession.id}` },
+        () => {
+          void fetchQrCheckInsCount(selectedSession.id)
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [fetchQrCheckInsCount, qrOpen, selectedSession])
 
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -143,6 +182,8 @@ export function ClassAttendancePage() {
     setQrOpen(false)
     setQrDataUrl(null)
     setQrValue('')
+    setQrExpiresAtSeconds(null)
+    setQrCheckInsCount(0)
     // Fetch existing attendance
     const { data } = await supabase
       .from('attendances')
@@ -155,7 +196,7 @@ export function ClassAttendancePage() {
     students.forEach(s => {
       initialData[s.id] = {
         student_id: s.id,
-        status: 'present'
+        status: s.active === false ? 'absent' : 'present'
       }
     })
 
@@ -173,10 +214,20 @@ export function ClassAttendancePage() {
     if (!selectedSession) return
     setQrLoading(true)
     try {
-      const value = `${window.location.origin}/app/check-in?sessionId=${selectedSession.id}`
+      const expiresAtDate = new Date(Date.now() + qrExpiresInHours * 60 * 60 * 1000)
+      const expiresAtSeconds = Math.floor(expiresAtDate.getTime() / 1000)
+      const { error: updateError } = await supabase
+        .from('class_sessions')
+        .update({ qr_checkin_expires_at: expiresAtDate.toISOString() })
+        .eq('id', selectedSession.id)
+
+      if (updateError) throw updateError
+
+      const value = `${window.location.origin}/app/check-in?sessionId=${selectedSession.id}&expiresAt=${expiresAtSeconds}`
       const dataUrl = await QRCode.toDataURL(value, { width: 280, margin: 1 })
       setQrValue(value)
       setQrDataUrl(dataUrl)
+      setQrExpiresAtSeconds(expiresAtSeconds)
       setQrOpen(true)
     } catch (error) {
       console.error('Erro ao gerar QR Code:', error)
@@ -197,6 +248,13 @@ export function ClassAttendancePage() {
   }
 
   const updateStatus = (studentId: string, status: Attendance['status']) => {
+    if (status === 'present') {
+      const student = students.find((s) => s.id === studentId)
+      if (student?.active === false) {
+        alert('Aluno inativo: não é permitido marcar como presente.')
+        return
+      }
+    }
     setAttendanceData(prev => ({
       ...prev,
       [studentId]: { ...prev[studentId], status }
@@ -390,15 +448,30 @@ export function ClassAttendancePage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={openCheckInQr}
-                    disabled={qrLoading}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-                  >
-                    <QrCode className="w-4 h-4" />
-                    {qrLoading ? 'Gerando...' : 'QR Check-in'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={qrExpiresInHours}
+                      onChange={(e) => {
+                        const next = Number(e.target.value)
+                        if (next === 1 || next === 2 || next === 3) setQrExpiresInHours(next)
+                      }}
+                      className="px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                      aria-label="Tempo de expiração do QR"
+                    >
+                      <option value={1}>Expira em 1h</option>
+                      <option value={2}>Expira em 2h</option>
+                      <option value={3}>Expira em 3h</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={openCheckInQr}
+                      disabled={qrLoading}
+                      className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                    >
+                      <QrCode className="w-4 h-4" />
+                      {qrLoading ? 'Gerando...' : 'QR Check-in'}
+                    </button>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
@@ -442,6 +515,15 @@ export function ClassAttendancePage() {
                       <div>
                         <p className="text-sm font-semibold text-slate-900">QR Code de Check-in</p>
                         <p className="text-xs text-slate-500">Alunos escaneiam para registrar presença</p>
+                        <p className="mt-1 text-xs text-slate-600">
+                          {qrCheckInsLoading ? 'Carregando check-ins...' : `Check-ins: ${qrCheckInsCount}/${students.length}`}
+                          {qrExpiresAtSeconds
+                            ? ` • Válido até ${new Date(qrExpiresAtSeconds * 1000).toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}`
+                            : ''}
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -505,18 +587,27 @@ export function ClassAttendancePage() {
                   <tbody className="divide-y divide-slate-100">
                     {students.map(student => {
                       const status = attendanceData[student.id]?.status || 'present'
+                      const isInactive = student.active === false
                       
                       return (
                         <tr key={student.id} className="hover:bg-slate-50">
                           <td className="px-4 py-3">
-                            <div className="font-medium text-slate-900">{student.full_name}</div>
+                            <div className="font-medium text-slate-900 flex items-center gap-2">
+                              <span>{student.full_name}</span>
+                              {isInactive ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">Inativo</span> : null}
+                            </div>
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex justify-center gap-2">
                               <button
                                 onClick={() => updateStatus(student.id, 'present')}
+                                disabled={isInactive}
                                 className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${
-                                  status === 'present' ? 'bg-green-100 text-green-700 ring-2 ring-green-500 ring-offset-1' : 'text-slate-400 hover:bg-slate-100'
+                                  status === 'present'
+                                    ? 'bg-green-100 text-green-700 ring-2 ring-green-500 ring-offset-1'
+                                    : isInactive
+                                      ? 'text-slate-300'
+                                      : 'text-slate-400 hover:bg-slate-100'
                                 }`}
                                 title="Presente"
                               >

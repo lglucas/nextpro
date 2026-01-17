@@ -1,184 +1,107 @@
 # 🧠 NextPro - Regras de Negócio e Funcionais
 
-**Versão:** 1.0  
-**Data:** 15/12/2025  
+**Versão:** 1.1  
+**Data:** 17/01/2026  
 **Status:** Aprovado  
 
 ---
 
-## 1. Gamificação (Progression System)
+## 1. Engines (visão geral)
+O NextPro é desenhado com 3 engines independentes (mas integráveis), com uma camada comum (shared).
 
-### 1.1 Estrutura de Badges (Matriz 50x5)
-O sistema suporta medalhas **Verticais** (Categorias) e **Horizontais** (Tiers).
+### 1.1 Engines
+- **Engine Técnica (futebol):** evolução técnica do atleta por temporada, posição e treino.
+- **Engine Social (influência econômica):** ranking monetizável do atleta (fanbase + presentes/moedas) com tiers e ciclos.
+- **Engine de Benefícios (fidelidade):** pontos/cashback e marketplace.
 
-**Categorias Macro (Exemplos):**
-1.  **Assiduidade:** "Rato de Treino"
-2.  **Artilharia:** "Matador"
-3.  **Defesa:** "Paredão"
-4.  **Assistência:** "Garçom"
-5.  **Fair Play:** "Gentleman"
-6.  **Liderança:** "Capitão"
-7.  **Evolução:** "Foguete" (Maior ganho de nota no mês)
-8.  **Social:** "Influencer" (Likes no feed)
-... (Total de 50 categorias planejadas)
-
-**Tiers (Níveis de Medalha):**
-- **Tier 1 (Bronze):** Iniciante (Ex: 5 Presenças).
-- **Tier 2 (Prata):** Intermediário (Ex: 25 Presenças).
-- **Tier 3 (Ouro):** Avançado (Ex: 50 Presenças).
-- **Tier 4 (Platina):** Elite (Ex: 100 Presenças).
-- **Tier 5 (Diamante):** Lenda (Ex: 200 Presenças).
-
-### 1.2 XP e Níveis (Leveling)
-Cada ação gera XP para o Atleta.
-- **Presença Confirmada:** +10 XP
-- **Destaque Positivo no Treino:** +50 XP
-- **Badge Desbloqueada:** +100 XP * Tier
-- **Tarefa de Casa (Vídeo Aula):** +20 XP
-
-**Curva de Nível:** Exponencial.
-- Nível 1 -> 2: 100 XP
-- Nível 2 -> 3: 250 XP
-- ...
+### 1.2 Princípios obrigatórios
+- **Separação:** social não muda nota técnica; benefícios não mudam nota técnica.
+- **Auditoria:** tudo que gera score vira evento auditável.
+- **Comparabilidade:** sempre por temporada (ano).
 
 ---
 
-## 2. Sistema de Avaliação (Scouting Intelligence)
-
-### 2.1 Avaliação Diária (Micro-Feedback)
-Para não sobrecarregar o técnico.
-- **Input:** Lista de chamada.
-- **Ação:** Técnico seleciona até 3 "Destaques Positivos" e até 3 "Pontos de Atenção".
-- **Orçamento:** O técnico tem um "budget" de pontos. Ele não pode dar destaque para todos. Isso garante escassez e valor.
-
-### 2.2 Avaliação Mensal (Deep Dive)
-Uma vez por mês, o técnico preenche a **Ficha Técnica Completa** (40 critérios).
-- **Escala:** 1 a 5 (Estrelas) ou 0 a 100 (Score).
-- **Algoritmo de Normalização (Curva de Gauss):**
-    - O sistema analisa a média de notas dadas pelo técnico.
-    - Se o técnico dá "10" para todos, o sistema entende que "10" vale "Médio".
-    - O Score Final do atleta é ajustado comparativamente à turma e à rede.
-    - *Objetivo:* Evitar inflação de notas. Um "Score 90" no NextPro deve ser raríssimo.
-
-### 2.3 Reset de Temporada
-- Todo dia **1º de Janeiro**, o Score de Temporada reseta.
-- O Histórico fica salvo como "Temporada 2025", "Temporada 2026".
-- As Badges de conquista (ex: "Artilheiro 2025") permanecem no perfil como troféus.
+## 2. Presença (estado atual)
+### 2.1 Regra: aluno inativo não marca “presente”
+- Se o aluno estiver inativo (`students.active = false`), não é permitido marcar `attendances.status = 'present'`.
+- Isso é garantido em 2 níveis:
+  - UI (botão/fluxo bloqueado)
+  - banco (trigger), para impedir bypass
 
 ---
 
-## 3. Regras Financeiras e Bloqueio
+## 3. Gamificação (estado atual no código)
+### 3.1 XP por presença
+- Presença confirmada gera XP automaticamente (trigger no banco).
+- O valor base vem de `system_settings.xp_base`.
+- Existe trilha de eventos para idempotência/auditoria (não duplica XP).
 
-### 3.1 Status Financeiro
-Todo atleta tem um campo `financial_status`:
-- `active`: Pagamento em dia. Acesso total.
-- `warning`: Atraso < 15 dias. Acesso total + Aviso visual ("Regularize sua mensalidade").
-- `blocked`: Atraso > 15 dias (configurável).
-
-### 3.2 O "Kill Switch" (Bloqueio Total)
-Quando `status == blocked`:
-1.  **Atleta:** Não consegue fazer check-in (não ganha presença/XP). App mostra tela de bloqueio.
-2.  **Responsável:** Acesso restrito apenas à tela de Pagamento/Financeiro.
-3.  **Fans/Convidados:** Perdem acesso ao feed do atleta.
-4.  **Recuperação:** Assim que o pagamento é baixado (SchoolAdmin dá baixa ou Webhook do Gateway), o acesso volta instantaneamente.
+### 3.2 Badges/tiers (infra)
+- Existem tabelas base de badges/tiers no banco.
+- O motor de regras de desbloqueio automático é planejado (não entregue ainda).
 
 ---
 
-## 4. Privacidade e LGPD
+## 4. Engine Técnica (planejada e parcialmente preparada)
+### 4.1 Temporadas (ano)
+- Temporada anual é a unidade principal (2026, 2025, etc).
+- Rankings e histórico são por temporada.
 
-### 4.1 Consentimento Parental
-- O cadastro do menor de idade **EXIGE** vínculo com um CPF de maior responsável.
-- O Responsável deve marcar checkboxes granulares:
-    - [x] Aceito os Termos de Uso.
-    - [x] Autorizo a coleta de dados de saúde (peso, altura) para fins esportivos.
-    - [x] Autorizo o uso da imagem do meu filho em materiais da escolinha.
-    - [x] Autorizo a visibilidade de dados técnicos para Scouts parceiros (Opcional).
+### 4.2 Núcleos
+- Núcleo é o agrupamento operacional de escolinhas (para seleção e calibração pela equipe NextPro).
+- Uma escola pertence a um núcleo por temporada.
 
-### 4.2 Direito ao Esquecimento
--98→- Se o pai solicitar exclusão, os dados pessoais são anonimizados (`Atleta #12345`), mas os dados estatísticos (gols, presença) são mantidos para não quebrar o histórico da turma.
-99→
-100→---
-101→
-102→## 5. Regras de Cadastro e Dependência
-103→
-104→### 5.1 Hierarquia Estrita de Cadastro
-105→Para garantir a integridade dos dados e a segurança jurídica (menores de idade), o sistema impõe a seguinte ordem:
-106→
-107→1.  **Escola:** A entidade raiz deve existir.
-108→2.  **Responsável (Guardian):** Deve ser cadastrado *antes* do aluno.
-109→    - Não é permitido digitar o nome do responsável em campo de texto livre no cadastro do aluno.
-110→    - O responsável deve ser uma entidade selecionável (busca por CPF/Nome).
-111→3.  **Aluno (Student):** Vinculado obrigatoriamente a um Responsável e a uma Escola.
-112→4.  **Turma (Class):** Criada independentemente, mas necessária para matrícula.
-113→5.  **Matrícula (Class Student):** Vínculo N:N entre Aluno e Turma.
-114→    - Um aluno pode estar em múltiplas turmas (ex: Futsal Sub-11 e Campo Sub-11).
-115→
-116→### 5.2 Unicidade
-117→117→- **CPF do Responsável:** Deve ser único por escola (ou global, dependendo da regra de negócio multi-tenancy).
-118→118→- **Aluno na Turma:** Um aluno não pode ser matriculado duas vezes na mesma turma.
+### 4.3 Rubricas técnicas (catálogo versionado)
+O catálogo de perguntas técnicas é versionado por temporada e separado em:
+- **Base:** slot 1 (menu de perguntas base)
+- **Por posição:** slots 2 e 3 (menus por posição)
 
----
+#### O que é o `key` da pergunta
+Em `technical_questions`, `key` é o identificador técnico estável da pergunta:
+- o texto do prompt pode mudar sem quebrar histórico;
+- o cálculo e os eventos referenciam pelo `key`;
+- formato recomendado: `snake_case` sem acentos.
 
-## 6. Carreira de Scouts (NextPro Academy)
+Exemplos:
+- `disciplina_compromisso`
+- `finalizacao_pe_fraco`
+- `passe_vertical`
+- `1v1_defensivo`
 
-### 6.1 Níveis e Pesos
-- **Olheiro Iniciante (Nível 1):** Peso 0.5x nas avaliações.
-- **Analista Tático (Nível 2):** Peso 1.0x nas avaliações.
-- **Scout Elite/Master (Nível 3):** Peso 2.0x nas avaliações (após certificações e histórico validado).
-- Cursos e conteúdos ficam fora do MVP; a mecânica de níveis/pesos integra a Engine de Gamificação.
+### 4.4 Avaliação diária (por treino) — fluxo previsto
+- Gating obrigatório: 3 piores → 3 melhores
+- 3 perguntas por atleta (0–10), com seleção estilo “iFood”:
+  - 1 base (slot 1)
+  - 2 por posição (slots 2 e 3)
 
-### 6.2 Progressão
-- Missões e avaliações assertivas aumentam confiabilidade e desbloqueiam níveis.
-- Recompensas: acesso a relatórios avançados, convites, benefícios em parceiros.
+### 4.5 Avaliação mensal — fluxo previsto
+- Prova mensal por turma: 20–40 perguntas por atleta.
+- Perguntas fixas/versionadas por temporada para comparabilidade.
 
 ---
 
-## 7. Protocolo Pinóquio (Detecção de Mentiras)
+## 5. Engine Social (planejada)
+### 5.1 Seguir vs ser fã
+- Seguir é gratuito e define o feed.
+- Ser fã cria vínculo com um atleta e direciona contribuição de fanbase.
 
-### 7.1 Métricas Internas (visíveis ao staff)
-- `mentiras_confirmadas`: contagem de validações desmentidas por equipe/algoritmo.
-- `confiabilidade_avaliador`: índice composto (peso dinâmico) por acerto histórico.
-- `shadow_ban`: redução silenciosa de peso (→ 0) para avaliadores recorrentes.
+### 5.2 Moedas e presentes no feed
+- 1 curtida grátis por post; extras/presentes via moedas.
+- Compra de moedas exige verificação (telefone + CPF no pagamento).
 
-### 7.2 Comportamento do Sistema
-- Sem aviso ao usuário final ao reduzir peso; feedback permanece “Sucesso” para evitar fraude e evasão.
-- Logs e dashboards internos exibem estatísticas de confiabilidade por avaliador/escola.
-
----
-
-## 8. Censo Familiar e Socioeconômico (Wizard)
-
-### 8.1 Estrutura de Blocos
-- **Guardião:** Identificação, escolaridade, profissão, faixa de renda, composição familiar.
-- **Dependentes:** Escola, turno, série, saúde (alergias, medicamentos, tipo sanguíneo), esporte (posição, pé dominante).
-- **Vínculo:** Seleção de escolinha existente ou criação assistida.
-
-### 8.2 Privacidade
-- Coletas sensíveis com consentimentos granulares; uso exclusivo para fins esportivos e operacionais.
+### 5.3 Tiers e ciclos
+- Reavaliação a cada 15 dias por percentil.
+- Reset no fim da temporada (ano).
 
 ---
 
-## 9. Aprovação em Camadas (Onboarding)
-
-### 9.1 Status do Fluxo
-- `pendente_escola` → `aguardando_contrato` → `ativo`.
-- Disparo automático ao responsável para assinatura dos termos quando escola confirmar pré-cadastro.
-
-### 9.2 Assinatura Legal
-- Preferência por assinatura eletrônica **forte** com evidências (IP, timestamp, device fingerprint, hash de versão) e provedor externo (DocuSign/Clicksign) com logs/webhooks.
+## 6. Engine de Benefícios (planejada)
+- Pontos/cashback para marketplace/parceiros.
+- Integração permitida: parte do gasto no social pode virar cashback (benefícios).
 
 ---
 
-## 10. Parceiros e Perguntas Direcionadas (Base)
-
-### 10.1 Exemplos de Verticais
-- **Seguradoras:** cobertura em treinos/jogos/testes; perguntas sobre deslocamento, histórico médico básico.
-- **Saúde/Clínicas:** triagens, fisioterapia, exames; consentimento para contato e ofertas.
-- **Educação:** bolsas, reforço escolar; turno e desempenho.
-- **Transporte:** rotas até o núcleo; horários, distância, preferência.
-
-### 10.2 Perguntas Base (ajustáveis por parceiro)
-- Tem seguro ativo vinculado ao aluno? Qual cobertura?
-- Há plano de saúde? Qual operadora?
-- Necessita transporte para treinos/testes? Frequência e origem.
-- Autorizo contato por WhatsApp para ofertas vinculadas ao projeto? (Opt-in)
+## 7. Privacidade e LGPD (princípios)
+- Menores: acesso sempre por papel e vínculo (RLS).
+- Consentimento parental para coleta sensível e uso de imagem.
+- Direito ao esquecimento: anonimização de dados pessoais quando aplicável, preservando estatísticas agregadas.

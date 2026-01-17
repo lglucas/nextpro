@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ShieldCheck, Sparkles } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { SiteContainer } from '@/features/site/components/SiteContainer'
@@ -9,6 +9,16 @@ import { PreCadastroWizard } from '@/features/preCadastro/components/PreCadastro
 
 export function PreCadastroPage() {
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const inviteSchool = {
+    id: searchParams.get('schoolId') || '',
+    uf: searchParams.get('uf') || '',
+    city: searchParams.get('city') || '',
+    name: searchParams.get('schoolName') || '',
+  }
+  const hasInviteSchool = Boolean(inviteSchool.id)
+  const returnTo = `/pre-cadastro${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
 
   return (
     <div>
@@ -20,13 +30,13 @@ export function PreCadastroPage() {
         {!user ? (
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
-              to="/login?returnTo=%2Fpre-cadastro"
+              to={`/login?returnTo=${encodeURIComponent(returnTo)}`}
               className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
             >
               Entrar
             </Link>
             <Link
-              to="/register?returnTo=%2Fpre-cadastro"
+              to={`/register?returnTo=${encodeURIComponent(returnTo)}`}
               className="inline-flex items-center justify-center px-5 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition-colors"
             >
               Criar acesso
@@ -39,7 +49,7 @@ export function PreCadastroPage() {
         <SiteContainer>
           {user ? (
             <div className="mb-8">
-              <PreCadastroWizard />
+              <PreCadastroWizard inviteSchool={hasInviteSchool ? inviteSchool : null} />
             </div>
           ) : null}
 

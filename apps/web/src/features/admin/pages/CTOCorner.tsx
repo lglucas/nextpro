@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { ShieldAlert, Database, Save, Activity, Users, Search, ClipboardList } from 'lucide-react'
+import { ShieldAlert, Database, Save, Activity, Users, Search, ClipboardList, Layers } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { PreCadastrosAdminPanel } from '@/features/admin/components/PreCadastrosAdminPanel'
+import { EnginesSetupAdminPanel } from '@/features/admin/components/EnginesSetupAdminPanel'
 
 interface AuditLog {
   id: string
@@ -35,7 +36,7 @@ type SystemSettings = { xp_base: number; financial_block_days: number } & Record
 
 export function CTOCornerPage() {
   const { role, user: currentUser } = useAuth()
-  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users' | 'pre_cadastros'>('settings')
+  const [activeTab, setActiveTab] = useState<'settings' | 'logs' | 'users' | 'pre_cadastros' | 'engines'>('settings')
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loadingLogs, setLoadingLogs] = useState(false)
   const [users, setUsers] = useState<UserRow[]>([])
@@ -264,6 +265,21 @@ export function CTOCornerPage() {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
             )}
           </button>
+
+          <button
+            onClick={() => setActiveTab('engines')}
+            className={`pb-4 px-2 text-sm font-medium transition-colors relative ${
+              activeTab === 'engines' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4" />
+              Engines
+            </div>
+            {activeTab === 'engines' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-t-full" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -403,11 +419,13 @@ export function CTOCornerPage() {
                             inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                             ${u.role === 'super_admin' ? 'bg-purple-100 text-purple-700' : 
                               u.role === 'school_admin' ? 'bg-amber-100 text-amber-700' :
+                              u.role === 'coach' ? 'bg-green-100 text-green-700' :
                               u.role === 'partner' ? 'bg-blue-100 text-blue-700' : 
                               'bg-slate-100 text-slate-700'}
                           `}>
                             {u.role === 'super_admin' ? 'Super Admin' : 
                              u.role === 'school_admin' ? 'Gestor de Escola' :
+                             u.role === 'coach' ? 'Professor' :
                              u.role === 'partner' ? 'Sócio' : 'Atleta'}
                           </span>
                         </td>
@@ -437,6 +455,14 @@ export function CTOCornerPage() {
                                 Virar Gestor
                               </button>
                             )}
+                            {u.role !== 'coach' && (
+                              <button
+                                onClick={() => handleUpdateRole(u.id, 'coach')}
+                                className="text-xs text-green-700 hover:bg-green-50 px-2 py-1 rounded"
+                              >
+                                Virar Professor
+                              </button>
+                            )}
                             {u.role !== 'user' && (
                               <button 
                                 onClick={() => handleUpdateRole(u.id, 'user')}
@@ -458,6 +484,9 @@ export function CTOCornerPage() {
 
         {/* PRE-CADASTROS TAB */}
         {activeTab === 'pre_cadastros' && <PreCadastrosAdminPanel />}
+
+        {/* ENGINES TAB */}
+        {activeTab === 'engines' && <EnginesSetupAdminPanel />}
 
       </div>
     </div>

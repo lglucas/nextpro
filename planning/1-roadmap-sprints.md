@@ -1,9 +1,9 @@
-# 📅 NextPro - Roadmap de Sprints Detalhado (MVP)
+# 📅 NextPro - Roadmap de Sprints (Produto Final, modular por sprints)
 
-**Versão:** 1.0  
-**Data:** 15/12/2025  
+**Versão:** 1.1  
+**Data:** 17/01/2026  
 **Status:** Aprovado  
-**Meta:** MVP Funcional (Web/PWA) em Março de 2026.
+**Meta:** Produto final por módulos (sem “cabeça de MVP”).
 
 ---
 
@@ -18,12 +18,12 @@
 
 ---
 
-## 🛠️ Detalhamento por Sprint
+## 🛠️ Detalhamento por Sprint (estado atual + próximos)
 
 ### 🏁 Sprint 1: O "Hello World" Profissional (15/12 - 21/12)
-**Status:** ✅ Concluído (com adiantamentos)
+**Status:** ✅ Concluído
 **Objetivo:** Ter o ambiente de desenvolvimento pronto, CI/CD configurado e Banco de Dados estruturado.
-- [x] **Setup Monorepo:** Configurar Turborepo (Apps: Web, Admin; Packages: UI, Config).
+- [x] **Setup Monorepo:** Estrutura `apps/web` com scripts NPM e alias `@`.
 - [x] **Setup Supabase:** Criar projeto, configurar Auth (Email/Senha + Google) e Storage.
 - [x] **Database Schema V1:** Criar tabelas `organizations`, `schools`, `users`, `profiles`.
 - [x] **Frontend Skeleton:** Instalar React, Tailwind, Framer Motion e configurar i18n (i18next).
@@ -35,7 +35,7 @@
 - **Bug Fix:** Migração forçada de Docker para Supabase Cloud devido a instabilidades no ambiente Windows.
 
 ### 🏗️ Sprint 2: Gestão de Entidades & Dashboard (22/12 - 28/12)
-**Status:** ✅ Concluído (Com funcionalidades avançadas)
+**Status:** ✅ Concluído
 **Objetivo:** O SuperAdmin consegue visualizar KPIs globais e gerenciar Escolinhas. Sócios têm visão de leitura.
 - [x] **Dashboard Layout:** Sidebar responsiva, Header com perfil e navegação por Roles.
 - [x] **BI & KPIs:** Cards de métricas e Widget de Logs reais.
@@ -57,7 +57,7 @@
 - [x] **LGPD (Consentimentos):** Consentimento no envio com evidências mínimas (data/hora, versão e meta básica).
 
 ### �🎮 Sprint 3: O Cadastro de Atletas e Responsáveis (29/12 - 04/01)
-**Status:** 🚧 Em Andamento (Adiantado)
+**Status:** ✅ Concluído (v0.6.23)
 **Objetivo:** Popular o banco de dados com dados reais e métricas.
 - [x] **Conexão de KPIs:** Substituir dados mockados do Dashboard por Queries reais (`useDashboardMetrics`).
 - [x] **Painel SchoolAdmin:** Dashboard inicial e gestão de turmas (`ClassesPage`).
@@ -70,34 +70,47 @@
 ### 📱 Sprint 4: O "Check-in" e Presença (05/01 - 11/01)
 **Objetivo:** A operação diária básica.
 - [x] **Lista de Chamada Manual:** Interface para o treinador marcar presença (`ClassAttendancePage`).
-- [ ] **Gerador de QR Code:** O Técnico ou Admin gera o QR da aula.
-- [ ] **Leitor de QR (PWA):** O Aluno lê o QR e marca presença.
-- [ ] **Regra de Negócio:** Presença só conta se o aluno estiver "Ativo" (Financeiro OK).
+- [x] **Gerador de QR Code:** O Técnico ou Admin gera o QR da aula.
+- [x] **Leitor de QR (PWA):** O Aluno lê o QR e marca presença.
+- [x] **Regra de Negócio:** Aluno inativo não pode marcar presença como “presente” (UI + banco).
 
 ### 🏆 Sprint 5: Gamificação Parte 1 - Engine (12/01 - 18/01)
 **Objetivo:** O sistema de pontos e níveis.
-- [ ] **Estrutura de Badges:** Tabela de `badges` (Verticais) e `tiers` (Horizontais).
-- [ ] **Trigger de Pontos:** "Presença = +10XP".
-- [ ] **Level Up:** Lógica de subir de nível (Nível 1 -> Nível 2) com animação na tela.
-- [ ] **Perfil do Atleta (Card):** Visualização estilo "FUT Card" com foto e nível.
+- [x] **Estrutura de Badges:** Infra de `badges` e `tiers` no banco.
+- [x] **Trigger de Pontos:** Presença gera XP (valor via `system_settings.xp_base`).
+- [x] **Level Up:** Cálculo de nível por XP (UI exibe aviso simples).
+- [x] **Perfil do Atleta (Card):** Visualização estilo “FUT Card” com foto, nível e barra.
   
 **Notas Estratégicas (Conversa de 17/12):**
-- **NextPro Academy (Carreira de Scouts):** Definir níveis (Iniciante, Analista, Elite) com pesos na avaliação (0.5x, 1.0x, 2.0x). Conteúdos/cursos ficam fora do MVP, mas a mecânica de níveis e pesos entra como base da Engine.
+- **NextPro Academy (Carreira de Scouts):** Definir 5 níveis com pesos na avaliação (e anti-fraude com evidências). Conteúdos/cursos podem entrar por etapas, mas a mecânica de níveis/peso entra como base do produto.
 - **Protocolo Pinóquio (Confiabilidade):** Projetar métricas internas visíveis ao staff: `mentiras_confirmadas`, `confiabilidade_avaliador` e **shadow ban silencioso** (peso → 0) para avaliadores recorrentes; sem aviso ao usuário final.
 - **Censo Socioeconômico (Wizard):** Estruturar blocos Guardião/Dependentes/Vínculo para futura coleta; perguntas direcionadas poderão ser ajustadas conforme parceiros (ex.: seguradoras).
 - **Aprovação em Camadas:** Documentar status do fluxo (Pendente Escola → Aguardando Contrato → Ativo) para integração com Termos/Assinatura em sprint de Legal.
 
+### 🧠 Sprint 5.1: Engines (Técnica + Social + Benefícios) — Especificação e Fundações (19/01 - 25/01)
+**Objetivo:** Consolidar o “produto final” das 3 engines e construir as fundações de dados/segurança para executar tudo com auditoria e comparabilidade por temporada.
+
+**Entregáveis (produto e engenharia):**
+- [x] **Manual definitivo das 3 engines:** `project/manual-3-engines-nextpro.md`.
+- [x] **Camada comum (shared):** temporadas, núcleos e trilha de eventos (`engine_events`).
+- [x] **Rubrica técnica versionada:** `technical_questions` por temporada/posição.
+- [x] **Admin (CTO):** Aba Engines para gerir temporadas, núcleos e rubricas.
+- [x] **Plano Sprint 5.1:** `planning/sprint-05.1-plan.md` + ADR-002.
+
 ### 🌟 Sprint 6: Avaliação Técnica Diária (19/01 - 25/01)
 **Objetivo:** O input do Treinador.
 - [ ] **Tela "Pós-Treino":** Lista de presentes para o técnico avaliar.
-- [ ] **Input Rápido:** Selecionar "Destaque Positivo" e "Destaque Negativo" (Orçamento de pontos).
-- [ ] **Feedback:** O aluno recebe notificação do feedback (sem saber a nota exata numérica, apenas o badge/conceito).
+- [ ] **Gating obrigatório:** Selecionar 3 piores (avaliar) para liberar 3 melhores (avaliar).
+- [ ] **Perguntas por atleta (treino):** 3 perguntas com nota 0–10 via seleção de menus (base + posição).
+- [ ] **Posição no treino:** Sugestão automática por frequência e confirmação do técnico quando necessário.
+- [ ] **Feedback ao atleta:** Notificação e histórico (sem expor nota crua para o atleta; foco em conceitos/tiers).
 
 ### 📊 Sprint 7: Avaliação Mensal & Algoritmo (26/01 - 01/02)
 **Objetivo:** A "Prova Real".
-- [ ] **Formulário 40 Critérios:** Tela para avaliação profunda (Scouting).
-- [ ] **Algoritmo de Normalização:** Script para ponderar as notas e aplicar a Curva de Gauss (evitar inflação).
-- [ ] **Radar Chart:** Visualização gráfica das habilidades (Físico, Técnico, Tático, Mental).
+- [ ] **Formulário 20–40 critérios por atleta:** Prova mensal por turma (técnico responde por aluno).
+- [ ] **Variação por posição:** Total de perguntas pode ser maior; perguntas base comuns a todas as posições.
+- [ ] **Normalização e pesos por fonte:** Ponderar notas por camada e reputação; reduzir inflação.
+- [ ] **Skill tree / Radar:** Visualização por posição e por temporada (compatível com card EA FC).
 
 ### 🚫 Sprint 8: Financeiro e Bloqueio (02/02 - 08/02)
 **Objetivo:** A ferramenta de cobrança.
@@ -108,16 +121,18 @@
 
 ### 💬 Sprint 9: Feed Social e Comunidade (09/02 - 15/02)
 **Objetivo:** Engajamento da família.
-- [ ] **Feed da Turma:** Postagens automáticas ("João ganhou a medalha X") + Posts manuais.
-- [ ] **Interação:** Curtir e Comentar (apenas para Fans aprovados).
-- [ ] **Moderação:** Filtro de palavras proibidas e botão de denúncia.
-- [ ] **Mural de Avisos:** SchoolAdmin posta comunicados oficiais.
+- [ ] **Feed:** Postagens da turma e do atleta (padrão Instagram).
+- [ ] **Seguidores vs Fanbase:** Seguir é livre; “ser fã” é vínculo do apoiador com o atleta.
+- [ ] **Interações básicas:** Curtir (1 grátis por post), comentar, compartilhar, moderação e denúncias.
+- [ ] **Presentes no feed (moedas):** Reações/presentes pagos; compra exige verificação (telefone + CPF no pagamento).
+- [ ] **Tiers e ciclo:** Reavaliação a cada 15 dias (subida/queda de tiers por percentil), reset por temporada.
 
 ### 🛒 Sprint 10: Marketplace & Vouchers (16/02 - 22/02)
 **Objetivo:** Monetização inicial.
 - [ ] **Catálogo de Vouchers:** Listagem de parceiros com filtros geográficos (Geo-fencing simples).
 - [ ] **Resgate:** Usuário clica em "Resgatar", gera um código único.
 - [ ] **Painel Parceiro (MVP):** Visualização básica de quantos vouchers foram resgatados.
+- [ ] **Pontos de Benefícios / Cashback:** Saldo de fidelidade para compras e resgates, incluindo cashback parcial vindo do Social.
 
 ### 🧪 Sprint 11: Testes e Polish (23/02 - 01/03)
 **Objetivo:** Garantia de Qualidade.
