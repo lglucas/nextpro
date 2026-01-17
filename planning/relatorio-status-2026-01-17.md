@@ -7,6 +7,12 @@ Este relatório resume onde o projeto está em relação ao cronograma de sprint
 - **Versão de referência no repo:** v0.7.0.
 - **Condição para avançar:** iniciar Sprint 6 (avaliação técnica diária) consumindo `technical_questions` e registrando eventos por temporada.
 
+### Situação vs cronograma (adiantado/atrasado)
+Comparando com as datas do roadmap:
+- Em **2026-01-17**, o cronograma coloca o time ainda dentro do **Sprint 5** (12/01–18/01).
+- Como já entregamos também o **Sprint 5.1** (planejado para 19/01–25/01), o projeto está **adiantado ~1 sprint** no eixo “engine foundations”.
+- Em termos de calendário, isso significa estar adiantado em **~2 dias** versus o início do Sprint 5.1 e **~8 dias** versus o fim do Sprint 5.1.
+
 ## 2) Status por sprint (planejado vs entregue)
 Fonte do plano: [1-roadmap-sprints.md](file:///c:/Users/lucas/OneDrive/Documentos/Lucas/SuperAppFutebol/planning/1-roadmap-sprints.md)
 
@@ -92,4 +98,3 @@ Fonte do plano: [1-roadmap-sprints.md](file:///c:/Users/lucas/OneDrive/Documento
 ### Em paralelo (qualidade e operação)
 - Reforçar logs/auditoria onde necessário (sem travar UX).
 - Definir o conjunto inicial de posições do produto (as mesmas da UI de rubricas) e padronizar nomes.
-
