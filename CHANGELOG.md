@@ -15,6 +15,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Alunos:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
 - **Turmas:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
 - **Alunos:** Upload de foto no cadastro/edição com preview.
+- **Alunos:** Remover foto (apaga no Storage e limpa `photo_url`).
 - **Supabase (Storage):** Bucket `student-photos` com policies de upload por escola.
 
 ## [0.6.21] - 2026-01-15

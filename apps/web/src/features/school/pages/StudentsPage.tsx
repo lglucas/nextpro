@@ -57,6 +57,7 @@ export function StudentsPage() {
   const [isCreatingGuardian, setIsCreatingGuardian] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
+  const [photoRemoveRequested, setPhotoRemoveRequested] = useState(false)
 
   // Form Data (Aluno)
   const [formData, setFormData] = useState({
@@ -246,18 +247,27 @@ export function StudentsPage() {
 
       alert(editingStudentId ? 'Aluno atualizado com sucesso!' : 'Aluno cadastrado com sucesso!')
 
-      if (photoFile && savedStudent?.id && effectiveSchoolId) {
+      if (savedStudent?.id && effectiveSchoolId) {
         const objectPath = `${effectiveSchoolId}/${savedStudent.id}`
-        const { error: uploadError } = await supabase.storage.from('student-photos').upload(objectPath, photoFile, {
-          upsert: true,
-          contentType: photoFile.type || undefined,
-        })
-        if (uploadError) throw uploadError
 
-        const publicUrl = supabase.storage.from('student-photos').getPublicUrl(objectPath).data.publicUrl
-        const photoUrlWithVersion = `${publicUrl}?v=${Date.now()}`
-        const { error: updatePhotoError } = await supabase.from('students').update({ photo_url: photoUrlWithVersion }).eq('id', savedStudent.id)
-        if (updatePhotoError) throw updatePhotoError
+        if (photoRemoveRequested && !photoFile) {
+          await supabase.storage.from('student-photos').remove([objectPath])
+          const { error: updatePhotoError } = await supabase.from('students').update({ photo_url: null }).eq('id', savedStudent.id)
+          if (updatePhotoError) throw updatePhotoError
+        }
+
+        if (photoFile) {
+          const { error: uploadError } = await supabase.storage.from('student-photos').upload(objectPath, photoFile, {
+            upsert: true,
+            contentType: photoFile.type || undefined,
+          })
+          if (uploadError) throw uploadError
+
+          const publicUrl = supabase.storage.from('student-photos').getPublicUrl(objectPath).data.publicUrl
+          const photoUrlWithVersion = `${publicUrl}?v=${Date.now()}`
+          const { error: updatePhotoError } = await supabase.from('students').update({ photo_url: photoUrlWithVersion }).eq('id', savedStudent.id)
+          if (updatePhotoError) throw updatePhotoError
+        }
       }
 
       setIsCreating(false)
@@ -267,6 +277,7 @@ export function StudentsPage() {
       setIsCreatingGuardian(false)
       setPhotoFile(null)
       setPhotoPreviewUrl(null)
+      setPhotoRemoveRequested(false)
       fetchStudents()
       
       // Reset form
@@ -338,6 +349,7 @@ export function StudentsPage() {
     setIsCreatingGuardian(false)
     setPhotoFile(null)
     setPhotoPreviewUrl(null)
+    setPhotoRemoveRequested(false)
     setFormData({
       full_name: '',
       birth_date: '',
@@ -355,6 +367,7 @@ export function StudentsPage() {
     setIsCreatingGuardian(false)
     setPhotoFile(null)
     setPhotoPreviewUrl(student.photo_url || null)
+    setPhotoRemoveRequested(false)
     const school_id = (student.school_id || userSchoolId || formData.school_id || '').trim()
     setFormData({
       full_name: student.full_name || '',
@@ -670,7 +683,7 @@ export function StudentsPage() {
                       const file = e.target.files?.[0] || null
                       if (!file) {
                         setPhotoFile(null)
-                        setPhotoPreviewUrl(null)
+                        setPhotoPreviewUrl((prev) => (prev && prev.startsWith('blob:') ? null : prev))
                         return
                       }
                       if (file.size > 2 * 1024 * 1024) {
@@ -678,6 +691,7 @@ export function StudentsPage() {
                         e.target.value = ''
                         return
                       }
+                      setPhotoRemoveRequested(false)
                       setPhotoFile(file)
                       const nextUrl = URL.createObjectURL(file)
                       setPhotoPreviewUrl(nextUrl)
@@ -685,6 +699,23 @@ export function StudentsPage() {
                     className="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-900 file:text-white hover:file:bg-slate-800 disabled:opacity-50"
                   />
                   <p className="mt-1 text-xs text-slate-500">Formatos comuns (JPG/PNG/WebP). Máx. 2MB.</p>
+                  {editingStudentId ? (
+                    <div className="mt-2 flex items-center gap-3">
+                      <button
+                        type="button"
+                        disabled={savingStudent || (!photoPreviewUrl && !photoFile)}
+                        onClick={() => {
+                          setPhotoRemoveRequested(true)
+                          setPhotoFile(null)
+                          setPhotoPreviewUrl(null)
+                        }}
+                        className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
+                      >
+                        Remover foto
+                      </button>
+                      {photoRemoveRequested ? <span className="text-xs text-slate-500">Remoção pendente (salve para aplicar).</span> : null}
+                    </div>
+                  ) : null}
                 </div>
               </div>
               
