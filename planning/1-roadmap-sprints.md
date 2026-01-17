@@ -91,14 +91,11 @@
 **Objetivo:** Consolidar o “produto final” das 3 engines e construir as fundações de dados/segurança para executar tudo com auditoria e comparabilidade por temporada.
 
 **Entregáveis (produto e engenharia):**
-- [ ] **Manual definitivo das 3 engines:** Técnico, Social e Benefícios (com regras, saídas, anti-fraude, temporadas e integrações).
-- [ ] **Camada comum (shared):** Temporada anual + núcleo + sessão de treino + trilha de eventos e evidências.
-- [ ] **Rubrica técnica versionada:** Catálogo de perguntas por posição (base + variações), com governança por temporada.
-- [ ] **Modelo de avaliação multi-fonte:** Camadas A–D, reputação de avaliadores e “Protocolo Pinóquio” (punição silenciosa).
-- [ ] **Contrato de UI/UX do técnico:** Fluxo obrigatório “3 piores → 3 melhores” com seleção de perguntas estilo iFood e notas 0–10.
-- [ ] **Contrato de Social (sem live):** Moedas/presentes no feed, fanbase (seguir vs fã), cooldown progressivo e tiers por percentil com ciclo de 15 dias.
-- [ ] **Integração Social → Benefícios:** Cashback parcial de moedas para gasto no marketplace (sem afetar nota técnica).
-- [ ] **Clube (mercantil):** Assinaturas em 3 níveis + catálogo de 10–15 itens avulsos (sem alterar score técnico).
+- [ ] **Manual definitivo das 3 engines:** Documento único com regras e objetivos (baseado em `project/`).
+- [ ] **Camada comum (shared):** Temporada anual + núcleo + trilha de eventos auditáveis por engine.
+- [ ] **Rubrica técnica versionada:** Catálogo de perguntas por temporada/posição (base e variações).
+- [ ] **Admin (CTO):** CRUD para temporadas, núcleos e rubricas.
+- [ ] **Plano Sprint 5.1:** Documento detalhado com escopo e DoD.
 
 ### 🌟 Sprint 6: Avaliação Técnica Diária (19/01 - 25/01)
 **Objetivo:** O input do Treinador.
