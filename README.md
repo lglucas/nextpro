@@ -1,124 +1,111 @@
-# 🏆 NextPro - Plataforma de Gestão Esportiva
+# NextPro (SuperApp Futebol) — Plataforma de Escolinhas + Engines NextPro
 
-> **Sprint 5 iniciado 🚧** (última release: v0.6.17)
+**Última versão documentada no repo:** v0.7.0 (Jan/2026)
 
-O **NextPro** é uma solução completa para digitalização de escolinhas de futebol, gestão de carreiras de atletas e engajamento familiar. Focada em PWA (Web First) para alta acessibilidade.
+O NextPro é um super app para escolinhas de futebol com 3 engines planejadas (Técnica, Social e Benefícios). O projeto é Web-first (PWA), com Supabase como backend (Postgres + Auth + Storage + RLS).
 
-## 🚀 Status do Projeto
+## Status do produto (o que já existe)
+**Operação diária (escolinha)**
+- Turmas: CRUD completo + matrícula (adicionar/remover alunos).
+- Alunos: CRUD completo + ativar/inativar + upload/remover foto (Storage).
+- Presença: chamada manual + QR check-in (atleta) com validações de regra (aluno inativo não marca presente).
 
-Atualmente estamos na **Fase 2 (Core Loop)**. O sistema já possui autenticação robusta, painel administrativo e o primeiro loop operacional (presença/check-in).
+**Gamificação (base já entregue)**
+- XP e nível por atleta (DB) com idempotência por evento.
+- Trigger: presença confirmada gera XP automaticamente.
+- “FUT Card” no perfil do atleta (foto + nível + XP).
 
-### ✨ Funcionalidades Atuais
-- **Autenticação & Segurança:**
-  - Login/Registro com Supabase Auth.
-  - Controle de Acesso Baseado em Função (RBAC): **SuperAdmin**, **Partner**, **User**.
-  - *Self-Healing*: Correção automática de perfis corrompidos.
-  - *Audit Logs*: Rastreabilidade total de ações críticas.
+**Engines (fundações prontas, Sprint 5.1)**
+- Temporadas (ano), Núcleos e vínculo escola → núcleo por temporada.
+- Trilhas de eventos por engine (`engine_events`) para auditoria/idempotência.
+- Catálogo técnico versionado de perguntas (`technical_questions`) por temporada/posição.
+- Cantinho do CTO: telas para administrar temporadas, núcleos e rubricas.
 
-- **Dashboard Administrativo:**
-  - Layout responsivo com Sidebar dinâmica.
-  - **Gestão de Escolas (CRUD):** Cadastro completo de unidades.
-  - **Gestão de Alunos e Turmas:** Matrículas, frequência e cadastro de responsáveis.
-  - **Chamada Online:** Registro de presença em tempo real.
-  - **Relatórios PDF:** Geração automática de listas e resumos executivos.
-  - **Cantinho do CTO:** Área exclusiva para configurações globais do sistema.
+## O que ainda falta (próximos sprints)
+**Engine Técnica**
+- Fluxo “Pós‑Treino” do técnico: gating 3 piores → 3 melhores, com perguntas 0–10.
+- Prova mensal (20–40 perguntas por atleta, por turma) por temporada.
+- Agregações: skills (por posição) + ranking por turma/escola/núcleo + histórico anual.
+- Reputação do avaliador + Pinóquio (punição silenciosa) + pesos multi-fonte (A–D).
 
-- **Site Público + Pré‑Cadastro:**
-  - Site institucional multi‑páginas (rota `/`).
-  - Wizard do censo em `/pre-cadastro` com persistência e envio.
-  - CTO: listagem de pré‑cadastros + status de onboarding.
-  - Contato em `/contato` com gravação no Supabase (`contact_messages`) e anti-spam opcional (Turnstile).
+**Engine Social**
+- Feed estilo Instagram (sem live), moedas/presentes, fanbase (seguir vs fã), cooldown.
+- Tiers por percentil com ciclo de 15 dias, reset por temporada.
 
-- **App do Usuário (Atleta):**
-  - Landing Page personalizada.
-  - Check-in de presença via QR Code (rota `/app/check-in`).
-  - Perfil do atleta com card (nível e XP).
-  - XP automático por presença (engine inicial de gamificação).
-  - (Em validação) Gate de Termos de Uso com log de aceite (Sprint 3).
+**Engine de Benefícios**
+- Pontos/cashback e integração com marketplace.
 
-## 🛠️ Stack Tecnológica
+## Engines (visão clara)
+O produto tem 3 engines separadas, com integrações explícitas:
+- **Técnica (futebol):** mede evolução técnica (0–10), por posição, por treino e por temporada.
+- **Social (influência econômica):** mede influência monetizável (moedas/presentes/fanbase) e ranking por tiers.
+- **Benefícios (fidelidade):** pontos/cashback para marketplace e parceiros.
 
-| Camada | Tecnologia |
-|--------|------------|
-| **Frontend** | React 19, TypeScript, Vite |
-| **Estilização** | Tailwind CSS v3, Lucide Icons |
-| **Backend (BaaS)** | Supabase (PostgreSQL, Auth, Edge Functions) |
-| **Relatórios** | jsPDF, AutoTable |
-| **Infraestrutura** | Vercel (Frontend), Supabase Cloud (DB) |
+Tudo isso se apoia numa camada comum: temporada, núcleo, sessão/treino, eventos auditáveis e segurança (RLS).
 
-## 📦 Estrutura do Repositório (Monorepo)
+## Rubricas técnicas: o que é o “key”
+Nas rubricas (tabela `technical_questions`), o campo `key` é o **identificador técnico estável** da pergunta:
+- O `prompt` é o texto humano (pode mudar).
+- O `key` é o id interno (não deve mudar), usado para histórico, agregações e comparações.
 
+Formato recomendado: `snake_case` sem acentos, ex.: `finalizacao_pe_fraco`, `passe_vertical`, `1v1_defensivo`.
+
+## Stack
+- Frontend: React 19 + TypeScript + Vite + React Router
+- UI: Tailwind CSS + Lucide + framer-motion
+- i18n: i18next + react-i18next
+- Backend: Supabase (Postgres, Auth, Storage, RLS, Realtime)
+- Relatórios: jsPDF + AutoTable
+
+## Estrutura do repositório
 ```bash
-nextpro/
+/
 ├── apps/
-│   └── web/            # Aplicação Principal (PWA)
-├── planning/           # Documentação de Produto & Roadmap
-│   ├── 1-roadmap-sprints.md
-│   ├── sprint-02-report.md
-│   ├── sprint-02.5-report.md
-│   └── sprint-03-report.md
-├── supabase/           # Migrations e Configs de Banco
-└── packages/           # Libs compartilhadas (UI Kit - WIP)
+│   └── web/                 # App web (PWA)
+├── planning/                # Planejamento e docs do produto/engenharia
+├── project/                 # Documentos de especificação das 3 engines (referência)
+└── supabase/
+    └── migrations/          # Migrations SQL do banco
 ```
 
-## 📚 Documentação e Planejamento
+## Documentação
+- Índice do planejamento: [planning/README.md](./planning/README.md)
+- Roadmap: [planning/1-roadmap-sprints.md](./planning/1-roadmap-sprints.md)
+- Arquitetura técnica: [planning/2-arquitetura-tecnica.md](./planning/2-arquitetura-tecnica.md)
+- Regras (atuais + planejadas): [planning/3-regras-negocio-funcionais.md](./planning/3-regras-negocio-funcionais.md)
 
-Para detalhes sobre o roteiro de desenvolvimento e decisões técnicas, consulte a pasta `/planning`:
+Documentos de referência das engines (produto):
+- Manual das 3 engines: [project/manual-3-engines-nextpro.md](./project/manual-3-engines-nextpro.md)
+- Estado real do que existe (v0.6.17): [project/explicacao-engine-gamificacao-v0.6.17.md](./project/explicacao-engine-gamificacao-v0.6.17.md)
 
-- [📌 Roadmap de Sprints](./planning/1-roadmap-sprints.md) - Visão geral de todas as fases.
-- [🏗️ Arquitetura Técnica](./planning/2-arquitetura-tecnica.md) - Decisões de stack e infra.
-- [📝 Relatório Sprint 1](./planning/sprint-01-report.md) - Setup inicial.
-- [📝 Relatório Sprint 2](./planning/sprint-02-report.md) - Dashboard & Entidades.
-- [📝 Relatório Sprint 2.5](./planning/sprint-02.5-report.md) - Site Público & Pré‑Cadastro.
-- [📝 Relatório Sprint 3](./planning/sprint-03-report.md) - Execução parcial e próximos passos.
-
-## 🚀 Como Rodar Localmente
-
+## Rodando localmente (apps/web)
 ### Pré-requisitos
-- Node.js (v18+)
-- Conta no [Supabase](https://supabase.com)
+- Node.js 18+
+- Projeto Supabase (Cloud)
 
-### Passo a Passo
+### Passo a passo
+1) Instalar dependências
+```bash
+cd apps/web
+npm install
+```
 
-1.  **Clone o repositório**
-    ```bash
-    git clone https://github.com/lglucas/nextpro.git
-    cd nextpro
-    ```
+2) Configurar env
+- Criar `apps/web/.env` com:
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
 
-2.  **Instale as dependências**
-    ```bash
-    npm install
-    ```
-    Se você tiver erro no Vite/Babel (ex: módulo `@babel/*` ausente), prefira instalar pelo lockfile do app web:
-    ```bash
-    cd apps/web
-    npm ci
-    ```
+3) Rodar
+```bash
+npm run dev
+```
 
-3.  **Configure o Ambiente**
-    Crie um arquivo `apps/web/.env` baseado no exemplo:
-    ```bash
-    cp apps/web/.env.example apps/web/.env
-    ```
-    Preencha com suas chaves do Supabase (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
-    Opcional (anti-spam/captcha):
-    - `VITE_TURNSTILE_SITE_KEY` (Cloudflare Turnstile) para habilitar verificação no Contato e Pré‑Cadastro.
+### Migrations (Supabase Cloud)
+As migrations ficam em `supabase/migrations/`. Aplique no Supabase (SQL Editor) em ordem crescente.
 
-4.  **Banco de Dados**
-    Rode os scripts SQL localizados em `supabase/migrations/` no SQL Editor do seu projeto Supabase para criar as tabelas necessárias (`profiles`, `schools`, `audit_logs`).
-    Se você estiver usando o Contato:
-    - Rode `06_create_contact_messages.sql`.
+As mais recentes e relevantes para as engines:
+- `19_engines_shared_seasons_nuclei.sql`
+- `20_engines_shared_events_and_technical_rubrics.sql`
 
-5.  **Execute**
-    ```bash
-    npm run dev
-    ```
-    Acesse:
-    - Site público: `http://localhost:5173/`
-    - App (área logada): `http://localhost:5173/app`
-    - Dashboard admin: `http://localhost:5173/dashboard`
-
-## 📄 Licença
-
+## Licença
 Proprietário. Todos os direitos reservados.
