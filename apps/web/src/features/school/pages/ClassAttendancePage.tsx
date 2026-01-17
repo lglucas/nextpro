@@ -34,6 +34,7 @@ interface Student {
   id: string
   full_name: string
   photo_url?: string
+  active?: boolean | null
 }
 
 interface Attendance {
@@ -98,7 +99,7 @@ export function ClassAttendancePage() {
   const fetchStudents = useCallback(async () => {
     const { data } = await supabase
       .from('class_students')
-      .select('student:students(id, full_name, photo_url)')
+      .select('student:students(id, full_name, photo_url, active)')
       .eq('class_id', classId)
       .order('student(full_name)')
     
@@ -195,7 +196,7 @@ export function ClassAttendancePage() {
     students.forEach(s => {
       initialData[s.id] = {
         student_id: s.id,
-        status: 'present'
+        status: s.active === false ? 'absent' : 'present'
       }
     })
 
@@ -247,6 +248,13 @@ export function ClassAttendancePage() {
   }
 
   const updateStatus = (studentId: string, status: Attendance['status']) => {
+    if (status === 'present') {
+      const student = students.find((s) => s.id === studentId)
+      if (student?.active === false) {
+        alert('Aluno inativo: não é permitido marcar como presente.')
+        return
+      }
+    }
     setAttendanceData(prev => ({
       ...prev,
       [studentId]: { ...prev[studentId], status }
@@ -579,18 +587,27 @@ export function ClassAttendancePage() {
                   <tbody className="divide-y divide-slate-100">
                     {students.map(student => {
                       const status = attendanceData[student.id]?.status || 'present'
+                      const isInactive = student.active === false
                       
                       return (
                         <tr key={student.id} className="hover:bg-slate-50">
                           <td className="px-4 py-3">
-                            <div className="font-medium text-slate-900">{student.full_name}</div>
+                            <div className="font-medium text-slate-900 flex items-center gap-2">
+                              <span>{student.full_name}</span>
+                              {isInactive ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">Inativo</span> : null}
+                            </div>
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex justify-center gap-2">
                               <button
                                 onClick={() => updateStatus(student.id, 'present')}
+                                disabled={isInactive}
                                 className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${
-                                  status === 'present' ? 'bg-green-100 text-green-700 ring-2 ring-green-500 ring-offset-1' : 'text-slate-400 hover:bg-slate-100'
+                                  status === 'present'
+                                    ? 'bg-green-100 text-green-700 ring-2 ring-green-500 ring-offset-1'
+                                    : isInactive
+                                      ? 'text-slate-300'
+                                      : 'text-slate-400 hover:bg-slate-100'
                                 }`}
                                 title="Presente"
                               >

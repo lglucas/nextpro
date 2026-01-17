@@ -17,6 +17,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Alunos:** Upload de foto no cadastro/edição com preview.
 - **Alunos:** Remover foto (apaga no Storage e limpa `photo_url`).
 - **Supabase (Storage):** Bucket `student-photos` com policies de upload por escola.
+### Fixed
+- **Chamada/QR:** Impede marcar presença como “presente” para aluno inativo (UI + trigger no banco).
 
 ## [0.6.21] - 2026-01-15
 ### Added
