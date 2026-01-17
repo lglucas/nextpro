@@ -10,6 +10,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.6.23] - 2026-01-17
+### Added
+- **Alunos:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
+- **Turmas:** Edição, exclusão e ativar/inativar na lista (CRUD completo).
+- **Alunos:** Upload de foto no cadastro/edição com preview.
+- **Supabase (Storage):** Bucket `student-photos` com policies de upload por escola.
+
 ## [0.6.21] - 2026-01-15
 ### Added
 - **Pré‑Cadastro (SchoolAdmin):** Página `/dashboard/pre-cadastros` para validar (confirmar/rejeitar) envios da escolinha.

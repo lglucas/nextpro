@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { GraduationCap, Plus, Edit, Save, X, Clock, Calendar, Users, ClipboardList, UserPlus, Trash2, Search } from 'lucide-react'
+import { GraduationCap, Plus, Edit, Save, X, Clock, Calendar, Users, ClipboardList, UserPlus, Trash2, Search, Power } from 'lucide-react'
 
 interface Class {
   id: string
@@ -52,6 +52,8 @@ export function ClassesPage() {
   const [classes, setClasses] = useState<Class[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
+  const [savingClass, setSavingClass] = useState(false)
+  const [editingClassId, setEditingClassId] = useState<string | null>(null)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([])
   const [isStudentManagerOpen, setIsStudentManagerOpen] = useState(false)
@@ -156,6 +158,7 @@ export function ClassesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      setSavingClass(true)
       if (!effectiveSchoolId) {
         alert('Seu usuário precisa estar vinculado a uma escola para criar turmas.')
         return
@@ -172,12 +175,17 @@ export function ClassesPage() {
         teacher_id: role === 'coach' ? user?.id : null,
       }
 
-      const { error } = await supabase.from('classes').insert(payload)
+      const query = editingClassId
+        ? supabase.from('classes').update(payload).eq('id', editingClassId)
+        : supabase.from('classes').insert(payload)
+
+      const { error } = await query
 
       if (error) throw error
 
-      alert('Turma criada com sucesso!')
+      alert(editingClassId ? 'Turma atualizada com sucesso!' : 'Turma criada com sucesso!')
       setIsCreating(false)
+      setEditingClassId(null)
       fetchClasses()
       setFormData({
         name: '',
@@ -191,7 +199,9 @@ export function ClassesPage() {
     } catch (error) {
       console.error('Erro ao salvar:', error)
       const err = error as { message?: string; code?: string }
-      alert(err?.message ? `Erro ao criar turma: ${err.message}` : 'Erro ao criar turma.')
+      alert(err?.message ? `Erro ao salvar turma: ${err.message}` : 'Erro ao salvar turma.')
+    } finally {
+      setSavingClass(false)
     }
   }
 
@@ -289,6 +299,67 @@ export function ClassesPage() {
     return availableStudents.filter((s) => s.full_name.toLowerCase().includes(term))
   }, [availableStudents, studentSearch])
 
+  const openCreateForm = () => {
+    setEditingClassId(null)
+    setFormData({
+      name: '',
+      category: '',
+      days: [],
+      start_time: '',
+      end_time: '',
+      school_id: userSchoolId || '',
+    })
+    setIsCreating(true)
+  }
+
+  const openEditForm = (cls: Class) => {
+    setEditingClassId(cls.id)
+    setFormData({
+      name: cls.name || '',
+      category: cls.category || '',
+      days: Array.isArray(cls.days) ? cls.days : [],
+      start_time: cls.start_time || '',
+      end_time: cls.end_time || '',
+      school_id: cls.school_id || userSchoolId || '',
+    })
+    setIsCreating(true)
+  }
+
+  const handleDeleteClass = async (cls: Class) => {
+    const ok = confirm(`Excluir a turma "${cls.name}"? Esta ação não pode ser desfeita.`)
+    if (!ok) return
+    try {
+      setSavingClass(true)
+      const { error } = await supabase.from('classes').delete().eq('id', cls.id)
+      if (error) throw error
+      await fetchClasses()
+    } catch (error) {
+      console.error('Erro ao excluir turma:', error)
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao excluir turma.')
+    } finally {
+      setSavingClass(false)
+    }
+  }
+
+  const handleToggleActive = async (cls: Class) => {
+    const next = !cls.active
+    const ok = confirm(`${next ? 'Ativar' : 'Inativar'} a turma "${cls.name}"?`)
+    if (!ok) return
+    try {
+      setSavingClass(true)
+      const { error } = await supabase.from('classes').update({ active: next }).eq('id', cls.id)
+      if (error) throw error
+      await fetchClasses()
+    } catch (error) {
+      console.error('Erro ao atualizar status da turma:', error)
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status da turma.')
+    } finally {
+      setSavingClass(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -298,7 +369,7 @@ export function ClassesPage() {
         </div>
         {!isCreating && (
           <button 
-            onClick={() => setIsCreating(true)}
+            onClick={openCreateForm}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -310,8 +381,14 @@ export function ClassesPage() {
       {isCreating && (
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-4">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-slate-900">Nova Turma</h3>
-            <button onClick={() => setIsCreating(false)} className="text-slate-400 hover:text-slate-600">
+            <h3 className="text-lg font-semibold text-slate-900">{editingClassId ? 'Editar turma' : 'Nova Turma'}</h3>
+            <button
+              onClick={() => {
+                setIsCreating(false)
+                setEditingClassId(null)
+              }}
+              className="text-slate-400 hover:text-slate-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -413,17 +490,22 @@ export function ClassesPage() {
             <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
-                onClick={() => setIsCreating(false)}
-                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                onClick={() => {
+                  setIsCreating(false)
+                  setEditingClassId(null)
+                }}
+                disabled={savingClass}
+                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+                disabled={savingClass}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                Salvar Turma
+                {savingClass ? 'Salvando...' : editingClassId ? 'Salvar alterações' : 'Salvar Turma'}
               </button>
             </div>
           </form>
@@ -440,7 +522,7 @@ export function ClassesPage() {
             Crie turmas para organizar seus alunos por categoria (Sub-10, Sub-13, etc).
           </p>
           <button 
-            onClick={() => setIsCreating(true)}
+            onClick={openCreateForm}
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             Criar Primeira Turma
@@ -458,8 +540,32 @@ export function ClassesPage() {
                   </span>
                 </div>
                 <div className="flex gap-2">
-                   <button className="p-1 text-slate-400 hover:text-primary transition-colors">
+                   <button
+                    type="button"
+                    onClick={() => openEditForm(cls)}
+                    disabled={savingClass}
+                    className="p-1 text-slate-400 hover:text-primary transition-colors disabled:opacity-50"
+                    aria-label="Editar turma"
+                  >
                     <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(cls)}
+                    disabled={savingClass}
+                    className="p-1 text-slate-400 hover:text-amber-600 transition-colors disabled:opacity-50"
+                    aria-label={cls.active ? 'Inativar turma' : 'Ativar turma'}
+                  >
+                    <Power className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClass(cls)}
+                    disabled={savingClass}
+                    className="p-1 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                    aria-label="Excluir turma"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
