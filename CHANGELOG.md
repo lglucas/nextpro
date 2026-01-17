@@ -10,13 +10,15 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
-## [0.7.0] - 2026-01-17
+## [0.8.0] - 2026-01-17
 ### Added
 - **Engines (Base):** Temporadas, núcleos e vínculo escola→núcleo por temporada (DB + RLS).
 - **Engines (Base):** Trilha de eventos (`engine_events`) para auditoria por engine (DB + RLS).
 - **Engine Técnica:** Catálogo versionado de perguntas (`technical_questions`) por temporada/posição.
 - **CTO:** Aba Engines para gerir temporadas, núcleos e rubricas.
 - **Planning:** Sprint 5.1 detalhado + ADR-002 (fundações das 3 engines).
+- **Engine Técnica:** Tela “Pós‑treino” (3 piores → 3 melhores) salvando eventos técnicos.
+- **Engine Técnica (DB/RLS):** Professor/gestor pode inserir/editar/remover eventos técnicos próprios (`engine_events`).
 ### Fixed
 - **Dashboard:** Evita crash ao renderizar `audit_logs.details` (objeto JSON) e remove query em tabela inexistente (`evaluations`).
 

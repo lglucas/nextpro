@@ -1,6 +1,6 @@
 # NextPro (SuperApp Futebol) — Plataforma de Escolinhas + Engines NextPro
 
-**Última versão documentada no repo:** v0.7.0 (Jan/2026)
+**Última versão documentada no repo:** v0.8.0 (Jan/2026)
 
 O NextPro é um super app para escolinhas de futebol com 3 engines planejadas (Técnica, Social e Benefícios). O projeto é Web-first (PWA), com Supabase como backend (Postgres + Auth + Storage + RLS).
 

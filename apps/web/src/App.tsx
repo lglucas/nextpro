@@ -11,6 +11,7 @@ import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import { StudentsPage } from '@/features/school/pages/StudentsPage'
 import { ClassesPage } from '@/features/school/pages/ClassesPage'
 import { ClassAttendancePage } from '@/features/school/pages/ClassAttendancePage'
+import { PostTrainingEvaluationPage } from '@/features/school/pages/PostTrainingEvaluationPage'
 import { PublicSiteLayout } from '@/layouts/PublicSiteLayout'
 import { SiteHomePage } from '@/features/site/pages/SiteHomePage'
 import { ProjetoPage } from '@/features/site/pages/ProjetoPage'
@@ -104,6 +105,7 @@ function App() {
             <Route path="classes" element={<ClassesPage />} />
             <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
+            <Route path="classes/:id/sessions/:sessionId/post-treino" element={<PostTrainingEvaluationPage />} />
             <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
             <Route path="reports" element={<Navigate to="/dashboard" replace />} />
           </Route>
