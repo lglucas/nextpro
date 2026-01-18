@@ -10,6 +10,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.10] - 2026-01-18
+### Added
+- **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas mensais.
+- **Engine Técnica (DB):** Função RPC de normalização mensal por turma (MVP).
+- **Engine Técnica (DB):** Seed de pesos iniciais por fonte/papel (`technical_weights_v1`) usado na normalização.
+### Changed
+- **CTO (Engines):** Gestão de rubricas mensais inclui pilar.
+- **Avaliação Mensal:** Eventos gravam `pillar` no `meta`.
+- **Dashboard (Alunos):** Radar mensal passa a usar pilar configurado (com fallback).
+- **Dashboard (Alunos):** Exibe score normalizado (turma) no card do atleta.
+
 ## [0.7.9] - 2026-01-18
 ### Added
 - **Dashboard (Alunos):** Radar por pilares (técnica/tática/mental/físico) na avaliação mensal do card.

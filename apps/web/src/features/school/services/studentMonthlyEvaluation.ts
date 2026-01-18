@@ -14,6 +14,7 @@ export type MonthlySummary = {
   month: string
   actorId: string | null
   position: string | null
+  classId: string | null
   criteriaCount: number
   avg: number
   baseAvg: number | null
@@ -26,6 +27,12 @@ export type MonthlySummary = {
 export type MonthlyAveragePoint = { month: string; avg: number }
 
 export type PillarKey = 'tecnica' | 'tatica' | 'mental' | 'fisico'
+
+export type MonthlyNormalizationRow = {
+  avg_raw: number | null
+  avg_norm: number | null
+  pillars: Record<PillarKey, number | null>
+}
 
 export function monthLabel(month: string) {
   const [y, m] = month.split('-')
@@ -106,10 +113,20 @@ function detectPillar(label: string): PillarKey {
   return 'tecnica'
 }
 
-function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actorId: string | null) {
+function toPillar(value: unknown): PillarKey | null {
+  return value === 'tecnica' || value === 'tatica' || value === 'mental' || value === 'fisico' ? value : null
+}
+
+function summarizeMonthly(
+  events: EngineEventRow[],
+  fallbackMonth: string,
+  actorId: string | null,
+  pillarByKey?: Record<string, PillarKey | null>,
+) {
   const rows = events ?? []
   let month: string | null = null
   let position: string | null = null
+  let classId: string | null = null
 
   const values: number[] = []
   const baseValues: number[] = []
@@ -119,11 +136,13 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
   const items: Array<{ label: string; value: number }> = []
 
   rows.forEach((r) => {
-    const meta = r.meta as { month?: unknown; position?: unknown; kind?: unknown; prompt?: unknown } | null
+    const meta = r.meta as { month?: unknown; position?: unknown; kind?: unknown; prompt?: unknown; class_id?: unknown; pillar?: unknown } | null
     const m = typeof meta?.month === 'string' ? meta.month : null
     if (m) month = month ?? m
     const p = typeof meta?.position === 'string' ? meta.position : null
     if (p) position = position ?? p
+    const c = typeof meta?.class_id === 'string' ? meta.class_id : null
+    if (c) classId = classId ?? c
     const kind = typeof meta?.kind === 'string' ? meta.kind : null
 
     const v = toNumber(r.value)
@@ -135,7 +154,10 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
 
     const label = typeof meta?.prompt === 'string' ? meta.prompt : r.event_key || 'Rubrica'
     items.push({ label, value: v })
-    byPillar[detectPillar(label)].push(v)
+
+    const metaPillar = toPillar(meta?.pillar)
+    const keyPillar = r.event_key ? toPillar(pillarByKey?.[r.event_key] ?? null) : null
+    byPillar[(metaPillar ?? keyPillar ?? detectPillar(label))].push(v)
   })
 
   const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
@@ -164,6 +186,7 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
     month: month ?? fallbackMonth,
     actorId,
     position,
+    classId,
     criteriaCount: values.length,
     avg,
     baseAvg,
@@ -266,5 +289,47 @@ export async function getStudentMonthlySummary(seasonId: string, studentId: stri
   const { data: monthRows } = actorId ? await query.eq('actor_id', actorId) : await query
   const rows = (monthRows as unknown as EngineEventRow[]) ?? []
 
-  return summarizeMonthly(rows, month, actorId)
+  const keys = Array.from(new Set(rows.map((r) => r.event_key).filter((k): k is string => Boolean(k))))
+  const pillarByKey: Record<string, PillarKey | null> = {}
+  if (keys.length) {
+    const { data: questionRows } = await supabase.from('technical_monthly_questions').select('key, pillar').eq('season_id', seasonId).in('key', keys)
+    ;((questionRows as unknown as Array<{ key: string; pillar: unknown }>) ?? []).forEach((q) => {
+      pillarByKey[q.key] = toPillar(q.pillar)
+    })
+  }
+
+  return summarizeMonthly(rows, month, actorId, pillarByKey)
+}
+
+export async function getStudentMonthlyNormalization(seasonId: string, classId: string, month: string, studentId: string) {
+  const { data } = await supabase.rpc('compute_technical_monthly_class_normalization', {
+    target_season_id: seasonId,
+    target_class_id: classId,
+    target_month: month,
+  })
+
+  const rows =
+    (data as unknown as Array<{
+      student_id: string
+      avg_raw: number | null
+      avg_norm: number | null
+      pillars: unknown
+    }>) ?? []
+
+  const found = rows.find((r) => r.student_id === studentId)
+  if (!found) return null
+
+  const p = (found.pillars as Record<string, unknown> | null) ?? null
+  const pillars: Record<PillarKey, number | null> = {
+    tecnica: toNumber(p?.tecnica) ?? null,
+    tatica: toNumber(p?.tatica) ?? null,
+    mental: toNumber(p?.mental) ?? null,
+    fisico: toNumber(p?.fisico) ?? null,
+  }
+
+  return {
+    avg_raw: found.avg_raw == null ? null : Number(found.avg_raw),
+    avg_norm: found.avg_norm == null ? null : Number(found.avg_norm),
+    pillars,
+  } satisfies MonthlyNormalizationRow
 }

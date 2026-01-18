@@ -15,6 +15,7 @@ export function TechnicalMonthlyRubricsPanel() {
   const [form, setForm] = useState({
     kind: 'base' as 'base' | 'position',
     position: '',
+    pillar: 'tecnica' as 'tecnica' | 'tatica' | 'mental' | 'fisico',
     key: '',
     prompt: '',
     sort_order: 0,
@@ -74,6 +75,7 @@ export function TechnicalMonthlyRubricsPanel() {
       season_id: selectedSeasonId,
       kind: form.kind,
       position: form.kind === 'position' ? (form.position || selectedPosition) : null,
+      pillar: form.pillar,
       key: form.key.trim(),
       prompt: form.prompt.trim(),
       sort_order: form.sort_order,
@@ -86,7 +88,7 @@ export function TechnicalMonthlyRubricsPanel() {
       return
     }
 
-    setForm({ kind: 'base', position: '', key: '', prompt: '', sort_order: 0, active: true })
+    setForm({ kind: 'base', position: '', pillar: 'tecnica', key: '', prompt: '', sort_order: 0, active: true })
     await fetchQuestions()
   }
 
@@ -155,4 +157,3 @@ export function TechnicalMonthlyRubricsPanel() {
     </div>
   )
 }
-

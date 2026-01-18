@@ -1,4 +1,4 @@
-import { POSITIONS } from '@/features/admin/components/engines/types'
+import { PILLARS, POSITIONS } from '@/features/admin/components/engines/types'
 
 export function MonthlyQuestionForm({
   value,
@@ -10,6 +10,7 @@ export function MonthlyQuestionForm({
   value: {
     kind: 'base' | 'position'
     position: string
+    pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
     key: string
     prompt: string
     sort_order: number
@@ -20,6 +21,7 @@ export function MonthlyQuestionForm({
   onChange: (next: {
     kind: 'base' | 'position'
     position: string
+    pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
     key: string
     prompt: string
     sort_order: number
@@ -64,6 +66,22 @@ export function MonthlyQuestionForm({
             </select>
           </div>
         ) : null}
+
+        <div>
+          <label className="block text-xs text-slate-500">Pilar</label>
+          <select
+            value={value.pillar}
+            onChange={(e) => onChange({ ...value, pillar: e.target.value as 'tecnica' | 'tatica' | 'mental' | 'fisico' })}
+            className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+            disabled={disabled}
+          >
+            {PILLARS.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="sm:col-span-2">
           <label className="block text-xs text-slate-500">Key</label>
@@ -116,4 +134,3 @@ export function MonthlyQuestionForm({
     </div>
   )
 }
-
