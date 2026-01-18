@@ -70,6 +70,8 @@ export function StudentsPage() {
   const [billingClassId, setBillingClassId] = useState<string>('all')
   const [selectedStudentIds, setSelectedStudentIds] = useState<Record<string, boolean>>({})
   const [bulkFinancialStatus, setBulkFinancialStatus] = useState<'active' | 'warning' | 'blocked'>('warning')
+  const [billingMessageTemplate, setBillingMessageTemplate] = useState<'default' | 'warning' | 'blocked' | 'active'>('default')
+  const [billingMessageBusy, setBillingMessageBusy] = useState(false)
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -477,6 +479,73 @@ export function StudentsPage() {
     } finally {
       setSavingStudent(false)
     }
+  }
+
+  const formatPhoneForWhatsapp = (raw: string) => {
+    const digits = (raw || '').replace(/\D/g, '')
+    if (!digits) return null
+    if (digits.startsWith('55')) return digits
+    if (digits.length === 11 || digits.length === 10) return `55${digits}`
+    return digits
+  }
+
+  const statusLabel = (status: Student['financial_status']) => {
+    const s = status ?? 'active'
+    return s === 'active' ? 'em dia' : s === 'warning' ? 'em aviso' : 'bloqueado'
+  }
+
+  const buildBillingMessage = (student: Student) => {
+    const guardianName = student.guardian?.full_name?.trim() || 'Responsável'
+    const base = `Olá, ${guardianName}. Aqui é da secretaria.`
+    const line = `A mensalidade do atleta ${student.full_name} está ${statusLabel(student.financial_status)}.`
+    const close = `Se já regularizou, desconsidere. Obrigado.`
+
+    if (billingMessageTemplate === 'blocked') return `${base}\n${line}\nPor favor, regularize para liberar o acesso.\n${close}`
+    if (billingMessageTemplate === 'warning') return `${base}\n${line}\nPor favor, verifique a pendência para evitar bloqueio.\n${close}`
+    if (billingMessageTemplate === 'active') return `${base}\nA mensalidade do atleta ${student.full_name} está em dia.\n${close}`
+    return `${base}\n${line}\n${close}`
+  }
+
+  const selectedStudents = sortedVisibleStudents.filter((s) => selectedStudentIds[s.id])
+
+  const copyBillingMessages = async () => {
+    if (selectedStudents.length === 0) return
+    setBillingMessageBusy(true)
+    try {
+      const blocks = selectedStudents.map((student) => {
+        const phone = student.guardian?.phone || ''
+        const header = `Para: ${student.guardian?.full_name || 'Responsável'} (${phone || 'sem telefone'})`
+        return `${header}\n${buildBillingMessage(student)}`
+      })
+      await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+      await logAction('bulk_copy_financial_message', 'Financeiro (lote)', {
+        student_ids: selectedStudents.map((s) => s.id),
+        class_id: billingClassId === 'all' ? null : billingClassId,
+        template: billingMessageTemplate,
+      })
+      alert('Mensagens copiadas!')
+    } catch {
+      alert('Não consegui copiar. Tente novamente.')
+    } finally {
+      setBillingMessageBusy(false)
+    }
+  }
+
+  const openWhatsappForFirstSelected = async () => {
+    if (selectedStudents.length === 0) return
+    const student = selectedStudents[0]
+    const phone = formatPhoneForWhatsapp(student.guardian?.phone || '')
+    if (!phone) {
+      alert('Responsável sem telefone válido.')
+      return
+    }
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildBillingMessage(student))}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
+      student_id: student.id,
+      class_id: billingClassId === 'all' ? null : billingClassId,
+      template: billingMessageTemplate,
+    })
   }
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
@@ -1060,6 +1129,33 @@ export function StudentsPage() {
                     <span className="text-xs text-slate-500">
                       Selecionados: <span className="font-semibold text-slate-700">{selectedIds.length}</span>
                     </span>
+                    <select
+                      value={billingMessageTemplate}
+                      onChange={(e) => setBillingMessageTemplate(e.target.value as 'default' | 'warning' | 'blocked' | 'active')}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Template de mensagem"
+                    >
+                      <option value="default">Mensagem: padrão</option>
+                      <option value="warning">Mensagem: aviso</option>
+                      <option value="blocked">Mensagem: bloqueio</option>
+                      <option value="active">Mensagem: em dia</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => void copyBillingMessages()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {billingMessageBusy ? 'Copiando…' : 'Copiar mensagem'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void openWhatsappForFirstSelected()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      WhatsApp (1º)
+                    </button>
                     <select
                       value={bulkFinancialStatus}
                       onChange={(e) => setBulkFinancialStatus(e.target.value as 'active' | 'warning' | 'blocked')}
