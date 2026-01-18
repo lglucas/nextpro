@@ -17,6 +17,7 @@ export function TechnicalRubricsPanel() {
     kind: 'base' as 'base' | 'position',
     slot: 1 as 1 | 2 | 3,
     position: '',
+    pillar: 'tecnica' as 'tecnica' | 'tatica' | 'mental' | 'fisico',
     key: '',
     prompt: '',
     sort_order: 0,
@@ -78,6 +79,7 @@ export function TechnicalRubricsPanel() {
       kind: form.kind,
       slot: form.kind === 'base' ? 1 : form.slot,
       position: form.kind === 'position' ? (form.position || selectedPosition) : null,
+      pillar: form.pillar,
       key: form.key.trim(),
       prompt: form.prompt.trim(),
       sort_order: form.sort_order,
@@ -90,7 +92,7 @@ export function TechnicalRubricsPanel() {
       return
     }
 
-    setForm({ kind: 'base', slot: 1, position: '', key: '', prompt: '', sort_order: 0, active: true })
+    setForm({ kind: 'base', slot: 1, position: '', pillar: 'tecnica', key: '', prompt: '', sort_order: 0, active: true })
     await fetchQuestions()
   }
 

@@ -10,6 +10,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.11] - 2026-01-18
+### Added
+- **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas diárias.
+- **Engine Técnica (DB):** Reputação do avaliador com shadow ban (MVP).
+- **Dashboard (Alunos):** Skill tree (temporada) por pilares, com filtro de posição.
+### Changed
+- **CTO (Engines):** Gestão de rubricas diárias inclui pilar.
+- **Engine Técnica (DB):** Normalização mensal por turma inclui fonte diária e reputação (MVP).
+- **Pós-treino:** Eventos diários gravam `pillar` no `meta`.
+
 ## [0.7.10] - 2026-01-18
 ### Added
 - **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas mensais.

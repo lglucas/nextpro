@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import { StudentFutCard } from '@/features/school/components/StudentFutCard'
 import { StudentFichaSection } from '@/features/school/components/StudentFichaSection'
 import { StudentMonthlyEvaluationSection } from '@/features/school/components/StudentMonthlyEvaluationSection'
+import { StudentSeasonSkillTreeSection } from '@/features/school/components/StudentSeasonSkillTreeSection'
 
 type StudentProgressRow = { student_id: string; xp_total: number; level: number }
 type SeasonRow = { id: string; year: number }
@@ -148,6 +149,7 @@ export function StudentCardPage() {
             pct={fut.pct}
           />
           <StudentFichaSection student={student} />
+          <StudentSeasonSkillTreeSection studentId={student.id} season={season} />
           <StudentMonthlyEvaluationSection studentId={student.id} season={season} />
         </>
       )}

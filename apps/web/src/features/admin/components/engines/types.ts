@@ -32,6 +32,7 @@ export type TechnicalQuestionRow = {
   kind: 'base' | 'position'
   slot: 1 | 2 | 3
   position: string | null
+  pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
   key: string
   prompt: string
   active: boolean

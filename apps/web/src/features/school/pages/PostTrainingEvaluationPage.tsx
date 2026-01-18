@@ -27,6 +27,7 @@ type TechnicalQuestionRow = {
   kind: 'base' | 'position'
   slot: 1 | 2 | 3
   position: string | null
+  pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
   key: string
   prompt: string
   active: boolean
@@ -135,7 +136,7 @@ export function PostTrainingEvaluationPage() {
     if (!season?.id) return
     const { data, error } = await supabase
       .from('technical_questions')
-      .select('id, kind, slot, position, key, prompt, active, sort_order')
+      .select('id, kind, slot, position, pillar, key, prompt, active, sort_order')
       .eq('season_id', season.id)
       .order('kind', { ascending: true })
       .order('slot', { ascending: true })
@@ -303,6 +304,7 @@ export function PostTrainingEvaluationPage() {
 
     const baseByKey = new Map(baseQuestions.map((q) => [q.key, q.prompt]))
     const posByKey = new Map(positionQuestions.map((q) => [q.key, q.prompt]))
+    const pillarByKey = new Map(questions.map((q) => [q.key, q.pillar]))
 
     const rows = allIds.flatMap(({ group, id: studentId }) => {
       const item = draft[`${group}:${studentId}`] as DraftAnswer
@@ -324,6 +326,7 @@ export function PostTrainingEvaluationPage() {
             slot: 1,
             kind: 'base',
             position,
+            pillar: pillarByKey.get(item.q1Key) ?? 'tecnica',
             prompt: baseByKey.get(item.q1Key) ?? null,
           },
         },
@@ -343,6 +346,7 @@ export function PostTrainingEvaluationPage() {
             slot: 2,
             kind: 'position',
             position,
+            pillar: pillarByKey.get(item.q2Key) ?? 'tecnica',
             prompt: posByKey.get(item.q2Key) ?? null,
           },
         },
@@ -362,6 +366,7 @@ export function PostTrainingEvaluationPage() {
             slot: 3,
             kind: 'position',
             position,
+            pillar: pillarByKey.get(item.q3Key) ?? 'tecnica',
             prompt: posByKey.get(item.q3Key) ?? null,
           },
         },

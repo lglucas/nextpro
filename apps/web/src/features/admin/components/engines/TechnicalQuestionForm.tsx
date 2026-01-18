@@ -1,4 +1,4 @@
-import { POSITIONS } from '@/features/admin/components/engines/types'
+import { PILLARS, POSITIONS } from '@/features/admin/components/engines/types'
 
 export function TechnicalQuestionForm({
   value,
@@ -11,6 +11,7 @@ export function TechnicalQuestionForm({
     kind: 'base' | 'position'
     slot: 1 | 2 | 3
     position: string
+    pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
     key: string
     prompt: string
     sort_order: number
@@ -22,6 +23,7 @@ export function TechnicalQuestionForm({
     kind: 'base' | 'position'
     slot: 1 | 2 | 3
     position: string
+    pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
     key: string
     prompt: string
     sort_order: number
@@ -81,6 +83,22 @@ export function TechnicalQuestionForm({
         ) : null}
 
         <div className="sm:col-span-2">
+          <label className="block text-xs text-slate-500">Pilar</label>
+          <select
+            value={value.pillar}
+            onChange={(e) => onChange({ ...value, pillar: e.target.value as 'tecnica' | 'tatica' | 'mental' | 'fisico' })}
+            className="mt-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+            disabled={disabled}
+          >
+            {PILLARS.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="sm:col-span-2">
           <label className="block text-xs text-slate-500">Key</label>
           <input
             value={value.key}
@@ -128,4 +146,3 @@ export function TechnicalQuestionForm({
     </div>
   )
 }
-
