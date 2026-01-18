@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.3] - 2026-01-18
+### Added
+- **Alunos:** Modo cobrança com seleção e atualização em lote por turma.
+
 ## [0.8.2] - 2026-01-18
 ### Added
 - **Dashboard:** Atalhos de inadimplência (bloqueados/aviso) com contadores.

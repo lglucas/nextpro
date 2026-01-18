@@ -30,7 +30,9 @@ interface Student {
   active: boolean
   financial_status?: 'active' | 'warning' | 'blocked'
   class_students?: Array<{
+    class_id: string
     class?: {
+      id: string
       name: string
     } | null
   }>
@@ -39,6 +41,12 @@ interface Student {
 interface School {
   id: string
   name: string
+}
+
+interface ClassRow {
+  id: string
+  name: string
+  school_id: string | null
 }
 
 export function StudentsPage() {
@@ -55,8 +63,13 @@ export function StudentsPage() {
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
+  const [classes, setClasses] = useState<ClassRow[]>([])
   const [studentSearchTerm, setStudentSearchTerm] = useState('')
   const [financialFilter, setFinancialFilter] = useState<'all' | 'active' | 'warning' | 'blocked'>('all')
+  const [billingMode, setBillingMode] = useState(false)
+  const [billingClassId, setBillingClassId] = useState<string>('all')
+  const [selectedStudentIds, setSelectedStudentIds] = useState<Record<string, boolean>>({})
+  const [bulkFinancialStatus, setBulkFinancialStatus] = useState<'active' | 'warning' | 'blocked'>('warning')
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -93,6 +106,13 @@ export function StudentsPage() {
           full_name,
           phone,
           email
+        ),
+        class_students:class_students (
+          class_id,
+          class:classes (
+            id,
+            name
+          )
         )
       `)
       .order('created_at', { ascending: false })
@@ -100,6 +120,15 @@ export function StudentsPage() {
     if (error) console.error('Erro ao buscar alunos:', error)
     else setStudents(data || [])
   }, [])
+
+  const fetchClasses = useCallback(
+    async (schoolId: string | null) => {
+      const query = supabase.from('classes').select('id, name, school_id').order('name', { ascending: true })
+      const { data, error } = schoolId && role !== 'super_admin' ? await query.eq('school_id', schoolId) : await query
+      if (!error && data) setClasses(data as unknown as ClassRow[])
+    },
+    [role],
+  )
 
   const fetchGuardians = useCallback(async () => {
     const { data, error } = await supabase
@@ -113,6 +142,7 @@ export function StudentsPage() {
   const fetchProfileAndData = useCallback(async () => {
     try {
       setLoading(true)
+      let scopedSchoolId: string | null = null
       
       if (user) {
         const { data: profile } = await supabase
@@ -122,6 +152,7 @@ export function StudentsPage() {
           .single()
         
         if (profile?.school_id) {
+          scopedSchoolId = profile.school_id
           setUserSchoolId(profile.school_id)
           setFormData(prev => ({ ...prev, school_id: profile.school_id }))
         }
@@ -132,6 +163,7 @@ export function StudentsPage() {
         if (schoolsData) setSchools(schoolsData)
       }
 
+      await fetchClasses(scopedSchoolId)
       await fetchStudents()
       await fetchGuardians()
 
@@ -140,7 +172,7 @@ export function StudentsPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchGuardians, fetchStudents, role, user])
+  }, [fetchClasses, fetchGuardians, fetchStudents, role, user])
 
   useEffect(() => {
     fetchProfileAndData()
@@ -151,6 +183,8 @@ export function StudentsPage() {
     if (next === 'active' || next === 'warning' || next === 'blocked' || next === 'all') {
       setFinancialFilter(next)
     }
+    const cls = searchParams.get('class')
+    if (cls) setBillingClassId(cls)
   }, [searchParams])
 
   useEffect(() => {
@@ -361,7 +395,7 @@ export function StudentsPage() {
     : guardiansInScope
 
   const normalizedStudentSearch = studentSearchTerm.trim().toLowerCase()
-  const visibleStudents = normalizedStudentSearch
+  const visibleStudentsBase = normalizedStudentSearch
     ? students.filter((student) => {
         const guardianName = student.guardian?.full_name || ''
         const guardianPhone = student.guardian?.phone || ''
@@ -378,8 +412,13 @@ export function StudentsPage() {
   const blockedCount = students.filter((s) => (s.financial_status ?? 'active') === 'blocked').length
   const warningCount = students.filter((s) => (s.financial_status ?? 'active') === 'warning').length
 
+  const classFilteredStudents =
+    billingMode && billingClassId !== 'all'
+      ? visibleStudentsBase.filter((s) => s.class_students?.some((cs) => cs.class_id === billingClassId))
+      : visibleStudentsBase
+
   const financialFilteredStudents =
-    financialFilter === 'all' ? visibleStudents : visibleStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
+    financialFilter === 'all' ? classFilteredStudents : classFilteredStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
 
   const sortedVisibleStudents = [...financialFilteredStudents].sort((a, b) => {
     const order = (s: Student) => ((s.financial_status ?? 'active') === 'blocked' ? 0 : (s.financial_status ?? 'active') === 'warning' ? 1 : 2)
@@ -387,6 +426,58 @@ export function StudentsPage() {
     if (diff !== 0) return diff
     return a.full_name.localeCompare(b.full_name, 'pt-BR')
   })
+
+  const selectedIds = Object.keys(selectedStudentIds).filter((id) => selectedStudentIds[id])
+  const allPageSelected = sortedVisibleStudents.length > 0 && sortedVisibleStudents.every((s) => selectedStudentIds[s.id])
+
+  const toggleSelectAllPage = () => {
+    setSelectedStudentIds((prev) => {
+      const next: Record<string, boolean> = { ...prev }
+      if (allPageSelected) {
+        sortedVisibleStudents.forEach((s) => {
+          delete next[s.id]
+        })
+      } else {
+        sortedVisibleStudents.forEach((s) => {
+          next[s.id] = true
+        })
+      }
+      return next
+    })
+  }
+
+  const toggleSelectStudent = (studentId: string) => {
+    setSelectedStudentIds((prev) => ({ ...prev, [studentId]: !prev[studentId] }))
+  }
+
+  const clearSelection = () => setSelectedStudentIds({})
+
+  const applyBulkFinancialStatus = async () => {
+    if (selectedIds.length === 0) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    const ok = confirm(`Aplicar "${bulkFinancialStatus}" para ${selectedIds.length} aluno(s)?`)
+    if (!ok) return
+
+    try {
+      setSavingStudent(true)
+      const { error } = await supabase.from('students').update({ financial_status: bulkFinancialStatus }).in('id', selectedIds)
+      if (error) throw error
+
+      await logAction('bulk_update_student_financial_status', 'Alunos (lote)', {
+        student_ids: selectedIds,
+        next_status: bulkFinancialStatus,
+        class_id: billingClassId === 'all' ? null : billingClassId,
+      })
+
+      await fetchStudents()
+      clearSelection()
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status financeiro em lote')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
 
@@ -886,7 +977,7 @@ export function StudentsPage() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap justify-end">
                   <span className="text-xs text-slate-500">
                     Bloqueados: <span className="font-semibold text-slate-700">{blockedCount}</span> • Aviso:{' '}
                     <span className="font-semibold text-slate-700">{warningCount}</span>
@@ -911,14 +1002,102 @@ export function StudentsPage() {
                     <option value="warning">Financeiro: aviso</option>
                     <option value="blocked">Financeiro: bloqueado</option>
                   </select>
+
+                  {(role === 'school_admin' || role === 'super_admin') ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBillingMode((v) => {
+                          const next = !v
+                          setSearchParams((prev) => {
+                            const nextParams = new URLSearchParams(prev)
+                            if (!next) nextParams.delete('class')
+                            return nextParams
+                          })
+                          if (!next) setBillingClassId('all')
+                          clearSelection()
+                          return next
+                        })
+                      }}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50"
+                    >
+                      <Shield className="w-4 h-4 text-slate-500" />
+                      {billingMode ? 'Sair do modo cobrança' : 'Modo cobrança'}
+                    </button>
+                  ) : null}
                 </div>
               </div>
+
+              {billingMode ? (
+                <div className="mt-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={billingClassId}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setBillingClassId(next)
+                        clearSelection()
+                        setSearchParams((prev) => {
+                          const nextParams = new URLSearchParams(prev)
+                          if (next === 'all') nextParams.delete('class')
+                          else nextParams.set('class', next)
+                          return nextParams
+                        })
+                      }}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Filtro de turma"
+                    >
+                      <option value="all">Turma: todas</option>
+                      {classes.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="text-xs text-slate-500">
+                      Selecionados: <span className="font-semibold text-slate-700">{selectedIds.length}</span>
+                    </span>
+                    <select
+                      value={bulkFinancialStatus}
+                      onChange={(e) => setBulkFinancialStatus(e.target.value as 'active' | 'warning' | 'blocked')}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Ação em massa"
+                    >
+                      <option value="active">Marcar em dia</option>
+                      <option value="warning">Marcar aviso</option>
+                      <option value="blocked">Marcar bloqueado</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => void applyBulkFinancialStatus()}
+                      disabled={savingStudent || selectedIds.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
+                  {billingMode ? (
+                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase">
+                      <input
+                        type="checkbox"
+                        checked={allPageSelected}
+                        onChange={toggleSelectAllPage}
+                        className="h-4 w-4"
+                        aria-label="Selecionar todos"
+                      />
+                    </th>
+                  ) : null}
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Aluno</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Categoria</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Turmas</th>
@@ -931,6 +1110,18 @@ export function StudentsPage() {
               <tbody className="divide-y divide-slate-100">
                 {sortedVisibleStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
+                    {billingMode ? (
+                      <td className="px-4 py-4 align-top">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(selectedStudentIds[student.id])}
+                          onChange={() => toggleSelectStudent(student.id)}
+                          disabled={savingStudent}
+                          className="h-4 w-4"
+                          aria-label={`Selecionar ${student.full_name}`}
+                        />
+                      </td>
+                    ) : null}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center text-primary font-bold text-xs">
