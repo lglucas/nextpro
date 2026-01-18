@@ -14,6 +14,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **App (Atleta):** Home usa dados reais para próximo treino e frequência.
 - **App:** Coach agora vê link de acesso ao dashboard na barra superior.
 - **Dashboard:** Remove botão e item de menu sem página funcional (relatórios/novo relatório).
+- **App (Atleta):** Home exibe indicador de feedback técnico novo.
 ### Fixed
 
 ## [0.8.0] - 2026-01-17

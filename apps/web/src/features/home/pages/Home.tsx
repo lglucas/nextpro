@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { loadTechnicalLastSeenIso } from '@/features/technical/storage'
 
 type StudentRow = { id: string; full_name: string }
 
@@ -20,6 +21,7 @@ export function HomePage() {
   const [nextSession, setNextSession] = useState<NextSessionRow | null>(null)
   const [attendanceTotal, setAttendanceTotal] = useState(0)
   const [attendancePresent, setAttendancePresent] = useState(0)
+  const [technicalUnreadCount, setTechnicalUnreadCount] = useState<number | null>(null)
 
   const attendanceText = useMemo(() => {
     if (!attendanceTotal) return 'Sem treinos suficientes para calcular'
@@ -107,6 +109,29 @@ export function HomePage() {
     setAttendancePresent(present)
   }, [selectedStudentId])
 
+  const fetchTechnicalUnread = useCallback(async () => {
+    if (!user?.id) return
+    if (!selectedStudentId) {
+      setTechnicalUnreadCount(null)
+      return
+    }
+
+    const lastSeen = loadTechnicalLastSeenIso(user.id, selectedStudentId)
+    const query = supabase
+      .from('engine_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('engine', 'technical')
+      .eq('student_id', selectedStudentId)
+      .eq('source_type', 'technical_daily')
+
+    const { count, error } = lastSeen ? await query.gt('created_at', lastSeen) : await query
+    if (error) {
+      setTechnicalUnreadCount(null)
+      return
+    }
+    setTechnicalUnreadCount(count ?? 0)
+  }, [selectedStudentId, user])
+
   useEffect(() => {
     const timeoutId = window.setTimeout(() => void fetchStudents(), 0)
     return () => window.clearTimeout(timeoutId)
@@ -116,9 +141,10 @@ export function HomePage() {
     const timeoutId = window.setTimeout(() => {
       void fetchNextSession()
       void fetchAttendance()
+      void fetchTechnicalUnread()
     }, 0)
     return () => window.clearTimeout(timeoutId)
-  }, [fetchAttendance, fetchNextSession])
+  }, [fetchAttendance, fetchNextSession, fetchTechnicalUnread])
 
   return (
     <div className="space-y-8">
@@ -200,7 +226,14 @@ export function HomePage() {
           <div className="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center mb-4">
             <Trophy className="w-6 h-6 text-amber-600" />
           </div>
-          <h3 className="font-semibold text-slate-900 mb-1">Histórico técnico</h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-semibold text-slate-900 mb-1">Histórico técnico</h3>
+            {technicalUnreadCount != null && technicalUnreadCount > 0 ? (
+              <span className="text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-1 rounded-full">
+                {technicalUnreadCount} novo{technicalUnreadCount === 1 ? '' : 's'}
+              </span>
+            ) : null}
+          </div>
           <p className="text-sm text-slate-500 mb-4">Acompanhe seu resumo por treino</p>
           <Link to="/app/tecnico" className="text-sm text-amber-700 font-medium flex items-center hover:underline">
             Ver histórico <ArrowRight className="w-4 h-4 ml-1" />

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Trophy } from 'lucide-react'
+import { saveTechnicalLastSeenIso } from '@/features/technical/storage'
 
 type StudentRow = { id: string; full_name: string }
 type SeasonRow = { id: string; year: number }
@@ -136,6 +137,15 @@ export function TechnicalHistoryPage() {
       items: list,
     }))
   }, [events])
+
+  useEffect(() => {
+    if (!user?.id) return
+    if (!selectedStudentId) return
+    if (loading) return
+    const newest = events[0]?.created_at ?? null
+    if (!newest) return
+    saveTechnicalLastSeenIso(user.id, selectedStudentId, newest)
+  }, [events, loading, selectedStudentId, user])
 
   return (
     <div className="space-y-6">
