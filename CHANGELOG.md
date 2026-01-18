@@ -10,7 +10,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
-## [0.7.6] - 2026-01-18
+## [0.7.7] - 2026-01-17
+### Added
+- **Dashboard (Alunos):** Histórico de avaliações mensais por temporada no card do atleta (mês selecionável).
+- **Dashboard (Alunos):** Destaques e pontos de atenção (Top/Bottom rubricas) na avaliação mensal.
+### Changed
+- **Dashboard (Alunos):** Ficha do atleta refatorada em componentes menores.
+
+## [0.7.6] - 2026-01-17
 ### Added
 - **Docs:** Guia de changelog e versionamento.
 ### Changed
