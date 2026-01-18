@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   getStudentMonthlyAverages,
+  getStudentMonthlyNormalization,
   getStudentMonthlySummary,
   listStudentMonthlyMonths,
   monthLabel,
+  type PillarKey,
   type MonthlyAveragePoint,
+  type MonthlyNormalizationRow,
   type MonthlySummary,
   type SeasonRow,
 } from '@/features/school/services/studentMonthlyEvaluation'
@@ -20,6 +23,7 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
   const [loading, setLoading] = useState(false)
   const [summary, setSummary] = useState<MonthlySummary | null>(null)
   const [trend, setTrend] = useState<MonthlyAveragePoint[]>([])
+  const [normalized, setNormalized] = useState<MonthlyNormalizationRow | null>(null)
   const seasonId = season?.id ?? null
 
   useEffect(() => {
@@ -80,6 +84,7 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
       if (!mounted) return
 
       setSummary(next)
+      setNormalized(null)
       setLoading(false)
     }
 
@@ -89,6 +94,26 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
       mounted = false
     }
   }, [seasonId, selectedMonth, studentId])
+
+  useEffect(() => {
+    let mounted = true
+    const run = async () => {
+      if (!seasonId) return
+      if (!studentId) return
+      if (!selectedMonth) return
+      if (!summary?.classId) return
+
+      const next = await getStudentMonthlyNormalization(seasonId, summary.classId, selectedMonth, studentId)
+      if (!mounted) return
+      setNormalized(next)
+    }
+
+    void run()
+
+    return () => {
+      mounted = false
+    }
+  }, [seasonId, selectedMonth, studentId, summary?.classId])
 
   const header = useMemo(() => {
     if (!season) return null
@@ -113,6 +138,54 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
     const delta = prev == null ? null : last - prev
     return { points, last, prev, delta }
   }, [trend])
+
+  const radar = useMemo(() => {
+    if (!summary) return null
+    const values = summary.pillars
+    const keys: Array<{ key: PillarKey; label: string }> = [
+      { key: 'tecnica', label: 'Técnica' },
+      { key: 'tatica', label: 'Tática' },
+      { key: 'mental', label: 'Mental' },
+      { key: 'fisico', label: 'Físico' },
+    ]
+
+    const size = 140
+    const cx = size / 2
+    const cy = size / 2
+    const r = 48
+    const levels = [2.5, 5, 7.5, 10]
+
+    const pointFor = (idx: number, value: number) => {
+      const angle = (Math.PI * 2 * idx) / keys.length - Math.PI / 2
+      const rr = (Math.max(0, Math.min(10, value)) / 10) * r
+      return { x: cx + Math.cos(angle) * rr, y: cy + Math.sin(angle) * rr }
+    }
+
+    const axisFor = (idx: number) => {
+      const angle = (Math.PI * 2 * idx) / keys.length - Math.PI / 2
+      return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r }
+    }
+
+    const points = keys
+      .map((k, idx) => {
+        const v = values[k.key]
+        return pointFor(idx, v == null ? 0 : v)
+      })
+      .map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`)
+      .join(' ')
+
+    const gridPolys = levels.map((lvl) => {
+      const pts = keys
+        .map((_, idx) => pointFor(idx, lvl))
+        .map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`)
+        .join(' ')
+      return { lvl, pts }
+    })
+
+    const axes = keys.map((_, idx) => axisFor(idx))
+
+    return { size, cx, cy, r, keys, points, gridPolys, axes }
+  }, [summary])
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
@@ -194,6 +267,57 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
               <p className="mt-1 font-semibold text-slate-900">{summary.positionAvg == null ? '—' : summary.positionAvg.toFixed(1)}</p>
             </div>
           </div>
+
+          {radar ? (
+            <div className="border border-slate-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-slate-900">Radar (pilares)</p>
+              <p className="mt-1 text-xs text-slate-500">Calculado a partir do pilar configurado nas rubricas do mês.</p>
+              <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
+                <div className="flex justify-center">
+                  <svg viewBox={`0 0 ${radar.size} ${radar.size}`} className="w-64 h-64 text-slate-200">
+                    {radar.gridPolys.map((g) => (
+                      <polygon key={g.lvl} points={g.pts} fill="none" stroke="currentColor" strokeWidth={1} opacity={0.9} />
+                    ))}
+                    {radar.axes.map((a, idx) => (
+                      <line key={idx} x1={radar.cx} y1={radar.cy} x2={a.x} y2={a.y} stroke="currentColor" strokeWidth={1} opacity={0.9} />
+                    ))}
+                    <polygon points={radar.points} fill="currentColor" className="text-primary/20" stroke="currentColor" strokeWidth={2} />
+                  </svg>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {radar.keys.map((k) => (
+                    <div key={k.key} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                      <p className="text-xs text-slate-500">{k.label}</p>
+                      <p className="mt-1 text-sm font-bold text-slate-900">{summary.pillars[k.key] == null ? '—' : summary.pillars[k.key]!.toFixed(1)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {normalized ? (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-slate-900">Score normalizado (turma)</p>
+              <p className="mt-1 text-xs text-slate-500">Normalização por rubrica dentro da turma (média/variação do mês).</p>
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
+                  <p className="text-xs text-slate-500">Média bruta</p>
+                  <p className="mt-1 font-bold text-slate-900">{normalized.avg_raw == null ? '—' : normalized.avg_raw.toFixed(1)}</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
+                  <p className="text-xs text-slate-500">Média normalizada</p>
+                  <p className="mt-1 font-bold text-slate-900">{normalized.avg_norm == null ? '—' : normalized.avg_norm.toFixed(1)}</p>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
+                  <p className="text-xs text-slate-500">Técnica/Tática</p>
+                  <p className="mt-1 font-bold text-slate-900">
+                    {(normalized.pillars.tecnica == null ? '—' : normalized.pillars.tecnica.toFixed(1)) + ' / ' + (normalized.pillars.tatica == null ? '—' : normalized.pillars.tatica.toFixed(1))}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="border border-slate-200 rounded-xl overflow-hidden">

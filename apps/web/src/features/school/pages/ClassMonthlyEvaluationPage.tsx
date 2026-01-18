@@ -12,6 +12,7 @@ type MonthlyQuestionRow = {
   id: string
   kind: 'base' | 'position'
   position: string | null
+  pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
   key: string
   prompt: string
   active: boolean
@@ -112,7 +113,7 @@ export function ClassMonthlyEvaluationPage() {
     if (!season?.id) return
     const { data, error } = await supabase
       .from('technical_monthly_questions')
-      .select('id, kind, position, key, prompt, active, sort_order')
+      .select('id, kind, position, pillar, key, prompt, active, sort_order')
       .eq('season_id', season.id)
       .order('kind', { ascending: true })
       .order('sort_order', { ascending: true })
@@ -276,6 +277,7 @@ export function ClassMonthlyEvaluationPage() {
     }
 
     const baseByKey = new Map(baseQuestions.map((q) => [q.key, q.prompt]))
+    const pillarByKey = new Map([...baseQuestions, ...posQs].map((q) => [q.key, q.pillar]))
     const posByKey = new Map(positionQuestions.map((q) => [q.key, q.prompt]))
 
     const payload = [...baseQuestions, ...posQs].map((q) => ({
@@ -292,6 +294,7 @@ export function ClassMonthlyEvaluationPage() {
         month,
         kind: q.kind,
         position: draft.position,
+        pillar: pillarByKey.get(q.key) ?? 'tecnica',
         prompt: q.kind === 'base' ? baseByKey.get(q.key) ?? null : posByKey.get(q.key) ?? null,
       },
     }))

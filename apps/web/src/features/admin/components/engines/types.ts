@@ -32,6 +32,7 @@ export type TechnicalQuestionRow = {
   kind: 'base' | 'position'
   slot: 1 | 2 | 3
   position: string | null
+  pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
   key: string
   prompt: string
   active: boolean
@@ -43,6 +44,7 @@ export type TechnicalMonthlyQuestionRow = {
   season_id: string
   kind: 'base' | 'position'
   position: string | null
+  pillar: 'tecnica' | 'tatica' | 'mental' | 'fisico'
   key: string
   prompt: string
   active: boolean
@@ -58,6 +60,13 @@ export const POSITIONS = [
   { key: 'ponta', label: 'Ponta' },
   { key: 'atacante', label: 'Atacante' },
 ]
+
+export const PILLARS = [
+  { key: 'tecnica', label: 'Técnica' },
+  { key: 'tatica', label: 'Tática' },
+  { key: 'mental', label: 'Mental' },
+  { key: 'fisico', label: 'Físico' },
+] as const
 
 export function toIsoDateInput(value: string) {
   return value ? value.slice(0, 10) : ''

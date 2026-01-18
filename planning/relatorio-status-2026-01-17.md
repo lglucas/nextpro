@@ -2,6 +2,8 @@
 
 Este relatório resume onde o projeto está em relação ao cronograma de sprints, o que foi entregue e quais são os próximos passos recomendados.
 
+**Atualização (2026-01-18):** Sprint 6 e Sprint 7 foram fechados (MVP) e o fechamento do Sprint 7 foi tagueado como `v0.7.12` / `sprint-07`.
+
 ## 1) Onde estamos agora
 - **Fase atual:** Fase 2 (Core Loop) com fundações das engines prontas (Sprint 5.1).
 - **Versão de referência no repo:** v0.7.0.

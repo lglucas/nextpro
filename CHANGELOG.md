@@ -10,16 +10,49 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.12] - 2026-01-18
+### Added
+- **CTO (Engines):** Tela para gerenciar reputação do avaliador (peso + shadow ban).
+### Changed
+- **Dashboard (Alunos):** Skill tree exibe labels de posição.
+### Fixed
+- **Docs:** Checklist de Staging do Sprint 7 preenchido.
+
+## [0.7.11] - 2026-01-18
+### Added
+- **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas diárias.
+- **Engine Técnica (DB):** Reputação do avaliador com shadow ban (MVP).
+- **Dashboard (Alunos):** Skill tree (temporada) por pilares, com filtro de posição.
+### Changed
+- **CTO (Engines):** Gestão de rubricas diárias inclui pilar.
+- **Engine Técnica (DB):** Normalização mensal por turma inclui fonte diária e reputação (MVP).
+- **Pós-treino:** Eventos diários gravam `pillar` no `meta`.
+
+## [0.7.10] - 2026-01-18
+### Added
+- **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas mensais.
+- **Engine Técnica (DB):** Função RPC de normalização mensal por turma (MVP).
+- **Engine Técnica (DB):** Seed de pesos iniciais por fonte/papel (`technical_weights_v1`) usado na normalização.
+### Changed
+- **CTO (Engines):** Gestão de rubricas mensais inclui pilar.
+- **Avaliação Mensal:** Eventos gravam `pillar` no `meta`.
+- **Dashboard (Alunos):** Radar mensal passa a usar pilar configurado (com fallback).
+- **Dashboard (Alunos):** Exibe score normalizado (turma) no card do atleta.
+
+## [0.7.9] - 2026-01-18
+### Added
+- **Dashboard (Alunos):** Radar por pilares (técnica/tática/mental/físico) na avaliação mensal do card.
+
+
+## [0.7.8] - 2026-01-17
+### Added
+
 ## [0.7.7] - 2026-01-17
 ### Added
 - **Dashboard (Alunos):** Histórico de avaliações mensais por temporada no card do atleta (mês selecionável).
 - **Dashboard (Alunos):** Destaques e pontos de atenção (Top/Bottom rubricas) na avaliação mensal.
 ### Changed
 - **Dashboard (Alunos):** Ficha do atleta refatorada em componentes menores.
-
-## [0.7.8] - 2026-01-17
-### Added
-- **Dashboard (Alunos):** Evolução mensal (sparkline) no card do atleta.
 
 ## [0.7.6] - 2026-01-17
 ### Added

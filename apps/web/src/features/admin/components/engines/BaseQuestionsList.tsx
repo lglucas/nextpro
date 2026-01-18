@@ -1,4 +1,5 @@
 import type { TechnicalQuestionRow } from '@/features/admin/components/engines/types'
+import { PILLARS } from '@/features/admin/components/engines/types'
 
 export function BaseQuestionsList({
   questions,
@@ -19,7 +20,7 @@ export function BaseQuestionsList({
             <div className="min-w-0">
               <p className="text-sm text-slate-900 truncate">{q.prompt}</p>
               <p className="text-xs text-slate-500">
-                {q.key} • ordem {q.sort_order} • {q.active ? 'ativa' : 'inativa'}
+                {q.key} • {PILLARS.find((p) => p.key === q.pillar)?.label || q.pillar} • ordem {q.sort_order} • {q.active ? 'ativa' : 'inativa'}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -36,4 +37,3 @@ export function BaseQuestionsList({
     </div>
   )
 }
-
