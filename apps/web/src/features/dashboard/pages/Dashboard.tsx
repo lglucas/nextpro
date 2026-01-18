@@ -113,9 +113,6 @@ export function DashboardPage() {
           >
             Exportar PDF
           </button>
-          <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium shadow-sm">
-            Novo Relatório
-          </button>
         </div>
       </div>
 

@@ -7,7 +7,6 @@ import {
   LogOut, 
   Menu, 
   Trophy,
-  BarChart3,
   ShieldAlert,
   UserPlus,
   GraduationCap,
@@ -47,7 +46,6 @@ export function DashboardLayout() {
     { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Pré‑cadastros', href: '/dashboard/pre-cadastros', icon: ClipboardList, show: role === 'school_admin' || role === 'super_admin' },
-    { name: 'Relatórios', href: '/dashboard/reports', icon: BarChart3 },
     // Cantinho do CTO
     { name: 'Cantinho do CTO', href: '/dashboard/settings', icon: ShieldAlert, show: role === 'super_admin', special: true },
   ]

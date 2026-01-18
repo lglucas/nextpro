@@ -191,7 +191,7 @@ export function TechnicalHistoryPage() {
                   <p className="text-xs text-slate-500">{group.items.length} itens</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  {group.items.slice(0, 6).map((e) => {
+                  {group.items.map((e) => {
                     const meta = e.meta as { prompt?: unknown; group?: unknown } | null
                     const prompt = typeof meta?.prompt === 'string' ? meta.prompt : e.event_key || 'Pergunta'
                     const tag = getLabelFromValue(e.value)

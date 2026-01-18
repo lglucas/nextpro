@@ -11,6 +11,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Dashboard (Professor):** Resumo técnico por sessão (3 piores/3 melhores) via `engine_events`.
 - **Engine Técnica (DB/RLS):** Professor pode ler eventos técnicos da escola (`engine_events`).
 ### Changed
+- **App (Atleta):** Home usa dados reais para próximo treino e frequência.
+- **App:** Coach agora vê link de acesso ao dashboard na barra superior.
+- **Dashboard:** Remove botão e item de menu sem página funcional (relatórios/novo relatório).
 ### Fixed
 
 ## [0.8.0] - 2026-01-17
