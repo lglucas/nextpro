@@ -72,6 +72,8 @@ export function StudentsPage() {
   const [bulkFinancialStatus, setBulkFinancialStatus] = useState<'active' | 'warning' | 'blocked'>('warning')
   const [billingMessageTemplate, setBillingMessageTemplate] = useState<'default' | 'warning' | 'blocked' | 'active'>('default')
   const [billingMessageBusy, setBillingMessageBusy] = useState(false)
+  const [whatsQueueOpen, setWhatsQueueOpen] = useState(false)
+  const [whatsQueueIndex, setWhatsQueueIndex] = useState(0)
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -508,6 +510,9 @@ export function StudentsPage() {
   }
 
   const selectedStudents = sortedVisibleStudents.filter((s) => selectedStudentIds[s.id])
+  const whatsQueueStudents = selectedStudents
+    .map((student) => ({ student, phone: formatPhoneForWhatsapp(student.guardian?.phone || '') }))
+    .filter((row): row is { student: Student; phone: string } => Boolean(row.phone))
 
   const copyBillingMessages = async () => {
     if (selectedStudents.length === 0) return
@@ -584,6 +589,18 @@ export function StudentsPage() {
       setBillingMessageBusy(false)
       setSavingStudent(false)
     }
+  }
+
+  const openWhatsappForQueueIndex = async (index: number) => {
+    const row = whatsQueueStudents[index]
+    if (!row) return
+    const url = `https://wa.me/${row.phone}?text=${encodeURIComponent(buildBillingMessage(row.student))}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
+      student_id: row.student.id,
+      class_id: billingClassId === 'all' ? null : billingClassId,
+      template: billingMessageTemplate,
+    })
   }
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
@@ -1071,6 +1088,64 @@ export function StudentsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          {whatsQueueOpen ? (
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div className="text-sm text-slate-700">
+                  <span className="font-semibold text-slate-900">Fila WhatsApp</span>{' '}
+                  <span className="text-slate-500">
+                    {whatsQueueStudents.length === 0 ? 'Sem destinatários válidos' : `${whatsQueueIndex + 1}/${whatsQueueStudents.length}`}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 justify-end flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueOpen(false)}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50"
+                  >
+                    Fechar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueIndex((v) => Math.max(0, v - 1))}
+                    disabled={whatsQueueIndex <= 0}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueIndex((v) => Math.min(Math.max(0, whatsQueueStudents.length - 1), v + 1))}
+                    disabled={whatsQueueStudents.length === 0 || whatsQueueIndex >= whatsQueueStudents.length - 1}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Próximo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await openWhatsappForQueueIndex(whatsQueueIndex)
+                      setWhatsQueueIndex((v) => Math.min(Math.max(0, whatsQueueStudents.length - 1), v + 1))
+                    }}
+                    disabled={whatsQueueStudents.length === 0}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                  >
+                    Abrir WhatsApp
+                  </button>
+                </div>
+              </div>
+
+              {whatsQueueStudents.length > 0 ? (
+                <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <p className="text-xs font-semibold text-slate-900">Prévia</p>
+                  <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
+                    {buildBillingMessage(whatsQueueStudents[Math.min(whatsQueueIndex, whatsQueueStudents.length - 1)].student)}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {!isCreating && !isImporting ? (
             <div className="p-4 border-b border-slate-100 bg-white">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -1193,6 +1268,17 @@ export function StudentsPage() {
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       WhatsApp (1º)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWhatsQueueIndex(0)
+                        setWhatsQueueOpen(true)
+                      }}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || whatsQueueStudents.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      WhatsApp (fila)
                     </button>
                     <button
                       type="button"
