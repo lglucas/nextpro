@@ -5,6 +5,8 @@ import { LoginPage } from '@/features/auth/pages/Login'
 import { RegisterPage } from '@/features/auth/pages/Register'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
+import { DashboardIndexPage } from '@/features/dashboard/pages/DashboardIndexPage'
+import { OperationsHomePage } from '@/features/dashboard/pages/OperationsHomePage'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { PreCadastrosPage } from '@/features/dashboard/pages/PreCadastros'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
@@ -103,7 +105,9 @@ function App() {
               </TermsGate>
             </PrivateRoute>
           }>
-            <Route index element={<DashboardPage />} />
+            <Route index element={<DashboardIndexPage />} />
+            <Route path="overview" element={<DashboardPage />} />
+            <Route path="operacao" element={<OperationsHomePage />} />
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
@@ -115,7 +119,7 @@ function App() {
             <Route path="classes/:id/sessions/:sessionId/resumo-tecnico" element={<SessionTechnicalSummaryPage />} />
             <Route path="classes/:id/avaliacao-mensal" element={<ClassMonthlyEvaluationPage />} />
             <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
-            <Route path="reports" element={<Navigate to="/dashboard" replace />} />
+            <Route path="reports" element={<Navigate to="/dashboard/overview" replace />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

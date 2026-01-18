@@ -37,16 +37,21 @@ export function DashboardLayout() {
       navigate('/app', { replace: true })
       return
     }
-    navigate('/dashboard', { replace: true })
+    if (nextRole === 'coach' || nextRole === 'school_admin') {
+      navigate('/dashboard/operacao', { replace: true })
+      return
+    }
+    navigate('/dashboard/overview', { replace: true })
   }
 
   const navigation = [
-    { name: 'Visão Geral', href: '/dashboard', icon: LayoutDashboard },
+    role === 'super_admin' || role === 'partner'
+      ? { name: 'Dashboard', href: '/dashboard/overview', icon: LayoutDashboard }
+      : { name: 'Operação', href: '/dashboard/operacao', icon: LayoutDashboard },
     { name: 'Escolas', href: '/dashboard/schools', icon: Users, show: role === 'super_admin' },
     { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Pré‑cadastros', href: '/dashboard/pre-cadastros', icon: ClipboardList, show: role === 'school_admin' || role === 'super_admin' },
-    // Cantinho do CTO
     { name: 'Cantinho do CTO', href: '/dashboard/settings', icon: ShieldAlert, show: role === 'super_admin', special: true },
   ]
 
@@ -118,7 +123,9 @@ export function DashboardLayout() {
                       ? 'Sócio'
                       : role === 'school_admin'
                         ? 'Gestor'
-                        : 'Usuário'}
+                        : role === 'coach'
+                          ? 'Professor'
+                          : 'Usuário'}
                 </p>
               </div>
             </div>
