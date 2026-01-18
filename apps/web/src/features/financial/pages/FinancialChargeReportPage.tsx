@@ -111,6 +111,35 @@ export function FinancialChargeReportPage() {
     })
   }, [query, rows])
 
+  const summary = useMemo(() => {
+    const byChannel: Record<string, number> = {}
+    const byTemplate: Record<string, number> = {}
+    const byStatus: Record<string, number> = {}
+    const students = new Set<string>()
+
+    for (const r of filteredRows) {
+      byChannel[r.channel] = (byChannel[r.channel] || 0) + 1
+      byTemplate[r.template ?? '—'] = (byTemplate[r.template ?? '—'] || 0) + 1
+      byStatus[r.status_at_time ?? '—'] = (byStatus[r.status_at_time ?? '—'] || 0) + 1
+      if (r.student?.full_name) students.add(r.student.full_name)
+    }
+
+    const pick = (obj: Record<string, number>, key: string) => obj[key] || 0
+    return {
+      total: filteredRows.length,
+      students: students.size,
+      whatsapp: pick(byChannel, 'whatsapp'),
+      clipboard: pick(byChannel, 'clipboard'),
+      tmplDefault: pick(byTemplate, 'default'),
+      tmplWarning: pick(byTemplate, 'warning'),
+      tmplBlocked: pick(byTemplate, 'blocked'),
+      tmplActive: pick(byTemplate, 'active'),
+      statusActive: pick(byStatus, 'active'),
+      statusWarning: pick(byStatus, 'warning'),
+      statusBlocked: pick(byStatus, 'blocked'),
+    }
+  }, [filteredRows])
+
   const downloadCsv = async () => {
     const header = ['data_hora', 'canal', 'template', 'status', 'aluno', 'responsavel', 'telefone', 'escola', 'actor_id']
     const lines = filteredRows.map((r) => [
@@ -235,6 +264,32 @@ export function FinancialChargeReportPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <p className="text-xs text-slate-500">Registros</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{summary.total}</p>
+          <p className="mt-1 text-xs text-slate-500">Alunos: {summary.students}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <p className="text-xs text-slate-500">Canais</p>
+          <p className="mt-1 text-sm text-slate-700">WhatsApp: <span className="font-semibold text-slate-900">{summary.whatsapp}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Copiar: <span className="font-semibold text-slate-900">{summary.clipboard}</span></p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <p className="text-xs text-slate-500">Templates</p>
+          <p className="mt-1 text-sm text-slate-700">Padrão: <span className="font-semibold text-slate-900">{summary.tmplDefault}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Aviso: <span className="font-semibold text-slate-900">{summary.tmplWarning}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Bloqueio: <span className="font-semibold text-slate-900">{summary.tmplBlocked}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Em dia: <span className="font-semibold text-slate-900">{summary.tmplActive}</span></p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <p className="text-xs text-slate-500">Status no momento</p>
+          <p className="mt-1 text-sm text-slate-700">Em dia: <span className="font-semibold text-slate-900">{summary.statusActive}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Aviso: <span className="font-semibold text-slate-900">{summary.statusWarning}</span></p>
+          <p className="mt-1 text-sm text-slate-700">Bloqueado: <span className="font-semibold text-slate-900">{summary.statusBlocked}</span></p>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -283,4 +338,3 @@ export function FinancialChargeReportPage() {
     </div>
   )
 }
-
