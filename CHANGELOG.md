@@ -10,7 +10,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
-## [0.7.13] - 2026-01-18
+## [0.8.0] - 2026-01-18
 ### Added
 - **Financeiro (DB):** `financial_status` no aluno (active/warning/blocked).
 - **Dashboard (Alunos):** Controle de status financeiro na listagem de alunos.
