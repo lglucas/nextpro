@@ -783,9 +783,22 @@ export function PostTrainingEvaluationPage() {
               <p className="text-lg font-bold text-slate-900">Avaliação salva</p>
               <p className="text-sm text-slate-600">Os eventos técnicos foram registrados para a temporada ativa.</p>
               <div className="pt-2">
-                <button type="button" onClick={() => navigate(`/dashboard/classes/${classId}/attendance`)} className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">
-                  Voltar para a chamada
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/dashboard/classes/${classId}/sessions/${sessionId}/resumo-tecnico`)}
+                    className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+                  >
+                    Ver resumo técnico
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/dashboard/classes/${classId}/attendance`)}
+                    className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50"
+                  >
+                    Voltar para a chamada
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}

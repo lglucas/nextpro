@@ -8,6 +8,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 ### Added
 - **App (Atleta):** Página de histórico técnico baseada em `engine_events` (resumo por treino).
+- **Dashboard (Professor):** Resumo técnico por sessão (3 piores/3 melhores) via `engine_events`.
+- **Engine Técnica (DB/RLS):** Professor pode ler eventos técnicos da escola (`engine_events`).
 ### Changed
 ### Fixed
 
