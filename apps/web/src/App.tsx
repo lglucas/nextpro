@@ -51,6 +51,7 @@ import { AppLayout } from '@/layouts/AppLayout'
 import { HomePage } from '@/features/home/pages/Home'
 import { MeuPerfilPage } from '@/features/profile/pages/MeuPerfilPage'
 import { CheckInPage } from '@/features/attendance/pages/CheckInPage'
+import { TechnicalHistoryPage } from '@/features/technical/pages/TechnicalHistoryPage'
 
 function App() {
   return (
@@ -86,6 +87,7 @@ function App() {
           }>
             <Route index element={<HomePage />} />
             <Route path="meu-perfil" element={<MeuPerfilPage />} />
+            <Route path="tecnico" element={<TechnicalHistoryPage />} />
             <Route path="check-in" element={<CheckInPage />} />
             <Route path="aceite-termos" element={<AceiteTermosPage />} />
           </Route>

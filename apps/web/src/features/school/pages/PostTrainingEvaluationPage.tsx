@@ -178,27 +178,69 @@ export function PostTrainingEvaluationPage() {
     return () => window.clearTimeout(timeoutId)
   }, [fetchQuestions])
 
+  const buildDraftDefaults = useCallback(
+    (positionKey: string) => {
+      const q2First = positionQuestions.find((q) => q.position === positionKey && q.slot === 2)?.key ?? ''
+      const q3First = positionQuestions.find((q) => q.position === positionKey && q.slot === 3)?.key ?? ''
+      return { q2First, q3First }
+    },
+    [positionQuestions],
+  )
+
   const ensureDraft = useCallback(
-    (group: 'worst' | 'best', studentId: string) => {
-      const key = `${group}:${studentId}`
+    async (group: 'worst' | 'best', studentId: string) => {
+      const draftKey = `${group}:${studentId}`
+      if (draft[draftKey]) return
+      if (!season?.id) return
+      const firstBase = baseQuestions[0]?.key ?? ''
+
+      const { data } = await supabase
+        .from('engine_events')
+        .select('meta')
+        .eq('engine', 'technical')
+        .eq('season_id', season.id)
+        .eq('student_id', studentId)
+        .eq('source_type', 'technical_daily')
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      const positions: string[] = []
+      ;((data as unknown as Array<{ meta: unknown }>) ?? []).forEach((row) => {
+        const meta = row.meta as { position?: unknown } | null
+        const p = typeof meta?.position === 'string' ? meta.position : null
+        if (p) positions.push(p)
+      })
+
+      const counts = new Map<string, number>()
+      positions.forEach((p) => counts.set(p, (counts.get(p) ?? 0) + 1))
+      let suggested = 'atacante'
+      let bestCount = -1
+      for (const [p, c] of counts.entries()) {
+        if (c > bestCount) {
+          suggested = p
+          bestCount = c
+        }
+      }
+
+      const { q2First, q3First } = buildDraftDefaults(suggested)
+
       setDraft((prev) => {
-        if (prev[key]) return prev
-        const firstBase = baseQuestions[0]?.key ?? ''
+        if (prev[draftKey]) return prev
         return {
           ...prev,
-          [key]: {
-            position: 'atacante',
+          [draftKey]: {
+            position: suggested,
             q1Key: firstBase,
             q1Score: null,
-            q2Key: '',
+            q2Key: q2First,
             q2Score: null,
-            q3Key: '',
+            q3Key: q3First,
             q3Score: null,
           },
         }
       })
     },
-    [baseQuestions],
+    [baseQuestions, buildDraftDefaults, draft, season],
   )
 
   const toggleSelection = (ids: string[], setIds: (next: string[]) => void, studentId: string) => {
@@ -416,8 +458,10 @@ export function PostTrainingEvaluationPage() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => {
-                    worstIds.forEach((id) => ensureDraft('worst', id))
+                  onClick={async () => {
+                    for (const id of worstIds) {
+                      await ensureDraft('worst', id)
+                    }
                     setStep('worst_rate')
                   }}
                   disabled={worstIds.length !== 3}
@@ -587,8 +631,10 @@ export function PostTrainingEvaluationPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    bestIds.forEach((id) => ensureDraft('best', id))
+                  onClick={async () => {
+                    for (const id of bestIds) {
+                      await ensureDraft('best', id)
+                    }
                     setStep('best_rate')
                   }}
                   disabled={bestIds.length !== 3}

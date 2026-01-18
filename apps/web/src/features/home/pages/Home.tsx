@@ -27,7 +27,7 @@ export function HomePage() {
       </section>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
             <Trophy className="w-6 h-6 text-blue-600" />
@@ -58,6 +58,17 @@ export function HomePage() {
           <p className="text-sm text-slate-500 mb-4">Atualize suas estatísticas</p>
           <Link to="/app/meu-perfil" className="text-sm text-purple-600 font-medium flex items-center hover:underline">
             Editar perfil <ArrowRight className="w-4 h-4 ml-1" />
+          </Link>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center mb-4">
+            <Trophy className="w-6 h-6 text-amber-600" />
+          </div>
+          <h3 className="font-semibold text-slate-900 mb-1">Histórico técnico</h3>
+          <p className="text-sm text-slate-500 mb-4">Acompanhe seu resumo por treino</p>
+          <Link to="/app/tecnico" className="text-sm text-amber-700 font-medium flex items-center hover:underline">
+            Ver histórico <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
       </div>

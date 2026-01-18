@@ -7,6 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
+- **App (Atleta):** Página de histórico técnico baseada em `engine_events` (resumo por treino).
 ### Changed
 ### Fixed
 
