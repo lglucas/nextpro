@@ -18,11 +18,14 @@ export type MonthlySummary = {
   avg: number
   baseAvg: number | null
   positionAvg: number | null
+  pillars: Record<PillarKey, number | null>
   top: Array<{ label: string; value: number }>
   bottom: Array<{ label: string; value: number }>
 }
 
 export type MonthlyAveragePoint = { month: string; avg: number }
+
+export type PillarKey = 'tecnica' | 'tatica' | 'mental' | 'fisico'
 
 export function monthLabel(month: string) {
   const [y, m] = month.split('-')
@@ -36,6 +39,73 @@ function toNumber(value: unknown) {
   return n
 }
 
+function detectPillar(label: string): PillarKey {
+  const text = label.toLowerCase()
+
+  if (
+    text.includes('mental') ||
+    text.includes('emocional') ||
+    text.includes('coragem') ||
+    text.includes('confiança') ||
+    text.includes('confianca') ||
+    text.includes('maturidade') ||
+    text.includes('competitiv') ||
+    text.includes('liderança') ||
+    text.includes('lideranca') ||
+    text.includes('comunica') ||
+    text.includes('profissional') ||
+    text.includes('disciplina') ||
+    text.includes('assiduidade') ||
+    text.includes('pontual') ||
+    text.includes('compromiss') ||
+    text.includes('aprend') ||
+    text.includes('constân') ||
+    text.includes('constan') ||
+    text.includes('regular') ||
+    text.includes('calma')
+  ) {
+    return 'mental'
+  }
+
+  if (
+    text.includes('veloc') ||
+    text.includes('acelera') ||
+    text.includes('força') ||
+    text.includes('forca') ||
+    text.includes('resist') ||
+    text.includes('explos') ||
+    text.includes('agilid')
+  ) {
+    return 'fisico'
+  }
+
+  if (
+    text.includes('tática') ||
+    text.includes('tatica') ||
+    text.includes('posicion') ||
+    text.includes('compact') ||
+    text.includes('press') ||
+    text.includes('transi') ||
+    text.includes('linha') ||
+    text.includes('cobertura') ||
+    text.includes('balanço') ||
+    text.includes('balanco') ||
+    text.includes('organiza') ||
+    text.includes('gatilho') ||
+    text.includes('recompos') ||
+    text.includes('marcação') ||
+    text.includes('marcacao') ||
+    text.includes('leitura') ||
+    text.includes('gestão') ||
+    text.includes('gestao') ||
+    text.includes('ritmo')
+  ) {
+    return 'tatica'
+  }
+
+  return 'tecnica'
+}
+
 function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actorId: string | null) {
   const rows = events ?? []
   let month: string | null = null
@@ -44,6 +114,7 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
   const values: number[] = []
   const baseValues: number[] = []
   const positionValues: number[] = []
+  const byPillar: Record<PillarKey, number[]> = { tecnica: [], tatica: [], mental: [], fisico: [] }
 
   const items: Array<{ label: string; value: number }> = []
 
@@ -64,11 +135,18 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
 
     const label = typeof meta?.prompt === 'string' ? meta.prompt : r.event_key || 'Rubrica'
     items.push({ label, value: v })
+    byPillar[detectPillar(label)].push(v)
   })
 
   const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
   const baseAvg = baseValues.length ? baseValues.reduce((a, b) => a + b, 0) / baseValues.length : null
   const posAvg = positionValues.length ? positionValues.reduce((a, b) => a + b, 0) / positionValues.length : null
+  const pillars: Record<PillarKey, number | null> = {
+    tecnica: byPillar.tecnica.length ? byPillar.tecnica.reduce((a, b) => a + b, 0) / byPillar.tecnica.length : null,
+    tatica: byPillar.tatica.length ? byPillar.tatica.reduce((a, b) => a + b, 0) / byPillar.tatica.length : null,
+    mental: byPillar.mental.length ? byPillar.mental.reduce((a, b) => a + b, 0) / byPillar.mental.length : null,
+    fisico: byPillar.fisico.length ? byPillar.fisico.reduce((a, b) => a + b, 0) / byPillar.fisico.length : null,
+  }
 
   const dedup = new Map<string, number>()
   items.forEach((it) => {
@@ -90,6 +168,7 @@ function summarizeMonthly(events: EngineEventRow[], fallbackMonth: string, actor
     avg,
     baseAvg,
     positionAvg: posAvg,
+    pillars,
     top,
     bottom,
   } satisfies MonthlySummary
