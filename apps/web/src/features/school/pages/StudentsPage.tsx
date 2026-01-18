@@ -53,6 +53,7 @@ export function StudentsPage() {
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
   const [studentSearchTerm, setStudentSearchTerm] = useState('')
+  const [financialFilter, setFinancialFilter] = useState<'all' | 'active' | 'warning' | 'blocked'>('all')
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -355,6 +356,19 @@ export function StudentsPage() {
         )
       })
     : students
+
+  const blockedCount = students.filter((s) => (s.financial_status ?? 'active') === 'blocked').length
+  const warningCount = students.filter((s) => (s.financial_status ?? 'active') === 'warning').length
+
+  const financialFilteredStudents =
+    financialFilter === 'all' ? visibleStudents : visibleStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
+
+  const sortedVisibleStudents = [...financialFilteredStudents].sort((a, b) => {
+    const order = (s: Student) => ((s.financial_status ?? 'active') === 'blocked' ? 0 : (s.financial_status ?? 'active') === 'warning' ? 1 : 2)
+    const diff = order(a) - order(b)
+    if (diff !== 0) return diff
+    return a.full_name.localeCompare(b.full_name, 'pt-BR')
+  })
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
 
@@ -843,14 +857,34 @@ export function StudentsPage() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           {!isCreating && !isImporting ? (
             <div className="p-4 border-b border-slate-100 bg-white">
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                <input
-                  value={studentSearchTerm}
-                  onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  placeholder="Buscar aluno ou responsável..."
-                  className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
-                />
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="relative max-w-md w-full">
+                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                  <input
+                    value={studentSearchTerm}
+                    onChange={(e) => setStudentSearchTerm(e.target.value)}
+                    placeholder="Buscar aluno ou responsável..."
+                    className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">
+                    Bloqueados: <span className="font-semibold text-slate-700">{blockedCount}</span> • Aviso:{' '}
+                    <span className="font-semibold text-slate-700">{warningCount}</span>
+                  </span>
+                  <select
+                    value={financialFilter}
+                    onChange={(e) => setFinancialFilter(e.target.value as 'all' | 'active' | 'warning' | 'blocked')}
+                    className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                    aria-label="Filtro financeiro"
+                  >
+                    <option value="all">Financeiro: todos</option>
+                    <option value="active">Financeiro: em dia</option>
+                    <option value="warning">Financeiro: aviso</option>
+                    <option value="blocked">Financeiro: bloqueado</option>
+                  </select>
+                </div>
               </div>
             </div>
           ) : null}
@@ -868,7 +902,7 @@ export function StudentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {visibleStudents.map((student) => (
+                {sortedVisibleStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">

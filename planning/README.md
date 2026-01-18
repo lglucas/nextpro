@@ -13,6 +13,10 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Sprint 5.1 (detalhado): [sprint-05.1-plan.md](./sprint-05.1-plan.md)
 - ADR-002 (fundações das 3 engines): [ADR-002-engines-foundation.md](./ADR-002-engines-foundation.md)
 
+## Sprint atual (Financeiro)
+- Sprint 8 (detalhado): [sprint-08-plan.md](./sprint-08-plan.md)
+- Sprint 8 (Staging): [sprint-08-staging.md](./sprint-08-staging.md)
+
 ## Relatórios
 - Sprint 1: [sprint-01-report.md](./sprint-01-report.md)
 - Sprint 2: [sprint-02-report.md](./sprint-02-report.md)

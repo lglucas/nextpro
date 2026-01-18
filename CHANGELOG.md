@@ -15,6 +15,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Financeiro (DB):** `financial_status` no aluno (active/warning/blocked).
 - **Dashboard (Alunos):** Controle de status financeiro na listagem de alunos.
 - **App (Atleta):** Tela de bloqueio financeiro e gate de acesso.
+### Changed
+- **Dashboard (Alunos):** Filtro financeiro e ordenação por risco (bloqueado/aviso).
+### Fixed
+- **DevX:** `npm run build` disponível no root (atalho para `apps/web`).
+- **Dashboard (Auditoria):** Resolve “por Sistema” via `actor_id` quando possível.
 
 ## [0.7.12] - 2026-01-18
 ### Added

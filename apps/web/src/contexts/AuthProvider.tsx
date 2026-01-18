@@ -77,7 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const isUserBlocked = async (userId: string, role: string | null) => {
-    if (role !== 'user') return false
+    if (!role) return false
+    if (role === 'super_admin' || role === 'partner' || role === 'school_admin' || role === 'coach') return false
 
     const { data: studentData } = await supabase.from('students').select('id, financial_status').eq('user_id', userId).limit(1)
     const studentRow = (studentData as unknown as Array<{ id: string; financial_status: string }>)?.[0] ?? null
