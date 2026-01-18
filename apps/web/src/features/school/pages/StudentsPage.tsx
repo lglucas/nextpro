@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power, User } from 'lucide-react'
@@ -45,6 +45,7 @@ export function StudentsPage() {
   const { user, role } = useAuth()
   const { logAction } = useAuditLog()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [students, setStudents] = useState<Student[]>([])
   const [guardians, setGuardians] = useState<Guardian[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,6 +145,13 @@ export function StudentsPage() {
   useEffect(() => {
     fetchProfileAndData()
   }, [fetchProfileAndData])
+
+  useEffect(() => {
+    const next = searchParams.get('financial')
+    if (next === 'active' || next === 'warning' || next === 'blocked' || next === 'all') {
+      setFinancialFilter(next)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     return () => {
@@ -885,7 +893,16 @@ export function StudentsPage() {
                   </span>
                   <select
                     value={financialFilter}
-                    onChange={(e) => setFinancialFilter(e.target.value as 'all' | 'active' | 'warning' | 'blocked')}
+                    onChange={(e) => {
+                      const next = e.target.value as 'all' | 'active' | 'warning' | 'blocked'
+                      setFinancialFilter(next)
+                      setSearchParams((prev) => {
+                        const nextParams = new URLSearchParams(prev)
+                        if (next === 'all') nextParams.delete('financial')
+                        else nextParams.set('financial', next)
+                        return nextParams
+                      })
+                    }}
                     className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
                     aria-label="Filtro financeiro"
                   >

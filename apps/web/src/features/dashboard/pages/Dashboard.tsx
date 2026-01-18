@@ -39,6 +39,7 @@ export function DashboardPage() {
   })
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
   const [topStudents, setTopStudents] = useState<TopStudent[]>([])
+  const [financialStats, setFinancialStats] = useState({ blocked: 0, warning: 0 })
 
   useEffect(() => {
     async function fetchStats() {
@@ -52,10 +53,18 @@ export function DashboardPage() {
         const { count: studentsCount } = await supabase
           .from('students')
           .select('*', { count: 'exact', head: true })
+          .match(schoolId ? { school_id: schoolId } : {})
 
         const { count: classesCount } = await supabase
           .from('classes')
           .select('*', { count: 'exact', head: true })
+          .match(schoolId ? { school_id: schoolId } : {})
+
+        const blockedQuery = supabase.from('students').select('id', { count: 'exact', head: true }).eq('financial_status', 'blocked')
+        const warningQuery = supabase.from('students').select('id', { count: 'exact', head: true }).eq('financial_status', 'warning')
+        const { count: blockedCount } = await (schoolId ? blockedQuery.eq('school_id', schoolId) : blockedQuery)
+        const { count: warningCount } = await (schoolId ? warningQuery.eq('school_id', schoolId) : warningQuery)
+        setFinancialStats({ blocked: blockedCount || 0, warning: warningCount || 0 })
 
         setRealStats({
           students: studentsCount || 0,
@@ -190,7 +199,7 @@ export function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
             <h3 className="font-semibold text-slate-900">Top 3 alunos</h3>
@@ -221,6 +230,37 @@ export function DashboardPage() {
                 </div>
               ))
             )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <h3 className="font-semibold text-slate-900">Financeiro</h3>
+            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Ações rápidas</span>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-700">Alunos bloqueados</span>
+              <span className="text-sm font-bold text-slate-900">{financialStats.blocked}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-700">Alunos em aviso</span>
+              <span className="text-sm font-bold text-slate-900">{financialStats.warning}</span>
+            </div>
+            <div className="pt-2 flex gap-2">
+              <Link
+                to="/dashboard/students?financial=blocked"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 text-center"
+              >
+                Ver bloqueados
+              </Link>
+              <Link
+                to="/dashboard/students?financial=warning"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 text-center"
+              >
+                Ver aviso
+              </Link>
+            </div>
           </div>
         </div>
 

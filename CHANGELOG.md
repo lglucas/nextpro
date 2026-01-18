@@ -10,6 +10,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.2] - 2026-01-18
+### Added
+- **Dashboard:** Atalhos de inadimplência (bloqueados/aviso) com contadores.
+### Changed
+- **Dashboard:** Contagem de alunos/turmas respeita o escopo da escola (não-super_admin).
+- **Alunos:** Filtro financeiro suporta querystring `?financial=`.
+
 ## [0.8.1] - 2026-01-18
 ### Added
 - **Dashboard (Auditoria):** Log ao alterar status financeiro do aluno.
