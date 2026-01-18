@@ -122,7 +122,7 @@ export function HomePage() {
       .select('id', { count: 'exact', head: true })
       .eq('engine', 'technical')
       .eq('student_id', selectedStudentId)
-      .eq('source_type', 'technical_daily')
+      .in('source_type', ['technical_daily', 'technical_monthly'])
 
     const { count, error } = lastSeen ? await query.gt('created_at', lastSeen) : await query
     if (error) {

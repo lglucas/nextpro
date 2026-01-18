@@ -10,6 +10,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **App (Atleta):** Página de histórico técnico baseada em `engine_events` (resumo por treino).
 - **Dashboard (Professor):** Resumo técnico por sessão (3 piores/3 melhores) via `engine_events`.
 - **Engine Técnica (DB/RLS):** Professor pode ler eventos técnicos da escola (`engine_events`).
+- **Engine Técnica:** Estrutura de rubricas mensais (`technical_monthly_questions`) e tela de avaliação mensal por turma.
 ### Changed
 - **App (Atleta):** Home usa dados reais para próximo treino e frequência.
 - **App:** Coach agora vê link de acesso ao dashboard na barra superior.

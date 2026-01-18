@@ -13,6 +13,7 @@ import { ClassesPage } from '@/features/school/pages/ClassesPage'
 import { ClassAttendancePage } from '@/features/school/pages/ClassAttendancePage'
 import { PostTrainingEvaluationPage } from '@/features/school/pages/PostTrainingEvaluationPage'
 import { SessionTechnicalSummaryPage } from '@/features/school/pages/SessionTechnicalSummaryPage'
+import { ClassMonthlyEvaluationPage } from '@/features/school/pages/ClassMonthlyEvaluationPage'
 import { PublicSiteLayout } from '@/layouts/PublicSiteLayout'
 import { SiteHomePage } from '@/features/site/pages/SiteHomePage'
 import { ProjetoPage } from '@/features/site/pages/ProjetoPage'
@@ -110,6 +111,7 @@ function App() {
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
             <Route path="classes/:id/sessions/:sessionId/post-treino" element={<PostTrainingEvaluationPage />} />
             <Route path="classes/:id/sessions/:sessionId/resumo-tecnico" element={<SessionTechnicalSummaryPage />} />
+            <Route path="classes/:id/avaliacao-mensal" element={<ClassMonthlyEvaluationPage />} />
             <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
             <Route path="reports" element={<Navigate to="/dashboard" replace />} />
           </Route>

@@ -10,6 +10,7 @@ type SeasonRow = { id: string; year: number }
 type EngineEventRow = {
   id: string
   created_at: string
+  source_type: string
   event_key: string | null
   value: number | null
   meta: unknown
@@ -61,11 +62,11 @@ export function TechnicalHistoryPage() {
     setLoading(true)
     const { data, error } = await supabase
       .from('engine_events')
-      .select('id, created_at, event_key, value, meta')
+      .select('id, created_at, source_type, event_key, value, meta')
       .eq('engine', 'technical')
       .eq('season_id', season.id)
       .eq('student_id', selectedStudentId)
-      .eq('source_type', 'technical_daily')
+      .in('source_type', ['technical_daily', 'technical_monthly'])
       .order('created_at', { ascending: false })
       .limit(60)
 
@@ -126,8 +127,15 @@ export function TechnicalHistoryPage() {
   const grouped = useMemo(() => {
     const map = new Map<string, EngineEventRow[]>()
     events.forEach((e) => {
-      const sessionId = (e.meta as { session_id?: unknown } | null)?.session_id
-      const key = typeof sessionId === 'string' && sessionId ? sessionId : e.created_at.slice(0, 10)
+      const meta = e.meta as { session_id?: unknown; month?: unknown } | null
+      const month = typeof meta?.month === 'string' ? meta.month : null
+      const sessionId = meta?.session_id
+      const key =
+        e.source_type === 'technical_monthly' && month
+          ? `month:${month}`
+          : typeof sessionId === 'string' && sessionId
+            ? sessionId
+            : e.created_at.slice(0, 10)
       const list = map.get(key) ?? []
       list.push(e)
       map.set(key, list)
@@ -193,7 +201,12 @@ export function TechnicalHistoryPage() {
         <div className="space-y-4">
           {grouped.map((group) => {
             const session = sessionsById[group.key] ?? null
-            const title = session ? `${new Date(session.date).toLocaleDateString('pt-BR')} • ${session.topic || 'Treino'}` : group.key
+            const title =
+              group.key.startsWith('month:')
+                ? `Avaliação mensal • ${group.key.replace('month:', '')}`
+                : session
+                  ? `${new Date(session.date).toLocaleDateString('pt-BR')} • ${session.topic || 'Treino'}`
+                  : group.key
             return (
               <div key={group.key} className="bg-white border border-slate-200 rounded-xl p-6 space-y-3">
                 <div className="flex items-center justify-between gap-3">
@@ -205,7 +218,14 @@ export function TechnicalHistoryPage() {
                     const meta = e.meta as { prompt?: unknown; group?: unknown } | null
                     const prompt = typeof meta?.prompt === 'string' ? meta.prompt : e.event_key || 'Pergunta'
                     const tag = getLabelFromValue(e.value)
-                    const groupLabel = meta?.group === 'best' ? 'Destaque' : meta?.group === 'worst' ? 'Atenção' : 'Treino'
+                    const groupLabel =
+                      e.source_type === 'technical_monthly'
+                        ? 'Mensal'
+                        : meta?.group === 'best'
+                          ? 'Destaque'
+                          : meta?.group === 'worst'
+                            ? 'Atenção'
+                            : 'Treino'
                     return (
                       <div key={e.id} className="p-3 rounded-lg border border-slate-200">
                         <p className="text-sm text-slate-900 line-clamp-2">{prompt}</p>
