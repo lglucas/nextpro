@@ -586,8 +586,24 @@ export function StudentsPage() {
     }
   }
 
+  const confirmIfRecentCharge = (actionLabel: string, list: Student[]) => {
+    const recent = list.filter((s) => {
+      const last = lastChargeByStudentId[s.id]
+      if (!last) return false
+      return Date.now() - new Date(last.created_at).getTime() <= 24 * 60 * 60 * 1000
+    })
+    if (recent.length === 0) return true
+    const preview = recent
+      .slice(0, 6)
+      .map((s) => s.full_name)
+      .join(', ')
+    const more = recent.length > 6 ? ` (+${recent.length - 6})` : ''
+    return confirm(`Já existe cobrança nas últimas 24h para ${recent.length} aluno(s): ${preview}${more}.\n\nContinuar mesmo assim? (${actionLabel})`)
+  }
+
   const copyBillingMessages = async () => {
     if (selectedStudents.length === 0) return
+    if (!confirmIfRecentCharge('Copiar mensagem', selectedStudents)) return
     setBillingMessageBusy(true)
     try {
       const blocks = selectedStudents.map((student) => {
@@ -613,6 +629,7 @@ export function StudentsPage() {
   const openWhatsappForFirstSelected = async () => {
     if (selectedStudents.length === 0) return
     const student = selectedStudents[0]
+    if (!confirmIfRecentCharge('WhatsApp', [student])) return
     const phone = formatPhoneForWhatsapp(student.guardian?.phone || '')
     if (!phone) {
       alert('Responsável sem telefone válido.')
@@ -631,6 +648,7 @@ export function StudentsPage() {
   const settleAndCopyMessages = async () => {
     if (selectedStudents.length === 0) return
     if (role !== 'school_admin' && role !== 'super_admin') return
+    if (!confirmIfRecentCharge('Quitar + copiar', selectedStudents)) return
     const ok = confirm(`Marcar como "em dia" e copiar mensagem para ${selectedStudents.length} aluno(s)?`)
     if (!ok) return
 
@@ -669,6 +687,7 @@ export function StudentsPage() {
   const openWhatsappForQueueIndex = async (index: number) => {
     const row = whatsQueueStudents[index]
     if (!row) return
+    if (!confirmIfRecentCharge('WhatsApp (fila)', [row.student])) return
     const url = `https://wa.me/${row.phone}?text=${encodeURIComponent(buildBillingMessage(row.student))}`
     window.open(url, '_blank', 'noopener,noreferrer')
     await recordChargeEvents([{ student: row.student, channel: 'whatsapp', template: billingMessageTemplate }])

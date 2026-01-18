@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.13] - 2026-01-18
+### Added
+- **Alunos:** Confirmação antes de cobrar novamente em <24h.
+
 ## [0.8.12] - 2026-01-18
 ### Added
 - **Dashboard:** Resumo do relatório de cobranças (cards).
