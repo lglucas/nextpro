@@ -27,6 +27,8 @@ Esta sprint foca em consolidar a operação por persona (SchoolAdmin / Sócio / 
 - Inserts confirmados em `terms_acceptances` e liberação do gate após aceite.
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos impactados e revisão de caminhos/navegação.

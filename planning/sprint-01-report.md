@@ -39,6 +39,8 @@ A Sprint 1 focava no setup básico ("Hello World"). Conseguimos não apenas esta
 *   Configurar RLS para proteger dados entre escolas.
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos impactados e revisão de caminhos/navegação.

@@ -44,6 +44,8 @@ Release do marco: **v0.6.13**.
 - `npm run lint` e `npm run build` executados com sucesso.
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos impactados e revisão de caminhos/navegação.

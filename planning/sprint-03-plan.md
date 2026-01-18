@@ -44,6 +44,8 @@
 - [x] Registro de aceite com versão e evidências mínimas (IP/User-Agent/Meta).
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos de cadastro (responsável → aluno), turmas e presença.

@@ -51,6 +51,8 @@
 - CHANGELOG atualizado com a versão do ciclo.
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos do CTO (temporadas, núcleos, rubricas) e navegação.

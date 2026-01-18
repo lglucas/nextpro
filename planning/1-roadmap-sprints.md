@@ -168,3 +168,5 @@ Para evitar “pular de sprint” com caminhos quebrados, cada sprint passa por 
 - Deploy em Staging com o sprint fechado.
 - Checklist de regressão dos fluxos principais + console limpo.
 - Registro de sugestões/melhorias para priorizar no sprint seguinte.
+
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)

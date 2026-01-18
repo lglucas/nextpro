@@ -7,6 +7,7 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Arquitetura técnica (fiel ao repositório): [2-arquitetura-tecnica.md](./2-arquitetura-tecnica.md)
 - Regras de negócio (atuais + planejadas): [3-regras-negocio-funcionais.md](./3-regras-negocio-funcionais.md)
 - Processo: cada sprint tem gate de validação em ambiente de testes (Staging) no meio e no fim.
+- Template do gate (checklist): [staging-checklist-template.md](./staging-checklist-template.md)
 
 ## Sprint atual (Engine)
 - Sprint 5.1 (detalhado): [sprint-05.1-plan.md](./sprint-05.1-plan.md)

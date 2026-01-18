@@ -20,6 +20,8 @@ Objetivo: eliminar mocks/atalhos quebrados e integrar dados reais já existentes
 - Atualizar changelog (Unreleased).
 
 ## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
 ### Checkpoint (meio do sprint)
 - Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
 - Smoke test dos fluxos do atleta e do professor/gestor.
