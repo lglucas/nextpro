@@ -22,6 +22,8 @@ export type MonthlySummary = {
   bottom: Array<{ label: string; value: number }>
 }
 
+export type MonthlyAveragePoint = { month: string; avg: number }
+
 export function monthLabel(month: string) {
   const [y, m] = month.split('-')
   const date = new Date(Number(y), Math.max(0, Number(m) - 1), 1)
@@ -120,6 +122,43 @@ export async function listStudentMonthlyMonths(seasonId: string, studentId: stri
   return out
 }
 
+export async function getStudentMonthlyAverages(seasonId: string, studentId: string, limitMonths = 12) {
+  const { data } = await supabase
+    .from('engine_events')
+    .select('value, meta')
+    .eq('engine', 'technical')
+    .eq('season_id', seasonId)
+    .eq('student_id', studentId)
+    .eq('source_type', 'technical_monthly')
+    .order('created_at', { ascending: false })
+    .limit(5000)
+
+  const rows = (data as unknown as Array<{ value: unknown; meta: unknown }>) ?? []
+  const byMonth = new Map<string, number[]>()
+
+  rows.forEach((r) => {
+    const meta = r.meta as { month?: unknown } | null
+    const month = typeof meta?.month === 'string' ? meta.month : null
+    if (!month) return
+    const v = toNumber(r.value)
+    if (v == null) return
+    const list = byMonth.get(month) ?? []
+    list.push(v)
+    byMonth.set(month, list)
+  })
+
+  const months = Array.from(byMonth.keys())
+  months.sort((a, b) => a.localeCompare(b))
+
+  const points: MonthlyAveragePoint[] = months.map((m) => {
+    const values = byMonth.get(m) ?? []
+    const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
+    return { month: m, avg }
+  })
+
+  return points.slice(Math.max(0, points.length - Math.max(1, limitMonths)))
+}
+
 export async function getStudentMonthlySummary(seasonId: string, studentId: string, month: string) {
   const { data: lastRow } = await supabase
     .from('engine_events')
@@ -150,4 +189,3 @@ export async function getStudentMonthlySummary(seasonId: string, studentId: stri
 
   return summarizeMonthly(rows, month, actorId)
 }
-

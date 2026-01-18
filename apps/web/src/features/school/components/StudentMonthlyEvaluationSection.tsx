@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getStudentMonthlySummary, listStudentMonthlyMonths, monthLabel, type MonthlySummary, type SeasonRow } from '@/features/school/services/studentMonthlyEvaluation'
+import {
+  getStudentMonthlyAverages,
+  getStudentMonthlySummary,
+  listStudentMonthlyMonths,
+  monthLabel,
+  type MonthlyAveragePoint,
+  type MonthlySummary,
+  type SeasonRow,
+} from '@/features/school/services/studentMonthlyEvaluation'
 
 type Props = {
   studentId: string
@@ -11,6 +19,7 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
   const [selectedMonth, setSelectedMonth] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [summary, setSummary] = useState<MonthlySummary | null>(null)
+  const [trend, setTrend] = useState<MonthlyAveragePoint[]>([])
   const seasonId = season?.id ?? null
 
   useEffect(() => {
@@ -35,6 +44,21 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
 
     void run()
 
+    return () => {
+      mounted = false
+    }
+  }, [seasonId, studentId])
+
+  useEffect(() => {
+    let mounted = true
+    const run = async () => {
+      if (!seasonId) return
+      if (!studentId) return
+      const next = await getStudentMonthlyAverages(seasonId, studentId, 12)
+      if (!mounted) return
+      setTrend(next)
+    }
+    void run()
     return () => {
       mounted = false
     }
@@ -76,6 +100,20 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
     return Math.max(0, Math.min(100, Math.round((summary.avg / 10) * 100)))
   }, [summary])
 
+  const trendPoints = useMemo(() => {
+    if (!trend.length) return null
+    const w = 100
+    const h = 24
+    const pad = 2
+    const xs = trend.map((_, idx) => (trend.length === 1 ? w / 2 : (idx / (trend.length - 1)) * (w - pad * 2) + pad))
+    const ys = trend.map((p) => h - (Math.max(0, Math.min(10, p.avg)) / 10) * (h - pad * 2) - pad)
+    const points = xs.map((x, i) => `${x.toFixed(2)},${ys[i].toFixed(2)}`).join(' ')
+    const last = trend[trend.length - 1]?.avg ?? 0
+    const prev = trend.length > 1 ? trend[trend.length - 2]?.avg ?? null : null
+    const delta = prev == null ? null : last - prev
+    return { points, last, prev, delta }
+  }, [trend])
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
@@ -83,6 +121,28 @@ export function StudentMonthlyEvaluationSection({ studentId, season }: Props) {
           <h2 className="text-lg font-bold text-slate-900">Avaliação técnica mensal</h2>
           <p className="mt-1 text-sm text-slate-600">{header || 'Sem temporada ativa definida.'}</p>
         </div>
+        {trendPoints ? (
+          <div className="md:text-right">
+            <p className="text-xs font-semibold text-slate-500">Evolução (últimos {trend.length} meses)</p>
+            <div className="mt-2 flex items-center gap-3 md:justify-end">
+              <svg viewBox="0 0 100 24" className="w-36 h-8">
+                <polyline points={trendPoints.points} fill="none" stroke="currentColor" strokeWidth={2} className="text-primary" />
+              </svg>
+              <div className="text-right">
+                <p className="text-xs text-slate-500">Última</p>
+                <p className="text-sm font-bold text-slate-900">
+                  {trendPoints.last.toFixed(1)}
+                  {trendPoints.delta == null ? null : (
+                    <span className={`ml-2 text-xs font-semibold ${trendPoints.delta >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                      {trendPoints.delta >= 0 ? '+' : ''}
+                      {trendPoints.delta.toFixed(1)}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
         {months.length ? (
           <div>
             <p className="text-xs font-semibold text-slate-500">Mês</p>

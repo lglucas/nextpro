@@ -17,6 +17,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - **Dashboard (Alunos):** Ficha do atleta refatorada em componentes menores.
 
+## [0.7.8] - 2026-01-17
+### Added
+- **Dashboard (Alunos):** Evolução mensal (sparkline) no card do atleta.
+
 ## [0.7.6] - 2026-01-17
 ### Added
 - **Docs:** Guia de changelog e versionamento.
