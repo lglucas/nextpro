@@ -15,6 +15,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **CTO (Engines):** Tela para gerenciar reputação do avaliador (peso + shadow ban).
 ### Changed
 - **Dashboard (Alunos):** Skill tree exibe labels de posição.
+### Fixed
+- **Docs:** Checklist de Staging do Sprint 7 preenchido.
 
 ## [0.7.11] - 2026-01-18
 ### Added
