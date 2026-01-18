@@ -10,6 +10,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.1] - 2026-01-18
+### Added
+- **Dashboard (Auditoria):** Log ao alterar status financeiro do aluno.
+- **Card do Atleta:** Badge de status financeiro (Em dia/Aviso/Bloqueado).
+
 ## [0.8.0] - 2026-01-18
 ### Added
 - **Financeiro (DB):** `financial_status` no aluno (active/warning/blocked).

@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power, User } from 'lucide-react'
 import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
 import { normalizeCpf, normalizePhone } from '@/features/school/utils/csv'
+import { useAuditLog } from '@/hooks/useAuditLog'
 
 interface Guardian {
   id: string
@@ -42,6 +43,7 @@ interface School {
 
 export function StudentsPage() {
   const { user, role } = useAuth()
+  const { logAction } = useAuditLog()
   const navigate = useNavigate()
   const [students, setStudents] = useState<Student[]>([])
   const [guardians, setGuardians] = useState<Guardian[]>([])
@@ -304,8 +306,16 @@ export function StudentsPage() {
   const handleUpdateFinancialStatus = async (student: Student, next: 'active' | 'warning' | 'blocked') => {
     try {
       setSavingStudent(true)
+      const prev = (student.financial_status ?? 'active') as 'active' | 'warning' | 'blocked'
       const { error } = await supabase.from('students').update({ financial_status: next }).eq('id', student.id)
       if (error) throw error
+      if (prev !== next) {
+        await logAction('update_student_financial_status', `Aluno: ${student.full_name}`, {
+          student_id: student.id,
+          previous_status: prev,
+          next_status: next,
+        })
+      }
       await fetchStudents()
     } catch (error) {
       const err = error as { message?: string }
