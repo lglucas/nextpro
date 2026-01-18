@@ -35,6 +35,7 @@ import { PreCadastroPage } from '@/features/site/pages/PreCadastroPage'
 import { TermsGate } from '@/features/legal/components/TermsGate'
 import { AceiteTermosPage } from '@/features/legal/pages/AceiteTermosPage'
 import { FinancialBlockedPage } from '@/features/financial/pages/FinancialBlockedPage'
+import { FinancialChargeReportPage } from '@/features/financial/pages/FinancialChargeReportPage'
 import './App.css'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -122,6 +123,7 @@ function App() {
             <Route path="students" element={<StudentsPage />} />
             <Route path="students/:id/card" element={<StudentCardPage />} />
             <Route path="classes" element={<ClassesPage />} />
+            <Route path="financial/charges" element={<FinancialChargeReportPage />} />
             <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
             <Route path="classes/:id/sessions/:sessionId/post-treino" element={<PostTrainingEvaluationPage />} />

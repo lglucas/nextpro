@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.11] - 2026-01-18
+### Added
+- **Dashboard:** Relatório de cobranças com filtros e exportação CSV.
+
 ## [0.8.10] - 2026-01-18
 ### Added
 - **Alunos:** Filtro por recência da cobrança no modo cobrança.
