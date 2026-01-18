@@ -12,6 +12,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Engine Técnica (DB/RLS):** Professor pode ler eventos técnicos da escola (`engine_events`).
 - **Engine Técnica:** Estrutura de rubricas mensais (`technical_monthly_questions`) e tela de avaliação mensal por turma.
 - **CTO (Engines):** Gestão de rubricas mensais na aba Engines.
+- **Engine Técnica:** Seeds de rubricas (diárias e mensais) para a temporada ativa.
 ### Changed
 - **App (Atleta):** Home usa dados reais para próximo treino e frequência.
 - **App:** Coach agora vê link de acesso ao dashboard na barra superior.

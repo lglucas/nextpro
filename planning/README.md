@@ -20,3 +20,4 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Status do cronograma (2026-01-17): [relatorio-status-2026-01-17.md](./relatorio-status-2026-01-17.md)
 - Auditoria de páginas (2026-01-18): [auditoria-paginas-app-2026-01-18.md](./auditoria-paginas-app-2026-01-18.md)
 - Sprint 6.2 (polish): [sprint-06.2-polish-app.md](./sprint-06.2-polish-app.md)
+- Rubricas técnicas (V1): [rubricas-tecnicas-v1.md](./rubricas-tecnicas-v1.md)
