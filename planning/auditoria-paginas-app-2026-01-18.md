@@ -89,3 +89,6 @@ Fonte: [App.tsx](file:///c:/Users/lucas/OneDrive/Documentos/Lucas/SuperAppFutebo
 ### Baixa (polish)
 - Revisar copy e consistência visual (“Em breve” vs “—”) em lugares de placeholder.
 
+## 4) Pendências registradas
+- **Dashboard (KPIs reais):** Implementar “Taxa de Presença” e “Avaliações” com dados reais (baseado em `attendances` e `engine_events`). Mantido como pendente para seguir o sprint normal.
+

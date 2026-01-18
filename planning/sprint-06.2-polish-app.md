@@ -2,6 +2,8 @@
 
 Objetivo: eliminar mocks/atalhos quebrados e integrar dados reais já existentes, consolidando uma experiência coerente para atleta e professor.
 
+**Status:** ✅ Concluído (2026-01-18)
+
 ## Escopo
 ### App (atleta)
 - Substituir “Próximo Jogo” por “Próximo treino” (dados reais via `class_sessions`).
@@ -28,3 +30,6 @@ Objetivo: eliminar mocks/atalhos quebrados e integrar dados reais já existentes
 - Sem links `to="#"` em cards.
 - Lint/build ok.
 
+## Pendências (não realizadas)
+- **Dashboard (KPIs reais):** Implementar “Taxa de Presença” e “Avaliações” com dados reais (baseado em `attendances` e `engine_events`).
+- **Dashboard (UI):** Decidir se “Relatórios” vira uma página real (e qual) ou fica fora do menu.
