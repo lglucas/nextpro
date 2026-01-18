@@ -43,6 +43,17 @@
 - [x] Gate de aceite obrigatório para acessar `/app` e `/dashboard`.
 - [x] Registro de aceite com versão e evidências mínimas (IP/User-Agent/Meta).
 
+## Ambiente de testes (Staging)
+### Checkpoint (meio do sprint)
+- Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos de cadastro (responsável → aluno), turmas e presença.
+- Registro rápido de caminhos quebrados e ajustes de UI/UX antes de seguir.
+
+### Fechamento (antes do próximo sprint)
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão dos fluxos principais (School Admin) + console limpo.
+- Lista de melhorias/sugestões para priorizar na próxima sprint.
+
 ## Status Atual
 - Estrutura base implementada.
 - Tabelas criadas (`students`, `classes`, `guardians`, `class_students`, `class_sessions`, `attendances`).

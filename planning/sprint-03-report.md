@@ -26,6 +26,17 @@ Esta sprint foca em consolidar a operação por persona (SchoolAdmin / Sócio / 
 - Inserts confirmados em `contact_messages`.
 - Inserts confirmados em `terms_acceptances` e liberação do gate após aceite.
 
+## Ambiente de testes (Staging)
+### Checkpoint (meio do sprint)
+- Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos impactados e revisão de caminhos/navegação.
+- Registro rápido de ajustes de UI/UX antes de seguir.
+
+### Fechamento (antes do próximo sprint)
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão dos fluxos principais + console limpo.
+- Lista de melhorias/sugestões para priorizar na próxima sprint.
+
 ## 🔜 Próximos Passos (Sprint 3)
 - Completar CRUD (edição/exclusão) em alunos e turmas.
 - Evoluir o termo (conteúdo e versão) e definir política de atualização/renovação.

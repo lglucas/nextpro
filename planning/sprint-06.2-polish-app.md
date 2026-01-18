@@ -19,6 +19,17 @@ Objetivo: eliminar mocks/atalhos quebrados e integrar dados reais já existentes
 - Garantir `npm run lint` e `npm run build` verdes.
 - Atualizar changelog (Unreleased).
 
+## Ambiente de testes (Staging)
+### Checkpoint (meio do sprint)
+- Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos do atleta e do professor/gestor.
+- Registro rápido de caminhos quebrados e ajustes de UI/UX antes de seguir.
+
+### Fechamento (antes do próximo sprint)
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão (app + dashboard) e console limpo.
+- Lista de melhorias/sugestões para priorizar na próxima sprint.
+
 ## Fora de escopo (por enquanto)
 - Calendário completo de treinos (recorrência por `classes.days`).
 - Jogos/partidas (entidade própria).

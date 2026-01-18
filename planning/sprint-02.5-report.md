@@ -43,6 +43,17 @@ Release do marco: **v0.6.13**.
 - Visualização e edição do status testadas no CTO.
 - `npm run lint` e `npm run build` executados com sucesso.
 
+## Ambiente de testes (Staging)
+### Checkpoint (meio do sprint)
+- Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos impactados e revisão de caminhos/navegação.
+- Registro rápido de ajustes de UI/UX antes de seguir.
+
+### Fechamento (antes do próximo sprint)
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão dos fluxos principais + console limpo.
+- Lista de melhorias/sugestões para priorizar na próxima sprint.
+
 ## 🔜 Pendências (Escopo Adiado / Próximas Iterações)
 - Captura de leads (formulário de contato) e eventos de métricas (GA/Meta).
 - Captcha “forte” (ex.: Cloudflare Turnstile/reCAPTCHA) além do honeypot.
