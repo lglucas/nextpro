@@ -99,16 +99,16 @@
 
 ### 🌟 Sprint 6: Avaliação Técnica Diária (19/01 - 25/01)
 **Objetivo:** O input do Treinador.
-- [ ] **Tela "Pós-Treino":** Lista de presentes para o técnico avaliar.
-- [ ] **Gating obrigatório:** Selecionar 3 piores (avaliar) para liberar 3 melhores (avaliar).
-- [ ] **Perguntas por atleta (treino):** 3 perguntas com nota 0–10 via seleção de menus (base + posição).
-- [ ] **Posição no treino:** Sugestão automática por frequência e confirmação do técnico quando necessário.
-- [ ] **Feedback ao atleta:** Notificação e histórico (sem expor nota crua para o atleta; foco em conceitos/tiers).
+- [x] **Tela "Pós-Treino":** Lista de presentes para o técnico avaliar.
+- [x] **Gating obrigatório:** Selecionar 3 piores (avaliar) para liberar 3 melhores (avaliar).
+- [x] **Perguntas por atleta (treino):** 3 perguntas com nota 0–10 via seleção de menus (base + posição).
+- [x] **Posição no treino:** Sugestão automática por frequência e confirmação do técnico quando necessário.
+- [x] **Feedback ao atleta:** Notificação e histórico (sem expor nota crua para o atleta; foco em conceitos/tiers).
 
 ### 📊 Sprint 7: Avaliação Mensal & Algoritmo (26/01 - 01/02)
 **Objetivo:** A "Prova Real".
-- [ ] **Formulário 20–40 critérios por atleta:** Prova mensal por turma (técnico responde por aluno).
-- [ ] **Variação por posição:** Total de perguntas pode ser maior; perguntas base comuns a todas as posições.
+- [x] **Formulário 20–40 critérios por atleta:** Prova mensal por turma (técnico responde por aluno).
+- [x] **Variação por posição:** Total de perguntas pode ser maior; perguntas base comuns a todas as posições.
 - [ ] **Normalização e pesos por fonte:** Ponderar notas por camada e reputação; reduzir inflação.
 - [ ] **Skill tree / Radar:** Visualização por posição e por temporada (compatível com card EA FC).
 
