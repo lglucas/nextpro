@@ -38,6 +38,17 @@ export type TechnicalQuestionRow = {
   sort_order: number
 }
 
+export type TechnicalMonthlyQuestionRow = {
+  id: string
+  season_id: string
+  kind: 'base' | 'position'
+  position: string | null
+  key: string
+  prompt: string
+  active: boolean
+  sort_order: number
+}
+
 export const POSITIONS = [
   { key: 'goleiro', label: 'Goleiro' },
   { key: 'zagueiro', label: 'Zagueiro' },
@@ -51,4 +62,3 @@ export const POSITIONS = [
 export function toIsoDateInput(value: string) {
   return value ? value.slice(0, 10) : ''
 }
-
