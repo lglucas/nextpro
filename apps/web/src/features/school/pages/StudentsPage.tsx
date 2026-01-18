@@ -494,15 +494,16 @@ export function StudentsPage() {
     return s === 'active' ? 'em dia' : s === 'warning' ? 'em aviso' : 'bloqueado'
   }
 
-  const buildBillingMessage = (student: Student) => {
+  const buildBillingMessage = (student: Student, template?: typeof billingMessageTemplate) => {
+    const chosen = template ?? billingMessageTemplate
     const guardianName = student.guardian?.full_name?.trim() || 'Responsável'
     const base = `Olá, ${guardianName}. Aqui é da secretaria.`
     const line = `A mensalidade do atleta ${student.full_name} está ${statusLabel(student.financial_status)}.`
     const close = `Se já regularizou, desconsidere. Obrigado.`
 
-    if (billingMessageTemplate === 'blocked') return `${base}\n${line}\nPor favor, regularize para liberar o acesso.\n${close}`
-    if (billingMessageTemplate === 'warning') return `${base}\n${line}\nPor favor, verifique a pendência para evitar bloqueio.\n${close}`
-    if (billingMessageTemplate === 'active') return `${base}\nA mensalidade do atleta ${student.full_name} está em dia.\n${close}`
+    if (chosen === 'blocked') return `${base}\n${line}\nPor favor, regularize para liberar o acesso.\n${close}`
+    if (chosen === 'warning') return `${base}\n${line}\nPor favor, verifique a pendência para evitar bloqueio.\n${close}`
+    if (chosen === 'active') return `${base}\nA mensalidade do atleta ${student.full_name} está em dia.\n${close}`
     return `${base}\n${line}\n${close}`
   }
 
@@ -546,6 +547,43 @@ export function StudentsPage() {
       class_id: billingClassId === 'all' ? null : billingClassId,
       template: billingMessageTemplate,
     })
+  }
+
+  const settleAndCopyMessages = async () => {
+    if (selectedStudents.length === 0) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    const ok = confirm(`Marcar como "em dia" e copiar mensagem para ${selectedStudents.length} aluno(s)?`)
+    if (!ok) return
+
+    setSavingStudent(true)
+    setBillingMessageBusy(true)
+    try {
+      const ids = selectedStudents.map((s) => s.id)
+      const { error } = await supabase.from('students').update({ financial_status: 'active' }).in('id', ids)
+      if (error) throw error
+
+      const blocks = selectedStudents.map((student) => {
+        const phone = student.guardian?.phone || ''
+        const header = `Para: ${student.guardian?.full_name || 'Responsável'} (${phone || 'sem telefone'})`
+        return `${header}\n${buildBillingMessage(student, 'active')}`
+      })
+      await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+
+      await logAction('bulk_settle_and_copy_financial_message', 'Financeiro (lote)', {
+        student_ids: ids,
+        class_id: billingClassId === 'all' ? null : billingClassId,
+      })
+
+      await fetchStudents()
+      clearSelection()
+      alert('Status atualizado e mensagens copiadas!')
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao quitar e copiar mensagem')
+    } finally {
+      setBillingMessageBusy(false)
+      setSavingStudent(false)
+    }
   }
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
@@ -1155,6 +1193,14 @@ export function StudentsPage() {
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       WhatsApp (1º)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void settleAndCopyMessages()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      Quitar + copiar
                     </button>
                     <select
                       value={bulkFinancialStatus}

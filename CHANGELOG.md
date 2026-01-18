@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.7] - 2026-01-18
+### Added
+- **Alunos:** Botão “Quitar + copiar” no modo cobrança.
+
 ## [0.8.6] - 2026-01-18
 ### Added
 - **Alunos:** Ação em massa para copiar/abrir mensagem de cobrança (WhatsApp).
