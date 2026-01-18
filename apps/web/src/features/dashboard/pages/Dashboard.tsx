@@ -1,8 +1,9 @@
-import { BarChart3, TrendingUp, Users, GraduationCap } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, GraduationCap, Trophy } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { generateDashboardReport } from '@/utils/pdf'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { Link } from 'react-router-dom'
 
 interface AuditLogEntry {
   action: string
@@ -19,18 +20,34 @@ interface RawAuditLog {
   payload?: unknown
 }
 
+type TopStudent = {
+  id: string
+  full_name: string
+  photo_url: string | null
+  xp_total: number
+  level: number
+  schoolName: string | null
+}
+
 export function DashboardPage() {
-  const { user } = useAuth()
+  const { user, role } = useAuth()
   const [realStats, setRealStats] = useState({
     students: 0,
     classes: 0,
     evaluations: 0
   })
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
+  const [topStudents, setTopStudents] = useState<TopStudent[]>([])
 
   useEffect(() => {
     async function fetchStats() {
       try {
+        let schoolId: string | null = null
+        if (user?.id && role !== 'super_admin') {
+          const { data: profile } = await supabase.from('profiles').select('school_id').eq('id', user.id).maybeSingle()
+          schoolId = (profile as unknown as { school_id?: string | null } | null)?.school_id ?? null
+        }
+
         const { count: studentsCount } = await supabase
           .from('students')
           .select('*', { count: 'exact', head: true })
@@ -44,6 +61,35 @@ export function DashboardPage() {
           classes: classesCount || 0,
           evaluations: 0
         })
+
+        const { data: rankingRows } = await supabase
+          .from('student_progress')
+          .select('student_id, xp_total, level, student:students(id, full_name, photo_url, school_id, school:schools(name))')
+          .order('xp_total', { ascending: false })
+          .limit(50)
+
+        const safeRows =
+          (rankingRows as unknown as Array<{
+            student_id: string
+            xp_total: number | null
+            level: number | null
+            student: { id: string; full_name: string; photo_url: string | null; school_id: string | null; school: { name: string } | null } | null
+          }>) ?? []
+
+        const filtered = schoolId ? safeRows.filter((r) => r.student?.school_id === schoolId) : safeRows
+        const top = filtered
+          .filter((r) => r.student?.id)
+          .slice(0, 3)
+          .map((r) => ({
+            id: r.student?.id || r.student_id,
+            full_name: r.student?.full_name || 'Aluno',
+            photo_url: r.student?.photo_url ?? null,
+            xp_total: r.xp_total ?? 0,
+            level: r.level ?? 1,
+            schoolName: r.student?.school?.name ?? null,
+          }))
+
+        setTopStudents(top)
 
         // Fetch Audit Logs
         const { data: logs } = await supabase
@@ -78,7 +124,7 @@ export function DashboardPage() {
       }
     }
     fetchStats()
-  }, [])
+  }, [role, user?.id])
 
   const kpiData = {
     students: realStats.students.toString(),
@@ -136,25 +182,61 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Audit Logs Widget (Visível para todos, mas gerenciado pelo CTO) */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-          <h3 className="font-semibold text-slate-900">Log de Atividades do Sistema</h3>
-          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Últimas 24h</span>
-        </div>
-        <div className="divide-y divide-slate-100">
-          {auditLogs.map((log, i) => (
-            <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{log.action}</p>
-                  <p className="text-xs text-slate-500">{log.detail} por <span className="font-semibold">{log.user}</span></p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <h3 className="font-semibold text-slate-900">Top 3 alunos</h3>
+            <Trophy className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="divide-y divide-slate-100">
+            {topStudents.length === 0 ? (
+              <div className="px-6 py-6 text-sm text-slate-600">Sem ranking disponível.</div>
+            ) : (
+              topStudents.map((s, idx) => (
+                <div key={s.id} className="px-6 py-4 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-700 text-xs font-bold">
+                      {s.photo_url ? <img src={s.photo_url} alt={s.full_name} className="w-full h-full object-cover" /> : <span>{idx + 1}</span>}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {idx + 1}º • {s.full_name}
+                      </p>
+                      <p className="text-xs text-slate-500 truncate">
+                        Nível {s.level} • {s.xp_total} XP{role === 'super_admin' && s.schoolName ? ` • ${s.schoolName}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <Link to={`/dashboard/students/${s.id}/card`} className="text-xs font-semibold text-primary hover:underline whitespace-nowrap">
+                    Ver card
+                  </Link>
                 </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden lg:col-span-2">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <h3 className="font-semibold text-slate-900">Log de Atividades do Sistema</h3>
+            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Últimas 24h</span>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {auditLogs.map((log, i) => (
+              <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-2 h-2 rounded-full bg-primary"></div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{log.action}</p>
+                    <p className="text-xs text-slate-500">
+                      {log.detail} por <span className="font-semibold">{log.user}</span>
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-slate-400 font-mono">{log.time}</span>
               </div>
-              <span className="text-xs text-slate-400 font-mono">{log.time}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

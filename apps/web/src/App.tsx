@@ -14,6 +14,7 @@ import { ClassAttendancePage } from '@/features/school/pages/ClassAttendancePage
 import { PostTrainingEvaluationPage } from '@/features/school/pages/PostTrainingEvaluationPage'
 import { SessionTechnicalSummaryPage } from '@/features/school/pages/SessionTechnicalSummaryPage'
 import { ClassMonthlyEvaluationPage } from '@/features/school/pages/ClassMonthlyEvaluationPage'
+import { StudentCardPage } from '@/features/school/pages/StudentCardPage'
 import { PublicSiteLayout } from '@/layouts/PublicSiteLayout'
 import { SiteHomePage } from '@/features/site/pages/SiteHomePage'
 import { ProjetoPage } from '@/features/site/pages/ProjetoPage'
@@ -106,6 +107,7 @@ function App() {
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
+            <Route path="students/:id/card" element={<StudentCardPage />} />
             <Route path="classes" element={<ClassesPage />} />
             <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />

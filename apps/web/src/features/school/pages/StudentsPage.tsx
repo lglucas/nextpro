@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power } from 'lucide-react'
+import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power, User } from 'lucide-react'
 import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
 import { normalizeCpf, normalizePhone } from '@/features/school/utils/csv'
 
@@ -40,6 +41,7 @@ interface School {
 
 export function StudentsPage() {
   const { user, role } = useAuth()
+  const navigate = useNavigate()
   const [students, setStudents] = useState<Student[]>([])
   const [guardians, setGuardians] = useState<Guardian[]>([])
   const [loading, setLoading] = useState(true)
@@ -899,6 +901,15 @@ export function StudentsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/dashboard/students/${student.id}/card`)}
+                        disabled={savingStudent}
+                        className="text-slate-400 hover:text-slate-700 transition-colors mx-1 disabled:opacity-50"
+                        aria-label="Ver ficha do atleta"
+                      >
+                        <User className="w-4 h-4" />
+                      </button>
                       <button
                         type="button"
                         onClick={() => openEditForm(student)}
