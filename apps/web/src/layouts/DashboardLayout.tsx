@@ -41,13 +41,19 @@ export function DashboardLayout() {
       navigate('/dashboard/operacao', { replace: true })
       return
     }
+    if (nextRole === 'partner') {
+      navigate('/dashboard/partner', { replace: true })
+      return
+    }
     navigate('/dashboard/overview', { replace: true })
   }
 
   const navigation = [
-    role === 'super_admin' || role === 'partner'
-      ? { name: 'Dashboard', href: '/dashboard/overview', icon: LayoutDashboard }
-      : { name: 'Operação', href: '/dashboard/operacao', icon: LayoutDashboard },
+    role === 'partner'
+      ? { name: 'Dashboard', href: '/dashboard/partner', icon: LayoutDashboard }
+      : role === 'super_admin'
+        ? { name: 'Dashboard', href: '/dashboard/overview', icon: LayoutDashboard }
+        : { name: 'Operação', href: '/dashboard/operacao', icon: LayoutDashboard },
     { name: 'Escolas', href: '/dashboard/schools', icon: Users, show: role === 'super_admin' },
     { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },

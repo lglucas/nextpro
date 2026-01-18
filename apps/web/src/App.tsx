@@ -7,6 +7,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
 import { DashboardIndexPage } from '@/features/dashboard/pages/DashboardIndexPage'
 import { OperationsHomePage } from '@/features/dashboard/pages/OperationsHomePage'
+import { PartnerDashboardPage } from '@/features/dashboard/pages/PartnerDashboardPage'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { PreCadastrosPage } from '@/features/dashboard/pages/PreCadastros'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
@@ -108,6 +109,7 @@ function App() {
             <Route index element={<DashboardIndexPage />} />
             <Route path="overview" element={<DashboardPage />} />
             <Route path="operacao" element={<OperationsHomePage />} />
+            <Route path="partner" element={<PartnerDashboardPage />} />
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />

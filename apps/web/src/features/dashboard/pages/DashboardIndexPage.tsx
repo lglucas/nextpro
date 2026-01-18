@@ -8,6 +8,9 @@ export function DashboardIndexPage() {
     return <Navigate to="/dashboard/operacao" replace />
   }
 
+  if (role === 'partner') {
+    return <Navigate to="/dashboard/partner" replace />
+  }
+
   return <Navigate to="/dashboard/overview" replace />
 }
-
