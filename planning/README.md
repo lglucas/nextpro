@@ -18,6 +18,7 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Sprint 2: [sprint-02-report.md](./sprint-02-report.md)
 - Sprint 2.5: [sprint-02.5-report.md](./sprint-02.5-report.md)
 - Sprint 3: [sprint-03-report.md](./sprint-03-report.md)
+- Sprint 7: [sprint-07-report.md](./sprint-07-report.md)
 - Relatório de testes (2026-01-15): [relatorio-testes-2026-01-15.md](./relatorio-testes-2026-01-15.md)
 - Status do cronograma (2026-01-17): [relatorio-status-2026-01-17.md](./relatorio-status-2026-01-17.md)
 - Auditoria de páginas (2026-01-18): [auditoria-paginas-app-2026-01-18.md](./auditoria-paginas-app-2026-01-18.md)
