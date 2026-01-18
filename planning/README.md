@@ -21,3 +21,4 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Auditoria de páginas (2026-01-18): [auditoria-paginas-app-2026-01-18.md](./auditoria-paginas-app-2026-01-18.md)
 - Sprint 6.2 (polish): [sprint-06.2-polish-app.md](./sprint-06.2-polish-app.md)
 - Rubricas técnicas (V1): [rubricas-tecnicas-v1.md](./rubricas-tecnicas-v1.md)
+- Rubricas técnicas (V2): [rubricas-tecnicas-v2.md](./rubricas-tecnicas-v2.md)
