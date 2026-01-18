@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { AuthProvider } from '@/contexts/AuthProvider'
 import { LoginPage } from '@/features/auth/pages/Login'
@@ -34,10 +34,12 @@ import { ParceirosPage } from '@/features/site/pages/ParceirosPage'
 import { PreCadastroPage } from '@/features/site/pages/PreCadastroPage'
 import { TermsGate } from '@/features/legal/components/TermsGate'
 import { AceiteTermosPage } from '@/features/legal/pages/AceiteTermosPage'
+import { FinancialBlockedPage } from '@/features/financial/pages/FinancialBlockedPage'
 import './App.css'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth()
+  const { session, loading, blocked } = useAuth()
+  const location = useLocation()
   
   if (loading)
     return (
@@ -48,6 +50,10 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   
   if (!session) {
     return <Navigate to="/login" replace />
+  }
+
+  if (blocked && location.pathname !== '/app/bloqueado') {
+    return <Navigate to="/app/bloqueado" replace />
   }
 
   return <>{children}</>
@@ -92,6 +98,7 @@ function App() {
             </PrivateRoute>
           }>
             <Route index element={<HomePage />} />
+            <Route path="bloqueado" element={<FinancialBlockedPage />} />
             <Route path="meu-perfil" element={<MeuPerfilPage />} />
             <Route path="tecnico" element={<TechnicalHistoryPage />} />
             <Route path="check-in" element={<CheckInPage />} />

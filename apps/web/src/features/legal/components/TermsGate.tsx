@@ -12,7 +12,7 @@ export function TermsGate({ children }: { children: React.ReactNode }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
 
-  const isTermsRoute = location.pathname.startsWith('/app/aceite-termos')
+  const isTermsRoute = location.pathname.startsWith('/app/aceite-termos') || location.pathname.startsWith('/app/bloqueado')
 
   const returnTo = useMemo(() => encodeURIComponent(location.pathname + location.search), [location.pathname, location.search])
 

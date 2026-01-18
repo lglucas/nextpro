@@ -27,6 +27,7 @@ interface Student {
   allergies?: string | null
   category: string
   active: boolean
+  financial_status?: 'active' | 'warning' | 'blocked'
   class_students?: Array<{
     class?: {
       name: string
@@ -294,6 +295,20 @@ export function StudentsPage() {
     } catch (error) {
       console.error('Erro ao salvar:', error)
       alert(editingStudentId ? 'Erro ao atualizar aluno.' : 'Erro ao cadastrar aluno.')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
+
+  const handleUpdateFinancialStatus = async (student: Student, next: 'active' | 'warning' | 'blocked') => {
+    try {
+      setSavingStudent(true)
+      const { error } = await supabase.from('students').update({ financial_status: next }).eq('id', student.id)
+      if (error) throw error
+      await fetchStudents()
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status financeiro')
     } finally {
       setSavingStudent(false)
     }
@@ -847,6 +862,7 @@ export function StudentsPage() {
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Categoria</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Turmas</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Responsável</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Financeiro</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">Ações</th>
                 </tr>
@@ -891,6 +907,31 @@ export function StudentsPage() {
                       <div className="text-sm text-slate-900">{student.guardian?.full_name || '---'}</div>
                       <div className="text-xs text-slate-500 flex items-center gap-1">
                         <Phone className="w-3 h-3" /> {student.guardian?.phone || '---'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            (student.financial_status ?? 'active') === 'active'
+                              ? 'bg-green-50 text-green-700 border border-green-100'
+                              : (student.financial_status ?? 'active') === 'warning'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                : 'bg-red-50 text-red-700 border border-red-100'
+                          }`}
+                        >
+                          {(student.financial_status ?? 'active') === 'active' ? 'Em dia' : (student.financial_status ?? 'active') === 'warning' ? 'Aviso' : 'Bloqueado'}
+                        </span>
+                        <select
+                          value={student.financial_status ?? 'active'}
+                          onChange={(e) => void handleUpdateFinancialStatus(student, e.target.value as 'active' | 'warning' | 'blocked')}
+                          disabled={savingStudent || (role !== 'school_admin' && role !== 'super_admin')}
+                          className="text-xs border border-slate-200 rounded px-2 py-1 bg-white disabled:opacity-50"
+                        >
+                          <option value="active">Em dia</option>
+                          <option value="warning">Aviso</option>
+                          <option value="blocked">Bloqueado</option>
+                        </select>
                       </div>
                     </td>
                     <td className="px-6 py-4">

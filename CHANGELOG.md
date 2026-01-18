@@ -10,6 +10,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.13] - 2026-01-18
+### Added
+- **Financeiro (DB):** `financial_status` no aluno (active/warning/blocked).
+- **Dashboard (Alunos):** Controle de status financeiro na listagem de alunos.
+- **App (Atleta):** Tela de bloqueio financeiro e gate de acesso.
+
 ## [0.7.12] - 2026-01-18
 ### Added
 - **CTO (Engines):** Tela para gerenciar reputação do avaliador (peso + shadow ban).
