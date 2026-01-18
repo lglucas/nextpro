@@ -10,6 +10,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.10] - 2026-01-18
+### Added
+- **Alunos:** Filtro por recência da cobrança no modo cobrança.
+### Changed
+- **Alunos:** Exibe canal e template da última cobrança.
+
 ## [0.8.9] - 2026-01-18
 ### Added
 - **Financeiro (DB):** Histórico de cobranças por aluno (`financial_charge_events`).

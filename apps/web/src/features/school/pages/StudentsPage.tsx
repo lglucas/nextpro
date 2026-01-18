@@ -75,6 +75,7 @@ export function StudentsPage() {
   const [whatsQueueOpen, setWhatsQueueOpen] = useState(false)
   const [whatsQueueIndex, setWhatsQueueIndex] = useState(0)
   const [lastChargeByStudentId, setLastChargeByStudentId] = useState<Record<string, { created_at: string; channel: string; template: string | null }>>({})
+  const [chargeRecencyFilter, setChargeRecencyFilter] = useState<'any' | 'none' | '24h' | '7d'>('any')
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -422,8 +423,21 @@ export function StudentsPage() {
       ? visibleStudentsBase.filter((s) => s.class_students?.some((cs) => cs.class_id === billingClassId))
       : visibleStudentsBase
 
+  const chargeFilteredStudents =
+    billingMode && chargeRecencyFilter !== 'any'
+      ? classFilteredStudents.filter((student) => {
+          const last = lastChargeByStudentId[student.id]
+          if (!last) return chargeRecencyFilter === 'none'
+          if (chargeRecencyFilter === 'none') return false
+          const ms = Date.now() - new Date(last.created_at).getTime()
+          if (chargeRecencyFilter === '24h') return ms <= 24 * 60 * 60 * 1000
+          if (chargeRecencyFilter === '7d') return ms <= 7 * 24 * 60 * 60 * 1000
+          return true
+        })
+      : classFilteredStudents
+
   const financialFilteredStudents =
-    financialFilter === 'all' ? classFilteredStudents : classFilteredStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
+    financialFilter === 'all' ? chargeFilteredStudents : chargeFilteredStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
 
   const sortedVisibleStudents = [...financialFilteredStudents].sort((a, b) => {
     const order = (s: Student) => ((s.financial_status ?? 'active') === 'blocked' ? 0 : (s.financial_status ?? 'active') === 'warning' ? 1 : 2)
@@ -1298,6 +1312,20 @@ export function StudentsPage() {
                         </option>
                       ))}
                     </select>
+                    <select
+                      value={chargeRecencyFilter}
+                      onChange={(e) => {
+                        setChargeRecencyFilter(e.target.value as 'any' | 'none' | '24h' | '7d')
+                        clearSelection()
+                      }}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Filtro de cobrança"
+                    >
+                      <option value="any">Cobrança: qualquer</option>
+                      <option value="none">Cobrança: sem histórico</option>
+                      <option value="24h">Cobrança: últimas 24h</option>
+                      <option value="7d">Cobrança: últimos 7 dias</option>
+                    </select>
                   </div>
 
                   <div className="flex items-center gap-2 justify-end">
@@ -1452,7 +1480,8 @@ export function StudentsPage() {
                       </div>
                       {billingMode && lastChargeByStudentId[student.id] ? (
                         <div className="text-xs text-slate-500 mt-1">
-                          Cobrança: {new Date(lastChargeByStudentId[student.id].created_at).toLocaleString('pt-BR')}
+                          Cobrança: {new Date(lastChargeByStudentId[student.id].created_at).toLocaleString('pt-BR')} • {lastChargeByStudentId[student.id].channel}
+                          {lastChargeByStudentId[student.id].template ? ` • ${lastChargeByStudentId[student.id].template}` : ''}
                         </div>
                       ) : null}
                     </td>
