@@ -10,6 +10,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.5] - 2026-01-18
+### Added
+- **App:** Botão “Tentar novamente” no bloqueio financeiro (revalida acesso).
+
 ## [0.8.4] - 2026-01-18
 ### Changed
 - **App:** Tela de bloqueio financeiro exibe aluno(es) e escola vinculada.

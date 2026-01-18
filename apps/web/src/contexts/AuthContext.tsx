@@ -10,6 +10,7 @@ export interface AuthContextType {
   blocked: boolean
   loading: boolean
   signOut: () => Promise<void>
+  refreshBlocked: () => Promise<boolean>
   setRoleOverride: (next: string | null) => void
 }
 
@@ -22,6 +23,7 @@ export const AuthContext = createContext<AuthContextType>({
   blocked: false,
   loading: true,
   signOut: async () => {},
+  refreshBlocked: async () => false,
   setRoleOverride: () => {},
 })
 

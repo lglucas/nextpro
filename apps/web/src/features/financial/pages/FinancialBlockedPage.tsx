@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type BlockedStudent = {
   id: string
@@ -9,9 +10,11 @@ type BlockedStudent = {
 }
 
 export function FinancialBlockedPage() {
-  const { signOut, user, role } = useAuth()
+  const { signOut, user, role, refreshBlocked } = useAuth()
+  const navigate = useNavigate()
   const [loadingDetails, setLoadingDetails] = useState(true)
   const [blockedStudents, setBlockedStudents] = useState<BlockedStudent[]>([])
+  const [rechecking, setRechecking] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -103,9 +106,30 @@ export function FinancialBlockedPage() {
           Se você já regularizou, saia e entre novamente.
         </p>
         <div className="mt-6">
-          <button type="button" onClick={() => void signOut()} className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">
-            Sair
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                if (rechecking) return
+                setRechecking(true)
+                try {
+                  const isBlocked = await refreshBlocked()
+                  if (!isBlocked) {
+                    navigate('/app', { replace: true })
+                  }
+                } finally {
+                  setRechecking(false)
+                }
+              }}
+              disabled={rechecking}
+              className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 disabled:opacity-50"
+            >
+              {rechecking ? 'Verificando…' : 'Tentar novamente'}
+            </button>
+            <button type="button" onClick={() => void signOut()} className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">
+              Sair
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -169,6 +169,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }
 
+  const refreshBlocked = async () => {
+    if (!user?.id) {
+      setBlocked(false)
+      return false
+    }
+
+    const baseRole = actualRole ?? (await fetchProfile(user.id, user.email))
+    if (!actualRole) setActualRole(baseRole)
+    const nextBlocked = await isUserBlocked(user.id, baseRole)
+    setBlocked(nextBlocked)
+    return nextBlocked
+  }
+
   const setRoleOverride = (next: string | null) => {
     if (actualRole !== 'super_admin') return
     setRoleOverrideState(next)
@@ -200,7 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const role = actualRole === 'super_admin' && roleOverride ? roleOverride : actualRole
-  const value = { session, user, role, actualRole, roleOverride, blocked, loading, signOut, setRoleOverride }
+  const value = { session, user, role, actualRole, roleOverride, blocked, loading, signOut, refreshBlocked, setRoleOverride }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
