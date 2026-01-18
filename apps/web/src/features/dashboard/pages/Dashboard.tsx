@@ -15,6 +15,7 @@ interface AuditLogEntry {
 interface RawAuditLog {
   action: string
   user_email?: string | null
+  actor_id?: string | null
   created_at: string
   details?: unknown
   payload?: unknown
@@ -100,10 +101,17 @@ export function DashboardPage() {
         
         if (logs) {
           const typedLogs = logs as unknown as RawAuditLog[]
+          const actorIds = Array.from(new Set(typedLogs.map((l) => l.actor_id).filter((id): id is string => Boolean(id))))
+          const { data: profilesData } = actorIds.length
+            ? await supabase.from('profiles').select('id, full_name, email').in('id', actorIds)
+            : { data: [] as unknown[] }
+          const profileById = new Map<string, { full_name: string | null; email: string | null }>()
+          ;((profilesData as unknown as Array<{ id: string; full_name: string | null; email: string | null }>) ?? []).forEach((p) => profileById.set(p.id, { full_name: p.full_name, email: p.email }))
+
           setAuditLogs(
             typedLogs.map((log) => ({
               action: log.action,
-              user: log.user_email || 'Sistema',
+              user: log.user_email || (log.actor_id ? profileById.get(log.actor_id)?.full_name || profileById.get(log.actor_id)?.email || 'Usuário' : 'Sistema'),
               time: new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
               detail:
                 log.details == null

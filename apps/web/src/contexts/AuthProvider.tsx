@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(nextSession?.user ?? null)
 
       if (nextSession?.user) {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
           const userRole = await fetchProfile(nextSession.user.id, nextSession.user.email)
           if (mounted) setActualRole(userRole)
           const nextBlocked = await isUserBlocked(nextSession.user.id, userRole)

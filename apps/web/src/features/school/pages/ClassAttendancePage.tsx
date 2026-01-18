@@ -476,7 +476,8 @@ export function ClassAttendancePage() {
                   <button
                     type="button"
                     onClick={() => navigate(`/dashboard/classes/${classId}/sessions/${selectedSession.id}/post-treino`)}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium flex items-center gap-2"
+                    disabled={(selectedSession._count?.attendances ?? 0) === 0}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                   >
                     <ClipboardList className="w-4 h-4" />
                     Pós‑treino
