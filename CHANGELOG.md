@@ -10,6 +10,65 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.7] - 2026-01-17
+### Added
+- **Dashboard (Alunos):** Histórico de avaliações mensais por temporada no card do atleta (mês selecionável).
+- **Dashboard (Alunos):** Destaques e pontos de atenção (Top/Bottom rubricas) na avaliação mensal.
+### Changed
+- **Dashboard (Alunos):** Ficha do atleta refatorada em componentes menores.
+
+## [0.7.8] - 2026-01-17
+### Added
+- **Dashboard (Alunos):** Evolução mensal (sparkline) no card do atleta.
+
+## [0.7.6] - 2026-01-17
+### Added
+- **Docs:** Guia de changelog e versionamento.
+### Changed
+- **Changelog:** Refatorado para releases 0.7.x (sem acumular entregas em `Unreleased`).
+- **Planning:** Roadmap atualizado com itens concluídos nas sprints 6–7 (MVP).
+
+## [0.7.5] - 2026-01-17
+### Added
+- **Dashboard (Personas):** Landing por role (`/dashboard` → `operacao`/`partner`/`overview`).
+- **Dashboard (Operação):** Home operacional para Coach/Gestor com atalhos e Top 3 (XP).
+- **Dashboard (Partner):** Home dedicada com KPIs macro (escolas/alunos/turmas).
+- **Docs:** Documentação das personas e rotas do dashboard.
+### Changed
+- **Dashboard:** Menu e troca de persona redirecionam para a home correta.
+- **Dashboard:** Remove links/atalhos sem página funcional (relatórios).
+
+## [0.7.4] - 2026-01-17
+### Added
+- **Dashboard (Alunos):** Ficha do atleta (FUT Card) em `/dashboard/students/:id/card`.
+- **Dashboard (Visão Geral):** Widget Top 3 alunos (XP) com link para ficha.
+- **Dashboard (Alunos):** Resumo da última avaliação técnica mensal no card do atleta.
+### Changed
+- **Dashboard (Alunos):** Ação “Ver ficha” na lista de alunos.
+
+## [0.7.3] - 2026-01-17
+### Added
+- **Engine Técnica:** Seeds V1 de rubricas diárias e mensais para a temporada ativa.
+- **Engine Técnica:** Seeds V2 com expansão de rubricas (mais opções) para a temporada ativa.
+- **Docs:** Catálogo de rubricas V1/V2 no planning.
+
+## [0.7.2] - 2026-01-17
+### Added
+- **Engine Técnica:** Estrutura de rubricas mensais (`technical_monthly_questions`) e tela de avaliação mensal por turma.
+- **CTO (Engines):** Gestão de rubricas mensais na aba Engines.
+- **Dashboard (Turmas):** Atalho para “Avaliação mensal” por turma.
+
+## [0.7.1] - 2026-01-17
+### Added
+- **App (Atleta):** Página de histórico técnico baseada em `engine_events` (resumo por treino).
+- **Dashboard (Professor):** Resumo técnico por sessão (3 piores/3 melhores) via `engine_events`.
+- **Engine Técnica:** Tela “Pós‑treino” (3 piores → 3 melhores) salvando eventos técnicos.
+- **Engine Técnica (DB/RLS):** Professor pode ler eventos técnicos da escola (`engine_events`).
+### Changed
+- **App (Atleta):** Home usa dados reais para próximo treino e frequência.
+- **App:** Coach agora vê link de acesso ao dashboard na barra superior.
+- **App (Atleta):** Home exibe indicador de feedback técnico novo.
+
 ## [0.7.0] - 2026-01-17
 ### Added
 - **Engines (Base):** Temporadas, núcleos e vínculo escola→núcleo por temporada (DB + RLS).
@@ -17,6 +76,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Engine Técnica:** Catálogo versionado de perguntas (`technical_questions`) por temporada/posição.
 - **CTO:** Aba Engines para gerir temporadas, núcleos e rubricas.
 - **Planning:** Sprint 5.1 detalhado + ADR-002 (fundações das 3 engines).
+- **Engine Técnica (DB/RLS):** Professor/gestor pode inserir/editar/remover eventos técnicos próprios (`engine_events`).
 ### Fixed
 - **Dashboard:** Evita crash ao renderizar `audit_logs.details` (objeto JSON) e remove query em tabela inexistente (`evaluations`).
 

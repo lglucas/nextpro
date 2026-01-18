@@ -601,6 +601,13 @@ export function ClassesPage() {
                     <ClipboardList className="w-3 h-3" />
                     Chamada
                   </button>
+                  <button
+                    onClick={() => navigate(`/dashboard/classes/${cls.id}/avaliacao-mensal`)}
+                    className="text-xs font-medium text-primary hover:text-primary-dark flex items-center gap-1"
+                  >
+                    <ClipboardList className="w-3 h-3" />
+                    Avaliação mensal
+                  </button>
                 </div>
                 <span className={`text-xs font-medium ${cls.active ? 'text-green-600' : 'text-red-600'}`}>
                   {cls.active ? 'Ativa' : 'Inativa'}

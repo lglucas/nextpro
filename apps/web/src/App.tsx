@@ -5,12 +5,19 @@ import { LoginPage } from '@/features/auth/pages/Login'
 import { RegisterPage } from '@/features/auth/pages/Register'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { DashboardPage } from '@/features/dashboard/pages/Dashboard'
+import { DashboardIndexPage } from '@/features/dashboard/pages/DashboardIndexPage'
+import { OperationsHomePage } from '@/features/dashboard/pages/OperationsHomePage'
+import { PartnerDashboardPage } from '@/features/dashboard/pages/PartnerDashboardPage'
 import { SchoolsPage } from '@/features/dashboard/pages/Schools'
 import { PreCadastrosPage } from '@/features/dashboard/pages/PreCadastros'
 import { CTOCornerPage } from '@/features/admin/pages/CTOCorner'
 import { StudentsPage } from '@/features/school/pages/StudentsPage'
 import { ClassesPage } from '@/features/school/pages/ClassesPage'
 import { ClassAttendancePage } from '@/features/school/pages/ClassAttendancePage'
+import { PostTrainingEvaluationPage } from '@/features/school/pages/PostTrainingEvaluationPage'
+import { SessionTechnicalSummaryPage } from '@/features/school/pages/SessionTechnicalSummaryPage'
+import { ClassMonthlyEvaluationPage } from '@/features/school/pages/ClassMonthlyEvaluationPage'
+import { StudentCardPage } from '@/features/school/pages/StudentCardPage'
 import { PublicSiteLayout } from '@/layouts/PublicSiteLayout'
 import { SiteHomePage } from '@/features/site/pages/SiteHomePage'
 import { ProjetoPage } from '@/features/site/pages/ProjetoPage'
@@ -50,6 +57,7 @@ import { AppLayout } from '@/layouts/AppLayout'
 import { HomePage } from '@/features/home/pages/Home'
 import { MeuPerfilPage } from '@/features/profile/pages/MeuPerfilPage'
 import { CheckInPage } from '@/features/attendance/pages/CheckInPage'
+import { TechnicalHistoryPage } from '@/features/technical/pages/TechnicalHistoryPage'
 
 function App() {
   return (
@@ -85,6 +93,7 @@ function App() {
           }>
             <Route index element={<HomePage />} />
             <Route path="meu-perfil" element={<MeuPerfilPage />} />
+            <Route path="tecnico" element={<TechnicalHistoryPage />} />
             <Route path="check-in" element={<CheckInPage />} />
             <Route path="aceite-termos" element={<AceiteTermosPage />} />
           </Route>
@@ -97,15 +106,22 @@ function App() {
               </TermsGate>
             </PrivateRoute>
           }>
-            <Route index element={<DashboardPage />} />
+            <Route index element={<DashboardIndexPage />} />
+            <Route path="overview" element={<DashboardPage />} />
+            <Route path="operacao" element={<OperationsHomePage />} />
+            <Route path="partner" element={<PartnerDashboardPage />} />
             <Route path="schools" element={<SchoolsPage />} />
             <Route path="settings" element={<CTOCornerPage />} />
             <Route path="students" element={<StudentsPage />} />
+            <Route path="students/:id/card" element={<StudentCardPage />} />
             <Route path="classes" element={<ClassesPage />} />
             <Route path="pre-cadastros" element={<PreCadastrosPage />} />
             <Route path="classes/:id/attendance" element={<ClassAttendancePage />} />
+            <Route path="classes/:id/sessions/:sessionId/post-treino" element={<PostTrainingEvaluationPage />} />
+            <Route path="classes/:id/sessions/:sessionId/resumo-tecnico" element={<SessionTechnicalSummaryPage />} />
+            <Route path="classes/:id/avaliacao-mensal" element={<ClassMonthlyEvaluationPage />} />
             <Route path="attendance" element={<Navigate to="/dashboard/classes" replace />} />
-            <Route path="reports" element={<Navigate to="/dashboard" replace />} />
+            <Route path="reports" element={<Navigate to="/dashboard/overview" replace />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

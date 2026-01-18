@@ -11,7 +11,7 @@ export function AppLayout() {
     navigate('/login')
   }
 
-  const canAccessDashboard = role === 'super_admin' || role === 'partner' || role === 'school_admin'
+  const canAccessDashboard = role === 'super_admin' || role === 'partner' || role === 'school_admin' || role === 'coach'
 
   return (
     <div className="min-h-screen bg-slate-50">
