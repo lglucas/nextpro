@@ -3,9 +3,10 @@ import { SeasonsPanel } from '@/features/admin/components/engines/SeasonsPanel'
 import { NucleiPanel } from '@/features/admin/components/engines/NucleiPanel'
 import { TechnicalRubricsPanel } from '@/features/admin/components/engines/TechnicalRubricsPanel'
 import { TechnicalMonthlyRubricsPanel } from '@/features/admin/components/engines/TechnicalMonthlyRubricsPanel'
+import { TechnicalEvaluatorReputationPanel } from '@/features/admin/components/engines/TechnicalEvaluatorReputationPanel'
 
 export function EnginesSetupAdminPanel() {
-  const [tab, setTab] = useState<'seasons' | 'nuclei' | 'rubrics' | 'monthly_rubrics'>('seasons')
+  const [tab, setTab] = useState<'seasons' | 'nuclei' | 'rubrics' | 'monthly_rubrics' | 'reputation'>('seasons')
 
   return (
     <div className="p-6 space-y-6">
@@ -43,12 +44,20 @@ export function EnginesSetupAdminPanel() {
         >
           Rubricas mensais
         </button>
+        <button
+          type="button"
+          onClick={() => setTab('reputation')}
+          className={`pb-3 px-1 text-sm font-semibold ${tab === 'reputation' ? 'text-slate-900 border-b-2 border-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Reputação
+        </button>
       </div>
 
       {tab === 'seasons' ? <SeasonsPanel /> : null}
       {tab === 'nuclei' ? <NucleiPanel /> : null}
       {tab === 'rubrics' ? <TechnicalRubricsPanel /> : null}
       {tab === 'monthly_rubrics' ? <TechnicalMonthlyRubricsPanel /> : null}
+      {tab === 'reputation' ? <TechnicalEvaluatorReputationPanel /> : null}
     </div>
   )
 }

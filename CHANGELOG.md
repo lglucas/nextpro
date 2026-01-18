@@ -10,6 +10,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.7.12] - 2026-01-18
+### Added
+- **CTO (Engines):** Tela para gerenciar reputação do avaliador (peso + shadow ban).
+### Changed
+- **Dashboard (Alunos):** Skill tree exibe labels de posição.
+
 ## [0.7.11] - 2026-01-18
 ### Added
 - **Engine Técnica (DB):** Pilar (`tecnica/tatica/mental/fisico`) nas rubricas diárias.

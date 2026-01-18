@@ -3,6 +3,16 @@ import { getStudentSeasonSkillTree, type PillarKey, type SeasonSkillTree } from 
 
 type SeasonRow = { id: string; year: number }
 
+const POSITIONS = [
+  { key: 'goleiro', label: 'Goleiro' },
+  { key: 'zagueiro', label: 'Zagueiro' },
+  { key: 'lateral', label: 'Lateral' },
+  { key: 'volante', label: 'Volante' },
+  { key: 'meia', label: 'Meia' },
+  { key: 'ponta', label: 'Ponta' },
+  { key: 'atacante', label: 'Atacante' },
+]
+
 type Props = {
   studentId: string
   season: SeasonRow | null
@@ -85,6 +95,11 @@ export function StudentSeasonSkillTreeSection({ studentId, season }: Props) {
     return { size, cx, cy, keys, points, gridPolys, axes }
   }, [values])
 
+  const positionLabel = useMemo(() => {
+    if (!position) return 'Geral'
+    return POSITIONS.find((p) => p.key === position)?.label || position
+  }, [position])
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
@@ -96,10 +111,10 @@ export function StudentSeasonSkillTreeSection({ studentId, season }: Props) {
           <div>
             <p className="text-xs font-semibold text-slate-500">Posição</p>
             <select value={position} onChange={(e) => setPosition(e.target.value)} className="mt-2 w-full md:w-[220px] text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white">
-              <option value="">Geral</option>
+              <option value="">{positionLabel}</option>
               {data.positions.map((p) => (
                 <option key={p} value={p}>
-                  {p}
+                  {POSITIONS.find((x) => x.key === p)?.label || p}
                 </option>
               ))}
             </select>
@@ -138,4 +153,3 @@ export function StudentSeasonSkillTreeSection({ studentId, season }: Props) {
     </div>
   )
 }
-
