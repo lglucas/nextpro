@@ -10,6 +10,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.9] - 2026-01-18
+### Added
+- **Financeiro (DB):** Histórico de cobranças por aluno (`financial_charge_events`).
+- **Alunos:** Exibe última cobrança no modo cobrança.
+
 ## [0.8.8] - 2026-01-18
 ### Added
 - **Alunos:** Fila de WhatsApp para envio sequencial no modo cobrança.

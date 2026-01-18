@@ -74,6 +74,7 @@ export function StudentsPage() {
   const [billingMessageBusy, setBillingMessageBusy] = useState(false)
   const [whatsQueueOpen, setWhatsQueueOpen] = useState(false)
   const [whatsQueueIndex, setWhatsQueueIndex] = useState(0)
+  const [lastChargeByStudentId, setLastChargeByStudentId] = useState<Record<string, { created_at: string; channel: string; template: string | null }>>({})
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -514,6 +515,63 @@ export function StudentsPage() {
     .map((student) => ({ student, phone: formatPhoneForWhatsapp(student.guardian?.phone || '') }))
     .filter((row): row is { student: Student; phone: string } => Boolean(row.phone))
 
+  useEffect(() => {
+    let mounted = true
+    const run = async () => {
+      if (!billingMode) return
+      const ids = sortedVisibleStudents.map((s) => s.id).slice(0, 500)
+      if (ids.length === 0) {
+        if (mounted) setLastChargeByStudentId({})
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('financial_charge_events')
+        .select('student_id, channel, template, created_at')
+        .in('student_id', ids)
+        .order('created_at', { ascending: false })
+        .limit(2000)
+
+      if (!mounted) return
+      if (error || !data) return
+
+      const next: Record<string, { created_at: string; channel: string; template: string | null }> = {}
+      for (const row of data as unknown as Array<{ student_id: string; channel: string; template: string | null; created_at: string }>) {
+        if (!next[row.student_id]) {
+          next[row.student_id] = { created_at: row.created_at, channel: row.channel, template: row.template }
+        }
+      }
+      setLastChargeByStudentId(next)
+    }
+
+    void run()
+
+    return () => {
+      mounted = false
+    }
+  }, [billingMode, sortedVisibleStudents])
+
+  const recordChargeEvents = async (rows: Array<{ student: Student; channel: string; template: string | null; meta?: object }>) => {
+    if (!user?.id) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    try {
+      const payload = rows.map((r) => ({
+        student_id: r.student.id,
+        guardian_id: r.student.guardian_id || null,
+        school_id: r.student.school_id || null,
+        actor_id: user.id,
+        channel: r.channel,
+        template: r.template,
+        status_at_time: r.student.financial_status ?? 'active',
+        meta: r.meta ?? {},
+      }))
+      const { error } = await supabase.from('financial_charge_events').insert(payload)
+      if (error) throw error
+    } catch (err) {
+      console.error('Falha ao registrar histórico de cobrança:', err)
+    }
+  }
+
   const copyBillingMessages = async () => {
     if (selectedStudents.length === 0) return
     setBillingMessageBusy(true)
@@ -524,6 +582,7 @@ export function StudentsPage() {
         return `${header}\n${buildBillingMessage(student)}`
       })
       await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+      await recordChargeEvents(selectedStudents.map((student) => ({ student, channel: 'clipboard', template: billingMessageTemplate })))
       await logAction('bulk_copy_financial_message', 'Financeiro (lote)', {
         student_ids: selectedStudents.map((s) => s.id),
         class_id: billingClassId === 'all' ? null : billingClassId,
@@ -547,6 +606,7 @@ export function StudentsPage() {
     }
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildBillingMessage(student))}`
     window.open(url, '_blank', 'noopener,noreferrer')
+    await recordChargeEvents([{ student, channel: 'whatsapp', template: billingMessageTemplate }])
     await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
       student_id: student.id,
       class_id: billingClassId === 'all' ? null : billingClassId,
@@ -573,6 +633,7 @@ export function StudentsPage() {
         return `${header}\n${buildBillingMessage(student, 'active')}`
       })
       await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+      await recordChargeEvents(selectedStudents.map((student) => ({ student, channel: 'clipboard', template: 'active', meta: { settle: true } })))
 
       await logAction('bulk_settle_and_copy_financial_message', 'Financeiro (lote)', {
         student_ids: ids,
@@ -596,6 +657,7 @@ export function StudentsPage() {
     if (!row) return
     const url = `https://wa.me/${row.phone}?text=${encodeURIComponent(buildBillingMessage(row.student))}`
     window.open(url, '_blank', 'noopener,noreferrer')
+    await recordChargeEvents([{ student: row.student, channel: 'whatsapp', template: billingMessageTemplate }])
     await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
       student_id: row.student.id,
       class_id: billingClassId === 'all' ? null : billingClassId,
@@ -1388,6 +1450,11 @@ export function StudentsPage() {
                       <div className="text-xs text-slate-500 flex items-center gap-1">
                         <Phone className="w-3 h-3" /> {student.guardian?.phone || '---'}
                       </div>
+                      {billingMode && lastChargeByStudentId[student.id] ? (
+                        <div className="text-xs text-slate-500 mt-1">
+                          Cobrança: {new Date(lastChargeByStudentId[student.id].created_at).toLocaleString('pt-BR')}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
