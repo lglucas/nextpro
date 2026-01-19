@@ -1,11 +1,11 @@
-# 🧪 Staging — Sprint 7 (Checkpoint + Fechamento)
+# 🧪 Staging — Sprint 8 (Checkpoint + Fechamento)
 
-**Sprint:** 7 (Avaliação Mensal & Algoritmo — MVP)  
-**Tag:** `v0.7.12` / `sprint-07`  
+**Sprint:** 8 (Financeiro e Bloqueio — MVP)  
+**Build/Release:** `0.8.0`  
 
 ## 1) Campos
 - **URL do Staging:** (preencher)
-- **Build/Release:** `v0.7.12`
+- **Build/Release:** `0.8.0`
 - **Data do checkpoint:** (preencher)
 - **Data do fechamento:** (preencher)
 - **Responsável pela validação:** (preencher)
@@ -20,23 +20,20 @@
 - [ ] Sem erros de RLS para fluxos esperados.
 
 ### B. Fluxos por persona (smoke test)
-**Atleta**
-- [ ] Login e carregar app sem “tela branca”.
-- [ ] Ver card do atleta e dados essenciais.
-- [ ] Ver avaliação mensal (mês atual) no card.
+Marcar apenas os que foram impactados.
 
-**Professor (coach)**
-- [ ] Prova mensal por turma abre e salva respostas.
+**Atleta / Responsável / Fan**
+- [ ] Usuário sem bloqueio acessa `/app` normalmente.
+- [ ] Usuário bloqueado é redirecionado para `/app/bloqueado`.
+- [ ] Tela de bloqueio exibe mensagem e permite sair.
 
 **Gestor (school_admin)**
-- [ ] Ver alunos e turmas.
-
-**CTO (super_admin)**
-- [ ] Rubricas mensais com pilar configurável (se aplicável).
+- [ ] Ajustar `financial_status` do aluno na listagem.
+- [ ] Encontrar rapidamente alunos `blocked` (filtro/organização).
 
 ### C. UI/UX (feedback rápido)
 - [ ] Textos, labels e estados vazios estão claros.
-- [ ] Caminhos estão “bons” (menos cliques, menos confusão).
+- [ ] Itens sem ação estão ocultos ou desabilitados.
 - [ ] Registrar 3 melhorias de UI/UX com prioridade (P0/P1/P2).
 
 ---
@@ -45,16 +42,16 @@
 ### A. Regressão mínima (obrigatória)
 - [ ] Login/logout ok.
 - [ ] RBAC ok (cada role vê o que deve, e não vê o que não deve).
-- [ ] Fluxos centrais do sprint ok (mensal + card).
+- [ ] Fluxos centrais do sprint ok (bloqueio + gestão).
 - [ ] Sem erros no console em navegação normal.
 
 ### B. Qualidade
-- [x] Lint ok.
-- [x] Build ok.
-- [x] CHANGELOG atualizado (v0.7.12).
+- [ ] Lint ok.
+- [ ] Build ok.
+- [ ] CHANGELOG atualizado (0.8.0).
 
 ### C. Registro final
 - [ ] Lista de correções obrigatórias concluída (P0).
 - [ ] Lista de melhorias priorizada para o próximo sprint (P1/P2).
-- [ ] “O que aprendemos” (3 bullets) registrado no relatório do sprint.
+- [ ] “O que aprendemos” (3 bullets) registrado.
 

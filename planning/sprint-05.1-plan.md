@@ -50,6 +50,19 @@
 - Projeto compila e passa lint/build.
 - CHANGELOG atualizado com a versão do ciclo.
 
+## Ambiente de testes (Staging)
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)
+
+### Checkpoint (meio do sprint)
+- Deploy em Staging com ~50% do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos do CTO (temporadas, núcleos, rubricas) e navegação.
+- Registro rápido de melhorias de UI/UX e correções antes de seguir.
+
+### Fechamento (antes do próximo sprint)
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão dos fluxos do CTO e RLS (roles principais).
+- Lista de melhorias/sugestões para priorizar na próxima sprint.
+
 ## Testes manuais recomendados
 - Criar temporada 2026 e marcar como ativa.
 - Criar núcleo e vincular uma escola na temporada ativa.

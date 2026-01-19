@@ -18,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [actualRole, setActualRole] = useState<string | null>(() => localStorage.getItem('@NextPro:role'))
   const [roleOverride, setRoleOverrideState] = useState<string | null>(() => localStorage.getItem('@NextPro:roleOverride'))
+  const [blocked, setBlocked] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -75,6 +76,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const isUserBlocked = async (userId: string, role: string | null) => {
+    if (!role) return false
+    if (role === 'super_admin' || role === 'partner' || role === 'school_admin' || role === 'coach') return false
+
+    const { data: studentData } = await supabase.from('students').select('id, financial_status').eq('user_id', userId).limit(1)
+    const studentRow = (studentData as unknown as Array<{ id: string; financial_status: string }>)?.[0] ?? null
+    if (studentRow && studentRow.financial_status === 'blocked') return true
+
+    const { data: guardianData } = await supabase.from('guardians').select('id').eq('user_id', userId).limit(1)
+    const guardianRow = (guardianData as unknown as Array<{ id: string }>)?.[0] ?? null
+    if (!guardianRow) return false
+
+    const { data: blockedChild } = await supabase
+      .from('students')
+      .select('id')
+      .eq('guardian_id', guardianRow.id)
+      .eq('financial_status', 'blocked')
+      .limit(1)
+    const childRow = (blockedChild as unknown as Array<{ id: string }>)?.[0] ?? null
+    return Boolean(childRow)
+  }
+
   useEffect(() => {
     let mounted = true
 
@@ -91,6 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data.session?.user) {
           const userRole = await fetchProfile(data.session.user.id, data.session.user.email)
           if (mounted) setActualRole(userRole)
+          const nextBlocked = await isUserBlocked(data.session.user.id, userRole)
+          if (mounted) setBlocked(nextBlocked)
+        } else {
+          if (mounted) setBlocked(false)
         }
       } catch (err: unknown) {
         console.error('AuthProvider: erro ao carregar sessão:', err)
@@ -110,13 +137,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(nextSession?.user ?? null)
 
       if (nextSession?.user) {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
           const userRole = await fetchProfile(nextSession.user.id, nextSession.user.email)
           if (mounted) setActualRole(userRole)
+          const nextBlocked = await isUserBlocked(nextSession.user.id, userRole)
+          if (mounted) setBlocked(nextBlocked)
         }
       } else if (event === 'SIGNED_OUT') {
         setActualRole(null)
         setRoleOverrideState(null)
+        setBlocked(false)
       }
 
       setLoading(false)
@@ -133,9 +163,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
     setActualRole(null)
     setRoleOverrideState(null)
+    setBlocked(false)
     setSession(null)
     setUser(null)
     setLoading(false)
+  }
+
+  const refreshBlocked = async () => {
+    if (!user?.id) {
+      setBlocked(false)
+      return false
+    }
+
+    const baseRole = actualRole ?? (await fetchProfile(user.id, user.email))
+    if (!actualRole) setActualRole(baseRole)
+    const nextBlocked = await isUserBlocked(user.id, baseRole)
+    setBlocked(nextBlocked)
+    return nextBlocked
   }
 
   const setRoleOverride = (next: string | null) => {
@@ -169,7 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const role = actualRole === 'super_admin' && roleOverride ? roleOverride : actualRole
-  const value = { session, user, role, actualRole, roleOverride, loading, signOut, setRoleOverride }
+  const value = { session, user, role, actualRole, roleOverride, blocked, loading, signOut, refreshBlocked, setRoleOverride }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

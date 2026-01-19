@@ -10,7 +10,8 @@ import {
   ShieldAlert,
   UserPlus,
   GraduationCap,
-  ClipboardList
+  ClipboardList,
+  MessageSquareText
 } from 'lucide-react'
 
 export function DashboardLayout() {
@@ -57,6 +58,7 @@ export function DashboardLayout() {
     { name: 'Escolas', href: '/dashboard/schools', icon: Users, show: role === 'super_admin' },
     { name: 'Alunos', href: '/dashboard/students', icon: UserPlus, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
     { name: 'Turmas', href: '/dashboard/classes', icon: GraduationCap, show: role === 'school_admin' || role === 'super_admin' || role === 'coach' },
+    { name: 'Cobranças', href: '/dashboard/financial/charges', icon: MessageSquareText, show: role === 'school_admin' || role === 'super_admin' || role === 'partner' },
     { name: 'Pré‑cadastros', href: '/dashboard/pre-cadastros', icon: ClipboardList, show: role === 'school_admin' || role === 'super_admin' },
     { name: 'Cantinho do CTO', href: '/dashboard/settings', icon: ShieldAlert, show: role === 'super_admin', special: true },
   ]

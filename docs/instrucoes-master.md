@@ -110,3 +110,15 @@ Siga RIGOROSAMENTE estas regras em TODAS as interações:
 
 29. 
     Nas interações com o usuário, entenda que eçe é um Dev Jr, e precisa de instruções claras, porém não se repita. Seja específico e direto.
+
+30.
+    TAG OBRIGATÓRIA NO FIM DO SPRINT
+    Ao fechar um sprint (após o gate de Staging de fechamento), crie uma tag no Git apontando para o commit de fechamento.
+    - Tag de versão (obrigatória): `v0.<SPRINT>.<PATCH>` (ex.: `v0.7.12`).
+    - Tag do sprint (opcional, mas recomendado): `sprint-<SPRINT>` (ex.: `sprint-07`).
+
+31.
+    BRANCH POR SPRINT (NOMENCLATURA OBRIGATÓRIA)
+    Todo trabalho deve acontecer em branch com nome compatível com o sprint atual:
+    - `sprint-<SPRINT>-<tema>` (ex.: `sprint-08-finance`).
+    Evite continuar commits em branches antigas (ex.: `sprint-03-*`) quando o sprint atual for outro.

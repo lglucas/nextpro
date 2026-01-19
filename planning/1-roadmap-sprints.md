@@ -137,7 +137,7 @@
 ### 🧪 Sprint 11: Testes e Polish (23/02 - 01/03)
 **Objetivo:** Garantia de Qualidade.
 - [ ] **Teste de Carga:** Simular 1000 alunos acessando ao mesmo tempo.
-- [ ] **UX Review:** Melhorar animações, feedbacks visuais e textos.
+- [ ] **UI + UX Review:** Revisar UI e UX; aproximar do visual dos mockups iniciais quando fizer sentido.
 - [ ] **Segurança:** Pentest básico (tentar burlar o RLS, tentar ver dados de outra escola).
 
 ### 🚀 Sprint 12: Go-Live (02/03 - 08/03)
@@ -155,3 +155,18 @@ Para uma task ser considerada "Pronta":
 2.  Deploy automático realizado no ambiente de Staging.
 3.  Funcionalidade testada pelo PO (Você).
 4.  Sem erros no console/logs.
+
+## 🧪 Gate de Ambiente de Testes (por Sprint)
+Para evitar “pular de sprint” com caminhos quebrados, cada sprint passa por dois gates de validação em um ambiente de testes (Staging):
+
+1) **Meio do sprint (checkpoint):**
+- Deploy em Staging com a metade do escopo (ou a cada ~10–12 mudanças relevantes).
+- Smoke test dos fluxos impactados e revisão de caminhos/navegação.
+- Lista curta de ajustes de UX/UI e correções rápidas antes de seguir.
+
+2) **Fechamento do sprint (antes do próximo):**
+- Deploy em Staging com o sprint fechado.
+- Checklist de regressão dos fluxos principais + console limpo.
+- Registro de sugestões/melhorias para priorizar no sprint seguinte.
+
+Template padrão: [staging-checklist-template.md](./staging-checklist-template.md)

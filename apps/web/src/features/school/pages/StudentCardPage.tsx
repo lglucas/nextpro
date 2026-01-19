@@ -17,6 +17,7 @@ type StudentRow = {
   category: string | null
   active: boolean | null
   photo_url: string | null
+  financial_status: 'active' | 'warning' | 'blocked' | null
   blood_type: string | null
   allergies: string | null
   school: { name: string } | null
@@ -71,6 +72,7 @@ export function StudentCardPage() {
           category,
           active,
           photo_url,
+          financial_status,
           blood_type,
           allergies,
           school:schools(name),
@@ -142,6 +144,7 @@ export function StudentCardPage() {
             photoUrl={student.photo_url}
             initials={fut.initials}
             schoolName={student.school?.name ?? null}
+            financialStatus={student.financial_status ?? 'active'}
             level={fut.level}
             xpTotal={fut.xpTotal}
             xpIntoLevel={fut.xpIntoLevel}

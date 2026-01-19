@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserPlus, Search, Edit, Save, X, Phone, UserCheck, Shield, Trash2, Power, User } from 'lucide-react'
 import { StudentCsvImport } from '@/features/school/components/StudentCsvImport'
 import { normalizeCpf, normalizePhone } from '@/features/school/utils/csv'
+import { useAuditLog } from '@/hooks/useAuditLog'
 
 interface Guardian {
   id: string
@@ -27,8 +28,11 @@ interface Student {
   allergies?: string | null
   category: string
   active: boolean
+  financial_status?: 'active' | 'warning' | 'blocked'
   class_students?: Array<{
+    class_id: string
     class?: {
+      id: string
       name: string
     } | null
   }>
@@ -39,9 +43,17 @@ interface School {
   name: string
 }
 
+interface ClassRow {
+  id: string
+  name: string
+  school_id: string | null
+}
+
 export function StudentsPage() {
   const { user, role } = useAuth()
+  const { logAction } = useAuditLog()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [students, setStudents] = useState<Student[]>([])
   const [guardians, setGuardians] = useState<Guardian[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,7 +63,20 @@ export function StudentsPage() {
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null)
   const [userSchoolId, setUserSchoolId] = useState<string | null>(null)
   const [schools, setSchools] = useState<School[]>([]) 
+  const [classes, setClasses] = useState<ClassRow[]>([])
   const [studentSearchTerm, setStudentSearchTerm] = useState('')
+  const [financialFilter, setFinancialFilter] = useState<'all' | 'active' | 'warning' | 'blocked'>('all')
+  const [billingMode, setBillingMode] = useState(false)
+  const [billingClassId, setBillingClassId] = useState<string>('all')
+  const [selectedStudentIds, setSelectedStudentIds] = useState<Record<string, boolean>>({})
+  const [bulkFinancialStatus, setBulkFinancialStatus] = useState<'active' | 'warning' | 'blocked'>('warning')
+  const [billingMessageTemplate, setBillingMessageTemplate] = useState<'default' | 'warning' | 'blocked' | 'active'>('default')
+  const [billingMessageBusy, setBillingMessageBusy] = useState(false)
+  const [whatsQueueOpen, setWhatsQueueOpen] = useState(false)
+  const [whatsQueueIndex, setWhatsQueueIndex] = useState(0)
+  const [lastChargeByStudentId, setLastChargeByStudentId] = useState<Record<string, { created_at: string; channel: string; template: string | null }>>({})
+  const [chargeRecencyFilter, setChargeRecencyFilter] = useState<'any' | 'none' | '24h' | '7d'>('any')
+  const [allowRecentChargeOverride, setAllowRecentChargeOverride] = useState(false)
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -88,6 +113,13 @@ export function StudentsPage() {
           full_name,
           phone,
           email
+        ),
+        class_students:class_students (
+          class_id,
+          class:classes (
+            id,
+            name
+          )
         )
       `)
       .order('created_at', { ascending: false })
@@ -95,6 +127,15 @@ export function StudentsPage() {
     if (error) console.error('Erro ao buscar alunos:', error)
     else setStudents(data || [])
   }, [])
+
+  const fetchClasses = useCallback(
+    async (schoolId: string | null) => {
+      const query = supabase.from('classes').select('id, name, school_id').order('name', { ascending: true })
+      const { data, error } = schoolId && role !== 'super_admin' ? await query.eq('school_id', schoolId) : await query
+      if (!error && data) setClasses(data as unknown as ClassRow[])
+    },
+    [role],
+  )
 
   const fetchGuardians = useCallback(async () => {
     const { data, error } = await supabase
@@ -108,6 +149,7 @@ export function StudentsPage() {
   const fetchProfileAndData = useCallback(async () => {
     try {
       setLoading(true)
+      let scopedSchoolId: string | null = null
       
       if (user) {
         const { data: profile } = await supabase
@@ -117,6 +159,7 @@ export function StudentsPage() {
           .single()
         
         if (profile?.school_id) {
+          scopedSchoolId = profile.school_id
           setUserSchoolId(profile.school_id)
           setFormData(prev => ({ ...prev, school_id: profile.school_id }))
         }
@@ -127,6 +170,7 @@ export function StudentsPage() {
         if (schoolsData) setSchools(schoolsData)
       }
 
+      await fetchClasses(scopedSchoolId)
       await fetchStudents()
       await fetchGuardians()
 
@@ -135,11 +179,20 @@ export function StudentsPage() {
     } finally {
       setLoading(false)
     }
-  }, [fetchGuardians, fetchStudents, role, user])
+  }, [fetchClasses, fetchGuardians, fetchStudents, role, user])
 
   useEffect(() => {
     fetchProfileAndData()
   }, [fetchProfileAndData])
+
+  useEffect(() => {
+    const next = searchParams.get('financial')
+    if (next === 'active' || next === 'warning' || next === 'blocked' || next === 'all') {
+      setFinancialFilter(next)
+    }
+    const cls = searchParams.get('class')
+    if (cls) setBillingClassId(cls)
+  }, [searchParams])
 
   useEffect(() => {
     return () => {
@@ -299,6 +352,28 @@ export function StudentsPage() {
     }
   }
 
+  const handleUpdateFinancialStatus = async (student: Student, next: 'active' | 'warning' | 'blocked') => {
+    try {
+      setSavingStudent(true)
+      const prev = (student.financial_status ?? 'active') as 'active' | 'warning' | 'blocked'
+      const { error } = await supabase.from('students').update({ financial_status: next }).eq('id', student.id)
+      if (error) throw error
+      if (prev !== next) {
+        await logAction('update_student_financial_status', `Aluno: ${student.full_name}`, {
+          student_id: student.id,
+          previous_status: prev,
+          next_status: next,
+        })
+      }
+      await fetchStudents()
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status financeiro')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
+
   const calculateCategory = (birthDate: string) => {
     if (!birthDate) return 'N/A'
     const year = new Date(birthDate).getFullYear()
@@ -327,7 +402,7 @@ export function StudentsPage() {
     : guardiansInScope
 
   const normalizedStudentSearch = studentSearchTerm.trim().toLowerCase()
-  const visibleStudents = normalizedStudentSearch
+  const visibleStudentsBase = normalizedStudentSearch
     ? students.filter((student) => {
         const guardianName = student.guardian?.full_name || ''
         const guardianPhone = student.guardian?.phone || ''
@@ -340,6 +415,306 @@ export function StudentsPage() {
         )
       })
     : students
+
+  const blockedCount = students.filter((s) => (s.financial_status ?? 'active') === 'blocked').length
+  const warningCount = students.filter((s) => (s.financial_status ?? 'active') === 'warning').length
+
+  const classFilteredStudents =
+    billingMode && billingClassId !== 'all'
+      ? visibleStudentsBase.filter((s) => s.class_students?.some((cs) => cs.class_id === billingClassId))
+      : visibleStudentsBase
+
+  const chargeFilteredStudents =
+    billingMode && chargeRecencyFilter !== 'any'
+      ? classFilteredStudents.filter((student) => {
+          const last = lastChargeByStudentId[student.id]
+          if (!last) return chargeRecencyFilter === 'none'
+          if (chargeRecencyFilter === 'none') return false
+          const ms = Date.now() - new Date(last.created_at).getTime()
+          if (chargeRecencyFilter === '24h') return ms <= 24 * 60 * 60 * 1000
+          if (chargeRecencyFilter === '7d') return ms <= 7 * 24 * 60 * 60 * 1000
+          return true
+        })
+      : classFilteredStudents
+
+  const financialFilteredStudents =
+    financialFilter === 'all' ? chargeFilteredStudents : chargeFilteredStudents.filter((s) => (s.financial_status ?? 'active') === financialFilter)
+
+  const sortedVisibleStudents = [...financialFilteredStudents].sort((a, b) => {
+    const order = (s: Student) => ((s.financial_status ?? 'active') === 'blocked' ? 0 : (s.financial_status ?? 'active') === 'warning' ? 1 : 2)
+    const diff = order(a) - order(b)
+    if (diff !== 0) return diff
+    return a.full_name.localeCompare(b.full_name, 'pt-BR')
+  })
+
+  const selectedIds = Object.keys(selectedStudentIds).filter((id) => selectedStudentIds[id])
+  const selectedIdsKey = [...selectedIds].sort().join('|')
+  const allPageSelected = sortedVisibleStudents.length > 0 && sortedVisibleStudents.every((s) => selectedStudentIds[s.id])
+
+  useEffect(() => {
+    if (!billingMode) {
+      setAllowRecentChargeOverride(false)
+      return
+    }
+    setAllowRecentChargeOverride(false)
+  }, [billingMode, selectedIdsKey])
+
+  const toggleSelectAllPage = () => {
+    setSelectedStudentIds((prev) => {
+      const next: Record<string, boolean> = { ...prev }
+      if (allPageSelected) {
+        sortedVisibleStudents.forEach((s) => {
+          delete next[s.id]
+        })
+      } else {
+        sortedVisibleStudents.forEach((s) => {
+          next[s.id] = true
+        })
+      }
+      return next
+    })
+  }
+
+  const toggleSelectStudent = (studentId: string) => {
+    setSelectedStudentIds((prev) => ({ ...prev, [studentId]: !prev[studentId] }))
+  }
+
+  const clearSelection = () => setSelectedStudentIds({})
+
+  const applyBulkFinancialStatus = async () => {
+    if (selectedIds.length === 0) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    const ok = confirm(`Aplicar "${bulkFinancialStatus}" para ${selectedIds.length} aluno(s)?`)
+    if (!ok) return
+
+    try {
+      setSavingStudent(true)
+      const { error } = await supabase.from('students').update({ financial_status: bulkFinancialStatus }).in('id', selectedIds)
+      if (error) throw error
+
+      await logAction('bulk_update_student_financial_status', 'Alunos (lote)', {
+        student_ids: selectedIds,
+        next_status: bulkFinancialStatus,
+        class_id: billingClassId === 'all' ? null : billingClassId,
+      })
+
+      await fetchStudents()
+      clearSelection()
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao atualizar status financeiro em lote')
+    } finally {
+      setSavingStudent(false)
+    }
+  }
+
+  const formatPhoneForWhatsapp = (raw: string) => {
+    const digits = (raw || '').replace(/\D/g, '')
+    if (!digits) return null
+    if (digits.startsWith('55')) return digits
+    if (digits.length === 11 || digits.length === 10) return `55${digits}`
+    return digits
+  }
+
+  const statusLabel = (status: Student['financial_status']) => {
+    const s = status ?? 'active'
+    return s === 'active' ? 'em dia' : s === 'warning' ? 'em aviso' : 'bloqueado'
+  }
+
+  const buildBillingMessage = (student: Student, template?: typeof billingMessageTemplate) => {
+    const chosen = template ?? billingMessageTemplate
+    const guardianName = student.guardian?.full_name?.trim() || 'Responsável'
+    const base = `Olá, ${guardianName}. Aqui é da secretaria.`
+    const line = `A mensalidade do atleta ${student.full_name} está ${statusLabel(student.financial_status)}.`
+    const close = `Se já regularizou, desconsidere. Obrigado.`
+
+    if (chosen === 'blocked') return `${base}\n${line}\nPor favor, regularize para liberar o acesso.\n${close}`
+    if (chosen === 'warning') return `${base}\n${line}\nPor favor, verifique a pendência para evitar bloqueio.\n${close}`
+    if (chosen === 'active') return `${base}\nA mensalidade do atleta ${student.full_name} está em dia.\n${close}`
+    return `${base}\n${line}\n${close}`
+  }
+
+  const selectedStudents = sortedVisibleStudents.filter((s) => selectedStudentIds[s.id])
+  const whatsQueueStudents = selectedStudents
+    .map((student) => ({ student, phone: formatPhoneForWhatsapp(student.guardian?.phone || '') }))
+    .filter((row): row is { student: Student; phone: string } => Boolean(row.phone))
+  const recentSelectedStudents = selectedStudents.filter((s) => {
+    const last = lastChargeByStudentId[s.id]
+    if (!last) return false
+    return Date.now() - new Date(last.created_at).getTime() <= 24 * 60 * 60 * 1000
+  })
+  const blockChargeActions = billingMode && selectedStudents.length > 0 && recentSelectedStudents.length > 0 && !allowRecentChargeOverride
+
+  useEffect(() => {
+    let mounted = true
+    const run = async () => {
+      if (!billingMode) return
+      const ids = sortedVisibleStudents.map((s) => s.id).slice(0, 500)
+      if (ids.length === 0) {
+        if (mounted) setLastChargeByStudentId({})
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('financial_charge_events')
+        .select('student_id, channel, template, created_at')
+        .in('student_id', ids)
+        .order('created_at', { ascending: false })
+        .limit(2000)
+
+      if (!mounted) return
+      if (error || !data) return
+
+      const next: Record<string, { created_at: string; channel: string; template: string | null }> = {}
+      for (const row of data as unknown as Array<{ student_id: string; channel: string; template: string | null; created_at: string }>) {
+        if (!next[row.student_id]) {
+          next[row.student_id] = { created_at: row.created_at, channel: row.channel, template: row.template }
+        }
+      }
+      setLastChargeByStudentId(next)
+    }
+
+    void run()
+
+    return () => {
+      mounted = false
+    }
+  }, [billingMode, sortedVisibleStudents])
+
+  const recordChargeEvents = async (rows: Array<{ student: Student; channel: string; template: string | null; meta?: object }>) => {
+    if (!user?.id) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    try {
+      const payload = rows.map((r) => ({
+        student_id: r.student.id,
+        guardian_id: r.student.guardian_id || null,
+        school_id: r.student.school_id || null,
+        actor_id: user.id,
+        channel: r.channel,
+        template: r.template,
+        status_at_time: r.student.financial_status ?? 'active',
+        meta: r.meta ?? {},
+      }))
+      const { error } = await supabase.from('financial_charge_events').insert(payload)
+      if (error) throw error
+    } catch (err) {
+      console.error('Falha ao registrar histórico de cobrança:', err)
+    }
+  }
+
+  const preventRecentCharge = (actionLabel: string, list: Student[]) => {
+    if (allowRecentChargeOverride) return false
+    const recent = list.filter((s) => {
+      const last = lastChargeByStudentId[s.id]
+      if (!last) return false
+      return Date.now() - new Date(last.created_at).getTime() <= 24 * 60 * 60 * 1000
+    })
+    if (recent.length === 0) return false
+    const preview = recent
+      .slice(0, 6)
+      .map((s) => s.full_name)
+      .join(', ')
+    const more = recent.length > 6 ? ` (+${recent.length - 6})` : ''
+    alert(`Cobrança bloqueada: já existe cobrança nas últimas 24h para ${recent.length} aluno(s): ${preview}${more}.\n\nClique em "Cobrar mesmo assim" para liberar. (${actionLabel})`)
+    return true
+  }
+
+  const copyBillingMessages = async () => {
+    if (selectedStudents.length === 0) return
+    if (preventRecentCharge('Copiar mensagem', selectedStudents)) return
+    setBillingMessageBusy(true)
+    try {
+      const blocks = selectedStudents.map((student) => {
+        const phone = student.guardian?.phone || ''
+        const header = `Para: ${student.guardian?.full_name || 'Responsável'} (${phone || 'sem telefone'})`
+        return `${header}\n${buildBillingMessage(student)}`
+      })
+      await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+      await recordChargeEvents(selectedStudents.map((student) => ({ student, channel: 'clipboard', template: billingMessageTemplate })))
+      await logAction('bulk_copy_financial_message', 'Financeiro (lote)', {
+        student_ids: selectedStudents.map((s) => s.id),
+        class_id: billingClassId === 'all' ? null : billingClassId,
+        template: billingMessageTemplate,
+      })
+      alert('Mensagens copiadas!')
+    } catch {
+      alert('Não consegui copiar. Tente novamente.')
+    } finally {
+      setBillingMessageBusy(false)
+    }
+  }
+
+  const openWhatsappForFirstSelected = async () => {
+    if (selectedStudents.length === 0) return
+    const student = selectedStudents[0]
+    if (preventRecentCharge('WhatsApp', [student])) return
+    const phone = formatPhoneForWhatsapp(student.guardian?.phone || '')
+    if (!phone) {
+      alert('Responsável sem telefone válido.')
+      return
+    }
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildBillingMessage(student))}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    await recordChargeEvents([{ student, channel: 'whatsapp', template: billingMessageTemplate }])
+    await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
+      student_id: student.id,
+      class_id: billingClassId === 'all' ? null : billingClassId,
+      template: billingMessageTemplate,
+    })
+  }
+
+  const settleAndCopyMessages = async () => {
+    if (selectedStudents.length === 0) return
+    if (role !== 'school_admin' && role !== 'super_admin') return
+    if (preventRecentCharge('Quitar + copiar', selectedStudents)) return
+    const ok = confirm(`Marcar como "em dia" e copiar mensagem para ${selectedStudents.length} aluno(s)?`)
+    if (!ok) return
+
+    setSavingStudent(true)
+    setBillingMessageBusy(true)
+    try {
+      const ids = selectedStudents.map((s) => s.id)
+      const { error } = await supabase.from('students').update({ financial_status: 'active' }).in('id', ids)
+      if (error) throw error
+
+      const blocks = selectedStudents.map((student) => {
+        const phone = student.guardian?.phone || ''
+        const header = `Para: ${student.guardian?.full_name || 'Responsável'} (${phone || 'sem telefone'})`
+        return `${header}\n${buildBillingMessage(student, 'active')}`
+      })
+      await navigator.clipboard.writeText(blocks.join('\n\n---\n\n'))
+      await recordChargeEvents(selectedStudents.map((student) => ({ student, channel: 'clipboard', template: 'active', meta: { settle: true } })))
+
+      await logAction('bulk_settle_and_copy_financial_message', 'Financeiro (lote)', {
+        student_ids: ids,
+        class_id: billingClassId === 'all' ? null : billingClassId,
+      })
+
+      await fetchStudents()
+      clearSelection()
+      alert('Status atualizado e mensagens copiadas!')
+    } catch (error) {
+      const err = error as { message?: string }
+      alert(err?.message || 'Erro ao quitar e copiar mensagem')
+    } finally {
+      setBillingMessageBusy(false)
+      setSavingStudent(false)
+    }
+  }
+
+  const openWhatsappForQueueIndex = async (index: number) => {
+    const row = whatsQueueStudents[index]
+    if (!row) return
+    if (preventRecentCharge('WhatsApp (fila)', [row.student])) return
+    const url = `https://wa.me/${row.phone}?text=${encodeURIComponent(buildBillingMessage(row.student))}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    await recordChargeEvents([{ student: row.student, channel: 'whatsapp', template: billingMessageTemplate }])
+    await logAction('open_whatsapp_financial_message', 'Financeiro (WhatsApp)', {
+      student_id: row.student.id,
+      class_id: billingClassId === 'all' ? null : billingClassId,
+      template: billingMessageTemplate,
+    })
+  }
 
   const visibleGuardianResults = normalizedGuardianSearch.length > 0 ? filteredGuardians : filteredGuardians.slice(0, 12)
 
@@ -826,34 +1201,297 @@ export function StudentsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          {whatsQueueOpen ? (
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div className="text-sm text-slate-700">
+                  <span className="font-semibold text-slate-900">Fila WhatsApp</span>{' '}
+                  <span className="text-slate-500">
+                    {whatsQueueStudents.length === 0 ? 'Sem destinatários válidos' : `${whatsQueueIndex + 1}/${whatsQueueStudents.length}`}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 justify-end flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueOpen(false)}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50"
+                  >
+                    Fechar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueIndex((v) => Math.max(0, v - 1))}
+                    disabled={whatsQueueIndex <= 0}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWhatsQueueIndex((v) => Math.min(Math.max(0, whatsQueueStudents.length - 1), v + 1))}
+                    disabled={whatsQueueStudents.length === 0 || whatsQueueIndex >= whatsQueueStudents.length - 1}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Próximo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await openWhatsappForQueueIndex(whatsQueueIndex)
+                      setWhatsQueueIndex((v) => Math.min(Math.max(0, whatsQueueStudents.length - 1), v + 1))
+                    }}
+                    disabled={whatsQueueStudents.length === 0 || blockChargeActions}
+                    className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                  >
+                    Abrir WhatsApp
+                  </button>
+                </div>
+              </div>
+
+              {whatsQueueStudents.length > 0 ? (
+                <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <p className="text-xs font-semibold text-slate-900">Prévia</p>
+                  <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
+                    {buildBillingMessage(whatsQueueStudents[Math.min(whatsQueueIndex, whatsQueueStudents.length - 1)].student)}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {!isCreating && !isImporting ? (
             <div className="p-4 border-b border-slate-100 bg-white">
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                <input
-                  value={studentSearchTerm}
-                  onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  placeholder="Buscar aluno ou responsável..."
-                  className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
-                />
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="relative max-w-md w-full">
+                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                  <input
+                    value={studentSearchTerm}
+                    onChange={(e) => setStudentSearchTerm(e.target.value)}
+                    placeholder="Buscar aluno ou responsável..."
+                    className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  <span className="text-xs text-slate-500">
+                    Bloqueados: <span className="font-semibold text-slate-700">{blockedCount}</span> • Aviso:{' '}
+                    <span className="font-semibold text-slate-700">{warningCount}</span>
+                  </span>
+                  <select
+                    value={financialFilter}
+                    onChange={(e) => {
+                      const next = e.target.value as 'all' | 'active' | 'warning' | 'blocked'
+                      setFinancialFilter(next)
+                      setSearchParams((prev) => {
+                        const nextParams = new URLSearchParams(prev)
+                        if (next === 'all') nextParams.delete('financial')
+                        else nextParams.set('financial', next)
+                        return nextParams
+                      })
+                    }}
+                    className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                    aria-label="Filtro financeiro"
+                  >
+                    <option value="all">Financeiro: todos</option>
+                    <option value="active">Financeiro: em dia</option>
+                    <option value="warning">Financeiro: aviso</option>
+                    <option value="blocked">Financeiro: bloqueado</option>
+                  </select>
+
+                  {(role === 'school_admin' || role === 'super_admin') ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBillingMode((v) => {
+                          const next = !v
+                          setSearchParams((prev) => {
+                            const nextParams = new URLSearchParams(prev)
+                            if (!next) nextParams.delete('class')
+                            return nextParams
+                          })
+                          if (!next) setBillingClassId('all')
+                          clearSelection()
+                          return next
+                        })
+                      }}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50"
+                    >
+                      <Shield className="w-4 h-4 text-slate-500" />
+                      {billingMode ? 'Sair do modo cobrança' : 'Modo cobrança'}
+                    </button>
+                  ) : null}
+                </div>
               </div>
+
+              {billingMode ? (
+                <div className="mt-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={billingClassId}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setBillingClassId(next)
+                        clearSelection()
+                        setSearchParams((prev) => {
+                          const nextParams = new URLSearchParams(prev)
+                          if (next === 'all') nextParams.delete('class')
+                          else nextParams.set('class', next)
+                          return nextParams
+                        })
+                      }}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Filtro de turma"
+                    >
+                      <option value="all">Turma: todas</option>
+                      {classes.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={chargeRecencyFilter}
+                      onChange={(e) => {
+                        setChargeRecencyFilter(e.target.value as 'any' | 'none' | '24h' | '7d')
+                        clearSelection()
+                      }}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Filtro de cobrança"
+                    >
+                      <option value="any">Cobrança: qualquer</option>
+                      <option value="none">Cobrança: sem histórico</option>
+                      <option value="24h">Cobrança: últimas 24h</option>
+                      <option value="7d">Cobrança: últimos 7 dias</option>
+                    </select>
+                  </div>
+
+                  {blockChargeActions ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-amber-700">
+                        Cobrança bloqueada: já houve cobrança &lt;24h para <span className="font-semibold">{recentSelectedStudents.length}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setAllowRecentChargeOverride(true)}
+                        className="inline-flex items-center gap-2 text-xs border border-amber-200 rounded px-3 py-2 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                      >
+                        Cobrar mesmo assim
+                      </button>
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="text-xs text-slate-500">
+                      Selecionados: <span className="font-semibold text-slate-700">{selectedIds.length}</span>
+                    </span>
+                    <select
+                      value={billingMessageTemplate}
+                      onChange={(e) => setBillingMessageTemplate(e.target.value as 'default' | 'warning' | 'blocked' | 'active')}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Template de mensagem"
+                    >
+                      <option value="default">Mensagem: padrão</option>
+                      <option value="warning">Mensagem: aviso</option>
+                      <option value="blocked">Mensagem: bloqueio</option>
+                      <option value="active">Mensagem: em dia</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => void copyBillingMessages()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {billingMessageBusy ? 'Copiando…' : 'Copiar mensagem'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void openWhatsappForFirstSelected()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      WhatsApp (1º)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWhatsQueueIndex(0)
+                        setWhatsQueueOpen(true)
+                      }}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || whatsQueueStudents.length === 0 || blockChargeActions}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      WhatsApp (fila)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void settleAndCopyMessages()}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      Quitar + copiar
+                    </button>
+                    <select
+                      value={bulkFinancialStatus}
+                      onChange={(e) => setBulkFinancialStatus(e.target.value as 'active' | 'warning' | 'blocked')}
+                      className="text-xs border border-slate-200 rounded px-2 py-2 bg-white"
+                      aria-label="Ação em massa"
+                    >
+                      <option value="active">Marcar em dia</option>
+                      <option value="warning">Marcar aviso</option>
+                      <option value="blocked">Marcar bloqueado</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => void applyBulkFinancialStatus()}
+                      disabled={savingStudent || selectedIds.length === 0}
+                      className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
+                  {billingMode ? (
+                    <th className="px-4 py-4 text-xs font-semibold text-slate-500 uppercase">
+                      <input
+                        type="checkbox"
+                        checked={allPageSelected}
+                        onChange={toggleSelectAllPage}
+                        className="h-4 w-4"
+                        aria-label="Selecionar todos"
+                      />
+                    </th>
+                  ) : null}
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Aluno</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Categoria</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Turmas</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Responsável</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Financeiro</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {visibleStudents.map((student) => (
+                {sortedVisibleStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
+                    {billingMode ? (
+                      <td className="px-4 py-4 align-top">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(selectedStudentIds[student.id])}
+                          onChange={() => toggleSelectStudent(student.id)}
+                          disabled={savingStudent}
+                          className="h-4 w-4"
+                          aria-label={`Selecionar ${student.full_name}`}
+                        />
+                      </td>
+                    ) : null}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center text-primary font-bold text-xs">
@@ -891,6 +1529,37 @@ export function StudentsPage() {
                       <div className="text-sm text-slate-900">{student.guardian?.full_name || '---'}</div>
                       <div className="text-xs text-slate-500 flex items-center gap-1">
                         <Phone className="w-3 h-3" /> {student.guardian?.phone || '---'}
+                      </div>
+                      {billingMode && lastChargeByStudentId[student.id] ? (
+                        <div className="text-xs text-slate-500 mt-1">
+                          Cobrança: {new Date(lastChargeByStudentId[student.id].created_at).toLocaleString('pt-BR')} • {lastChargeByStudentId[student.id].channel}
+                          {lastChargeByStudentId[student.id].template ? ` • ${lastChargeByStudentId[student.id].template}` : ''}
+                        </div>
+                      ) : null}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            (student.financial_status ?? 'active') === 'active'
+                              ? 'bg-green-50 text-green-700 border border-green-100'
+                              : (student.financial_status ?? 'active') === 'warning'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                : 'bg-red-50 text-red-700 border border-red-100'
+                          }`}
+                        >
+                          {(student.financial_status ?? 'active') === 'active' ? 'Em dia' : (student.financial_status ?? 'active') === 'warning' ? 'Aviso' : 'Bloqueado'}
+                        </span>
+                        <select
+                          value={student.financial_status ?? 'active'}
+                          onChange={(e) => void handleUpdateFinancialStatus(student, e.target.value as 'active' | 'warning' | 'blocked')}
+                          disabled={savingStudent || (role !== 'school_admin' && role !== 'super_admin')}
+                          className="text-xs border border-slate-200 rounded px-2 py-1 bg-white disabled:opacity-50"
+                        >
+                          <option value="active">Em dia</option>
+                          <option value="warning">Aviso</option>
+                          <option value="blocked">Bloqueado</option>
+                        </select>
                       </div>
                     </td>
                     <td className="px-6 py-4">

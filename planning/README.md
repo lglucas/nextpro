@@ -6,10 +6,16 @@ Esta pasta contém o planejamento oficial do produto e documentação técnica d
 - Roadmap: [1-roadmap-sprints.md](./1-roadmap-sprints.md)
 - Arquitetura técnica (fiel ao repositório): [2-arquitetura-tecnica.md](./2-arquitetura-tecnica.md)
 - Regras de negócio (atuais + planejadas): [3-regras-negocio-funcionais.md](./3-regras-negocio-funcionais.md)
+- Processo: cada sprint tem gate de validação em ambiente de testes (Staging) no meio e no fim.
+- Template do gate (checklist): [staging-checklist-template.md](./staging-checklist-template.md)
 
 ## Sprint atual (Engine)
 - Sprint 5.1 (detalhado): [sprint-05.1-plan.md](./sprint-05.1-plan.md)
 - ADR-002 (fundações das 3 engines): [ADR-002-engines-foundation.md](./ADR-002-engines-foundation.md)
+
+## Sprint atual (Financeiro)
+- Sprint 8 (detalhado): [sprint-08-plan.md](./sprint-08-plan.md)
+- Sprint 8 (Staging): [sprint-08-staging.md](./sprint-08-staging.md)
 
 ## Relatórios
 - Sprint 1: [sprint-01-report.md](./sprint-01-report.md)

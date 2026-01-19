@@ -7,8 +7,10 @@ export interface AuthContextType {
   role: string | null
   actualRole: string | null
   roleOverride: string | null
+  blocked: boolean
   loading: boolean
   signOut: () => Promise<void>
+  refreshBlocked: () => Promise<boolean>
   setRoleOverride: (next: string | null) => void
 }
 
@@ -18,8 +20,10 @@ export const AuthContext = createContext<AuthContextType>({
   role: null,
   actualRole: null,
   roleOverride: null,
+  blocked: false,
   loading: true,
   signOut: async () => {},
+  refreshBlocked: async () => false,
   setRoleOverride: () => {},
 })
 

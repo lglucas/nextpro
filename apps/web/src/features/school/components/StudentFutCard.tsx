@@ -3,6 +3,7 @@ type Props = {
   photoUrl: string | null
   initials: string
   schoolName: string | null
+  financialStatus?: 'active' | 'warning' | 'blocked'
   level: number
   xpTotal: number
   xpIntoLevel: number
@@ -10,7 +11,15 @@ type Props = {
   pct: number
 }
 
-export function StudentFutCard({ fullName, photoUrl, initials, schoolName, level, xpTotal, xpIntoLevel, xpForNext, pct }: Props) {
+export function StudentFutCard({ fullName, photoUrl, initials, schoolName, financialStatus, level, xpTotal, xpIntoLevel, xpForNext, pct }: Props) {
+  const status = financialStatus ?? 'active'
+  const statusLabel = status === 'active' ? 'Em dia' : status === 'warning' ? 'Aviso' : 'Bloqueado'
+  const statusClasses =
+    status === 'active'
+      ? 'bg-green-400/20 text-green-100 border border-green-300/30'
+      : status === 'warning'
+        ? 'bg-amber-400/20 text-amber-100 border border-amber-300/30'
+        : 'bg-red-400/20 text-red-100 border border-red-300/30'
   return (
     <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
       <div className="p-6">
@@ -21,7 +30,10 @@ export function StudentFutCard({ fullName, photoUrl, initials, schoolName, level
             </div>
             <div className="min-w-0">
               <p className="text-white font-bold truncate">{fullName}</p>
-              <p className="text-white/70 text-xs">FUT Card • {schoolName || '—'}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-white/70 text-xs">FUT Card • {schoolName || '—'}</p>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusClasses}`}>Financeiro: {statusLabel}</span>
+              </div>
             </div>
           </div>
           <div className="text-right">
@@ -45,4 +57,3 @@ export function StudentFutCard({ fullName, photoUrl, initials, schoolName, level
     </div>
   )
 }
-

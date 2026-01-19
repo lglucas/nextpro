@@ -10,6 +10,82 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.14] - 2026-01-18
+### Added
+- **Alunos:** Bloqueio automático de cobrança <24h com override explícito.
+### Fixed
+- **DevX:** Script `typecheck` no `apps/web` (habilita `npm run typecheck` no root).
+
+## [0.8.13] - 2026-01-18
+### Added
+- **Alunos:** Confirmação antes de cobrar novamente em <24h.
+
+## [0.8.12] - 2026-01-18
+### Added
+- **Dashboard:** Resumo do relatório de cobranças (cards).
+
+## [0.8.11] - 2026-01-18
+### Added
+- **Dashboard:** Relatório de cobranças com filtros e exportação CSV.
+
+## [0.8.10] - 2026-01-18
+### Added
+- **Alunos:** Filtro por recência da cobrança no modo cobrança.
+### Changed
+- **Alunos:** Exibe canal e template da última cobrança.
+
+## [0.8.9] - 2026-01-18
+### Added
+- **Financeiro (DB):** Histórico de cobranças por aluno (`financial_charge_events`).
+- **Alunos:** Exibe última cobrança no modo cobrança.
+
+## [0.8.8] - 2026-01-18
+### Added
+- **Alunos:** Fila de WhatsApp para envio sequencial no modo cobrança.
+
+## [0.8.7] - 2026-01-18
+### Added
+- **Alunos:** Botão “Quitar + copiar” no modo cobrança.
+
+## [0.8.6] - 2026-01-18
+### Added
+- **Alunos:** Ação em massa para copiar/abrir mensagem de cobrança (WhatsApp).
+
+## [0.8.5] - 2026-01-18
+### Added
+- **App:** Botão “Tentar novamente” no bloqueio financeiro (revalida acesso).
+
+## [0.8.4] - 2026-01-18
+### Changed
+- **App:** Tela de bloqueio financeiro exibe aluno(es) e escola vinculada.
+
+## [0.8.3] - 2026-01-18
+### Added
+- **Alunos:** Modo cobrança com seleção e atualização em lote por turma.
+
+## [0.8.2] - 2026-01-18
+### Added
+- **Dashboard:** Atalhos de inadimplência (bloqueados/aviso) com contadores.
+### Changed
+- **Dashboard:** Contagem de alunos/turmas respeita o escopo da escola (não-super_admin).
+- **Alunos:** Filtro financeiro suporta querystring `?financial=`.
+
+## [0.8.1] - 2026-01-18
+### Added
+- **Dashboard (Auditoria):** Log ao alterar status financeiro do aluno.
+- **Card do Atleta:** Badge de status financeiro (Em dia/Aviso/Bloqueado).
+
+## [0.8.0] - 2026-01-18
+### Added
+- **Financeiro (DB):** `financial_status` no aluno (active/warning/blocked).
+- **Dashboard (Alunos):** Controle de status financeiro na listagem de alunos.
+- **App (Atleta):** Tela de bloqueio financeiro e gate de acesso.
+### Changed
+- **Dashboard (Alunos):** Filtro financeiro e ordenação por risco (bloqueado/aviso).
+### Fixed
+- **DevX:** `npm run build` disponível no root (atalho para `apps/web`).
+- **Dashboard (Auditoria):** Resolve “por Sistema” via `actor_id` quando possível.
+
 ## [0.7.12] - 2026-01-18
 ### Added
 - **CTO (Engines):** Tela para gerenciar reputação do avaliador (peso + shadow ban).
