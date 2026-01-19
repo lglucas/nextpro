@@ -10,6 +10,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 ### Fixed
 
+## [0.8.14] - 2026-01-18
+### Added
+- **Alunos:** Bloqueio automático de cobrança <24h com override explícito.
+### Fixed
+- **DevX:** Script `typecheck` no `apps/web` (habilita `npm run typecheck` no root).
+
 ## [0.8.13] - 2026-01-18
 ### Added
 - **Alunos:** Confirmação antes de cobrar novamente em <24h.

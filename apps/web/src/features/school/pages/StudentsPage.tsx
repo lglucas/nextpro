@@ -76,6 +76,7 @@ export function StudentsPage() {
   const [whatsQueueIndex, setWhatsQueueIndex] = useState(0)
   const [lastChargeByStudentId, setLastChargeByStudentId] = useState<Record<string, { created_at: string; channel: string; template: string | null }>>({})
   const [chargeRecencyFilter, setChargeRecencyFilter] = useState<'any' | 'none' | '24h' | '7d'>('any')
+  const [allowRecentChargeOverride, setAllowRecentChargeOverride] = useState(false)
   
   // State para Busca de Responsável
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('')
@@ -447,7 +448,16 @@ export function StudentsPage() {
   })
 
   const selectedIds = Object.keys(selectedStudentIds).filter((id) => selectedStudentIds[id])
+  const selectedIdsKey = [...selectedIds].sort().join('|')
   const allPageSelected = sortedVisibleStudents.length > 0 && sortedVisibleStudents.every((s) => selectedStudentIds[s.id])
+
+  useEffect(() => {
+    if (!billingMode) {
+      setAllowRecentChargeOverride(false)
+      return
+    }
+    setAllowRecentChargeOverride(false)
+  }, [billingMode, selectedIdsKey])
 
   const toggleSelectAllPage = () => {
     setSelectedStudentIds((prev) => {
@@ -528,6 +538,12 @@ export function StudentsPage() {
   const whatsQueueStudents = selectedStudents
     .map((student) => ({ student, phone: formatPhoneForWhatsapp(student.guardian?.phone || '') }))
     .filter((row): row is { student: Student; phone: string } => Boolean(row.phone))
+  const recentSelectedStudents = selectedStudents.filter((s) => {
+    const last = lastChargeByStudentId[s.id]
+    if (!last) return false
+    return Date.now() - new Date(last.created_at).getTime() <= 24 * 60 * 60 * 1000
+  })
+  const blockChargeActions = billingMode && selectedStudents.length > 0 && recentSelectedStudents.length > 0 && !allowRecentChargeOverride
 
   useEffect(() => {
     let mounted = true
@@ -586,24 +602,26 @@ export function StudentsPage() {
     }
   }
 
-  const confirmIfRecentCharge = (actionLabel: string, list: Student[]) => {
+  const preventRecentCharge = (actionLabel: string, list: Student[]) => {
+    if (allowRecentChargeOverride) return false
     const recent = list.filter((s) => {
       const last = lastChargeByStudentId[s.id]
       if (!last) return false
       return Date.now() - new Date(last.created_at).getTime() <= 24 * 60 * 60 * 1000
     })
-    if (recent.length === 0) return true
+    if (recent.length === 0) return false
     const preview = recent
       .slice(0, 6)
       .map((s) => s.full_name)
       .join(', ')
     const more = recent.length > 6 ? ` (+${recent.length - 6})` : ''
-    return confirm(`Já existe cobrança nas últimas 24h para ${recent.length} aluno(s): ${preview}${more}.\n\nContinuar mesmo assim? (${actionLabel})`)
+    alert(`Cobrança bloqueada: já existe cobrança nas últimas 24h para ${recent.length} aluno(s): ${preview}${more}.\n\nClique em "Cobrar mesmo assim" para liberar. (${actionLabel})`)
+    return true
   }
 
   const copyBillingMessages = async () => {
     if (selectedStudents.length === 0) return
-    if (!confirmIfRecentCharge('Copiar mensagem', selectedStudents)) return
+    if (preventRecentCharge('Copiar mensagem', selectedStudents)) return
     setBillingMessageBusy(true)
     try {
       const blocks = selectedStudents.map((student) => {
@@ -629,7 +647,7 @@ export function StudentsPage() {
   const openWhatsappForFirstSelected = async () => {
     if (selectedStudents.length === 0) return
     const student = selectedStudents[0]
-    if (!confirmIfRecentCharge('WhatsApp', [student])) return
+    if (preventRecentCharge('WhatsApp', [student])) return
     const phone = formatPhoneForWhatsapp(student.guardian?.phone || '')
     if (!phone) {
       alert('Responsável sem telefone válido.')
@@ -648,7 +666,7 @@ export function StudentsPage() {
   const settleAndCopyMessages = async () => {
     if (selectedStudents.length === 0) return
     if (role !== 'school_admin' && role !== 'super_admin') return
-    if (!confirmIfRecentCharge('Quitar + copiar', selectedStudents)) return
+    if (preventRecentCharge('Quitar + copiar', selectedStudents)) return
     const ok = confirm(`Marcar como "em dia" e copiar mensagem para ${selectedStudents.length} aluno(s)?`)
     if (!ok) return
 
@@ -687,7 +705,7 @@ export function StudentsPage() {
   const openWhatsappForQueueIndex = async (index: number) => {
     const row = whatsQueueStudents[index]
     if (!row) return
-    if (!confirmIfRecentCharge('WhatsApp (fila)', [row.student])) return
+    if (preventRecentCharge('WhatsApp (fila)', [row.student])) return
     const url = `https://wa.me/${row.phone}?text=${encodeURIComponent(buildBillingMessage(row.student))}`
     window.open(url, '_blank', 'noopener,noreferrer')
     await recordChargeEvents([{ student: row.student, channel: 'whatsapp', template: billingMessageTemplate }])
@@ -1223,7 +1241,7 @@ export function StudentsPage() {
                       await openWhatsappForQueueIndex(whatsQueueIndex)
                       setWhatsQueueIndex((v) => Math.min(Math.max(0, whatsQueueStudents.length - 1), v + 1))
                     }}
-                    disabled={whatsQueueStudents.length === 0}
+                    disabled={whatsQueueStudents.length === 0 || blockChargeActions}
                     className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
                   >
                     Abrir WhatsApp
@@ -1347,6 +1365,21 @@ export function StudentsPage() {
                     </select>
                   </div>
 
+                  {blockChargeActions ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-amber-700">
+                        Cobrança bloqueada: já houve cobrança &lt;24h para <span className="font-semibold">{recentSelectedStudents.length}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setAllowRecentChargeOverride(true)}
+                        className="inline-flex items-center gap-2 text-xs border border-amber-200 rounded px-3 py-2 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                      >
+                        Cobrar mesmo assim
+                      </button>
+                    </div>
+                  ) : null}
+
                   <div className="flex items-center gap-2 justify-end">
                     <span className="text-xs text-slate-500">
                       Selecionados: <span className="font-semibold text-slate-700">{selectedIds.length}</span>
@@ -1365,7 +1398,7 @@ export function StudentsPage() {
                     <button
                       type="button"
                       onClick={() => void copyBillingMessages()}
-                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       {billingMessageBusy ? 'Copiando…' : 'Copiar mensagem'}
@@ -1373,7 +1406,7 @@ export function StudentsPage() {
                     <button
                       type="button"
                       onClick={() => void openWhatsappForFirstSelected()}
-                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       WhatsApp (1º)
@@ -1384,7 +1417,7 @@ export function StudentsPage() {
                         setWhatsQueueIndex(0)
                         setWhatsQueueOpen(true)
                       }}
-                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || whatsQueueStudents.length === 0}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || whatsQueueStudents.length === 0 || blockChargeActions}
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       WhatsApp (fila)
@@ -1392,7 +1425,7 @@ export function StudentsPage() {
                     <button
                       type="button"
                       onClick={() => void settleAndCopyMessages()}
-                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0}
+                      disabled={billingMessageBusy || savingStudent || selectedIds.length === 0 || blockChargeActions}
                       className="inline-flex items-center gap-2 text-xs border border-slate-200 rounded px-3 py-2 bg-white hover:bg-slate-50 disabled:opacity-50"
                     >
                       Quitar + copiar
